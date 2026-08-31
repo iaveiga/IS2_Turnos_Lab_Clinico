@@ -1,0 +1,1 @@
+Node JS v24 LTS (https://nodejs.org/en/download)
