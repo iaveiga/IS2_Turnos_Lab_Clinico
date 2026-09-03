@@ -1,1 +1,14 @@
 Node JS v24 LTS (https://nodejs.org/en/download)
+VS Code (https://code.visualstudio.com/download)
+VS Code Extensions
+  EJS Colorizer (resaltado de sintaxis)
+  PostgreSQL - Microsoft (ms-ossdata.vscode-pgsql) (conexión al motor de base de datos)
+  Prettier - Code formatter (formateador de código)
+  ESLint (detectar errores de sintaxis)
+  DotENV (resaltado de colores para archivos de configuración env)
+
+
+Creación del proyecto:
+npm init -y
+npm install express ejs pg dotenv
+npm install -D nodemon
