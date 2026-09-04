@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shift Management System</title>
+  <!-- Pico CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+</head>
+<body>
+  <main class="container">
+    <header style="padding-top: 2rem;">
+      <h1>Shift Management System</h1>
+      <p>Bienvenido al entorno de desarrollo con Node.js, Express y Neon PostgreSQL.</p>
+    </header>
+    
+    <section>
+      <article>
+        <h3>Estado de la Conexión</h3>
+        <% if (error) { %>
+          <p style="color: #b71c1c;"><strong>Error de conexión:</strong> <%= error %></p>
+        <% } else if (dbTime) { %>
+          <p style="color: #2e7d32;"><strong>¡Conexión exitosa!</strong> La base de datos en Neon responde correctamente.</p>
+          <p>Hora oficial del servidor PostgreSQL: <code><%= dbTime %></code></p>
+        <% } %>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
