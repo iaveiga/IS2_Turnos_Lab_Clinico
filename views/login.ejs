@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicia sesión - Clínica San Francisco</title>
+
+  <!-- Pico CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  
+  <!-- Font Awesome para el ícono del ojo y del escudo -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --pico-primary: #007a78;
+      --pico-primary-background: #007a78;
+      --pico-primary-hover: #005f5d;
+      --pico-border-radius: 0.5rem;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background-color: #eef7f8;
+      display: flex;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .login-container {
+      display: flex;
+      width: 100vw;
+      min-height: 100vh;
+    }
+
+    /* Panel Izquierdo (Hero Verde) */
+    .hero-panel {
+      flex: 1;
+      background: linear-gradient(135deg, #005a5b 0%, #00363a 100%);
+      color: #ffffff;
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-badge {
+      background: #ffffff;
+      color: #005a5b;
+      font-weight: bold;
+      padding: 0.4rem 0.6rem;
+      border-radius: 50%;
+      font-size: 0.85rem;
+    }
+
+    .brand-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      line-height: 1.1;
+    }
+
+    .brand-subtitle {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      display: block;
+    }
+
+    .hero-content h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 1rem;
+      line-height: 1.15;
+    }
+
+    .hero-content p {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 1rem;
+      max-width: 400px;
+    }
+
+    .hero-footer {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Panel Derecho (Formulario) */
+    .form-panel {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .login-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 440px;
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .badge-access {
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #007a78;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .login-card h2 {
+      margin-bottom: 0.2rem;
+      color: #111827;
+      font-size: 1.75rem;
+    }
+
+    .login-card .subtitle {
+      color: #6b7280;
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 38%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #6b7280;
+    }
+
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: 0.8rem;
+      color: #007a78;
+      text-decoration: none;
+      margin-top: -0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background-color: #007a78;
+      border: none;
+      color: white;
+      font-weight: 600;
+      border-radius: 20px;
+      padding: 0.6rem;
+    }
+
+    .card-footer-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 1.5rem;
+    }
+
+    .card-footer-text a {
+      color: #007a78;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .secondary-links {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      font-size: 0.78rem;
+      margin-top: 1rem;
+    }
+
+    .secondary-links a {
+      color: #4b5563;
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .login-container {
+        flex-direction: column;
+      }
+      .hero-panel {
+        padding: 2rem;
+        min-height: 250px;
+      }
+      .hero-content h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <!-- Hero / Branding -->
+    <div class="hero-panel">
+      <div class="brand-logo">
+        <span class="logo-badge">CSF</span>
+        <div>
+          <span class="brand-title">Clínica San Francisco</span>
+          <span class="brand-subtitle">Laboratorio clínico · Turnos</span>
+        </div>
+      </div>
+
+      <div class="hero-content">
+        <h1>Tu salud, en<br>tiempo real.</h1>
+        <p>Accede a tus turnos y mantén tu información de laboratorio siempre a mano.</p>
+      </div>
+
+      <div class="hero-footer">
+        <i class="fa-regular fa-shield-check"></i>
+        <span>Portal exclusivo para pacientes</span>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="form-panel">
+      <article class="login-card">
+        <span class="badge-access">Acceso de pacientes</span>
+        <h2>Inicia sesión</h2>
+        <p class="subtitle">Bienvenido de nuevo a tu portal.</p>
+
+        <!-- Mensaje de error dinámico con EJS -->
+        <% if (locals.error) { %>
+          <blockquote style="border-left-color: #e53e3e; background: #fff5f5; color: #c53030; padding: 0.5rem 1rem; margin-bottom: 1rem; font-size: 0.85rem;">
+            <%= error %>
+          </blockquote>
+        <% } %>
+
+        <form action="/login" method="POST">
+          <label for="cedula">
+            Cédula
+            <input 
+              type="text" 
+              id="cedula" 
+              name="cedula" 
+              placeholder="0012345678" 
+              value="<%= locals.cedula || '' %>"
+              required
+            >
+          </label>
+
+          <label for="password">
+            Contraseña
+            <div class="password-wrapper">
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                placeholder="••••••••" 
+                required
+              >
+              <i class="fa-regular fa-eye toggle-password" id="togglePassword"></i>
+            </div>
+          </label>
+
+          <a href="/recuperar-contrasena" class="forgot-link">Restablecer contraseña</a>
+
+          <button type="submit" class="btn-submit">Iniciar sesión</button>
+        </form>
+
+        <p class="card-footer-text">
+          ¿Primera vez? <a href="/registro">Crear una cuenta</a>
+        </p>
+
+        <div class="secondary-links">
+          <a href="/login/recepcion">Entrar como recepción</a> •
+          <a href="/login/tecnico">Entrar como técnico</a> •
+          <a href="/perfil">Ver mi perfil</a>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <script>
+    // Mostrar / Ocultar contraseña
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#password');
+
+    togglePassword.addEventListener('click', function () {
+      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+      password.setAttribute('type', type);
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
+    });
+  </script>
+</body>
+</html>
