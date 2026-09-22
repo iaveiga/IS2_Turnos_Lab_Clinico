@@ -12,3 +12,5 @@ Creación del proyecto:
 npm init -y
 npm install express ejs pg dotenv
 npm install -D nodemon
+
+npm install prisma @prisma/client --save-dev
