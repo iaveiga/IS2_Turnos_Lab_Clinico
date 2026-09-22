@@ -3,38 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear cuenta | Clinica San Francisco</title>
+    <title>Crear cuenta | Clínica San Francisco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="/css/custom.css">
 </head>
 <body class="auth-page">
     <main class="auth-layout">
-        <section class="auth-brand-panel" aria-label="Clinica San Francisco">
+        <section class="auth-brand-panel" aria-label="Clínica San Francisco">
             <a class="brand brand-light" href="/" aria-label="Ir al inicio">
-                <span class="brand-mark">CSF</span>
-                <span>
-                    <strong>Clinica San Francisco</strong>
-                    <small>Laboratorio clinico · Turnos</small>
+                <span class="brand-mark"><i data-lucide="flask-conical" aria-hidden="true"></i></span>
+                <span class="brand-copy">
+                    <strong>Clínica San Francisco</strong>
+                    <small>Laboratorio clínico · Turnos</small>
                 </span>
             </a>
 
             <div class="auth-message">
-                <h1>Tu cuidado<br>comienza aqui.</h1>
-                <p>Crea tu perfil de paciente para gestionar tus proximos turnos en un solo lugar.</p>
+                <h1>Tu cuidado<br>comienza aquí.</h1>
+                <p>Crea tu perfil de paciente para gestionar tus próximos turnos en un solo lugar.</p>
             </div>
 
-            <p class="secure-note"><span aria-hidden="true">✓</span> Portal exclusivo para pacientes</p>
+            <p class="secure-note"><i data-lucide="shield-check" aria-hidden="true"></i> Portal exclusivo para pacientes</p>
         </section>
 
         <section class="auth-form-panel">
             <div class="register-shell">
                 <% if (creado) { %>
                     <div class="success-state" role="status">
-                        <span class="success-icon" aria-hidden="true">✓</span>
+                        <span class="success-icon" aria-hidden="true"><i data-lucide="circle-check-big"></i></span>
                         <p class="eyebrow">REGISTRO COMPLETADO</p>
-                        <h1>Tu cuenta esta lista</h1>
-                        <p>Ya puedes iniciar sesion con tu correo y contraseña.</p>
-                        <a href="/auth/login" role="button">Iniciar sesion</a>
+                        <h1>Tu cuenta está lista</h1>
+                        <p>Ya puedes iniciar sesión con tu correo y contraseña.</p>
+                        <a href="/auth/login" role="button">Iniciar sesión</a>
                         <a class="text-link" href="/">Volver al inicio</a>
                     </div>
                 <% } else { %>
@@ -94,7 +97,7 @@
                         </div>
 
                         <label>
-                            Correo electronico
+                            Correo electrónico
                             <input type="email" name="correo" value="<%= datos.correo %>" placeholder="nombre@correo.com" autocomplete="email" required aria-invalid="<%= errores.correo ? 'true' : '' %>">
                             <% if (errores.correo) { %><small class="field-error"><%= errores.correo %></small><% } %>
                         </label>
@@ -109,12 +112,14 @@
                         </label>
 
                         <button class="primary-action" type="submit">Registrarme</button>
-                        <a class="text-link" href="/auth/login">Volver a iniciar sesion</a>
+                        <a class="text-link" href="/auth/login">Volver a iniciar sesión</a>
                     </form>
                 <% } %>
             </div>
         </section>
     </main>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script>lucide.createIcons();</script>
     <script src="/js/register.js" defer></script>
 </body>
 </html>
