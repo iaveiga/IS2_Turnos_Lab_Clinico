@@ -1,20 +1,16 @@
 const express = require('express');
 const router = express.Router();
+// ¡Fíjate en las llaves {} aquí!
 const { verificarPermiso } = require('../middlewares/authMiddleware');
 
-// 1. Ruta de Bienvenida / Home Público
+
+
 router.get('/', (req, res) => {
-    // Si el usuario ya inició sesión, podríamos redirigirlo al dashboard o perfil
     res.render('index'); 
 });
 
-// 2. Consola Operativa (Panel de control para el personal del laboratorio)
-// Ideal para ver los turnos del día, cambiar estados y registrar la atención
 router.get('/admin/console', verificarPermiso('ACCEDER_CONSOLA'), async (req, res) => {
     try {
-        // Aquí usarías Prisma para traer un resumen rápido:
-        // - Turnos programados para hoy (Sangre, VIH, Orina, Alergias)
-        // - Estadísticas del día
         res.render('admin/console', { 
             usuario: req.session.user 
         });
