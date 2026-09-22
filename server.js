@@ -1,42 +1,27 @@
 require('dotenv').config();
 const express = require('express');
-const { Pool } = require('pg');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configuración de la conexión a Neon PostgreSQL
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
-
-// Configurar EJS como motor de vistas
+// 1. Configurar EJS como motor de vistas
 app.set('view engine', 'ejs');
 
-// Carpeta de archivos estáticos (CSS, imágenes, etc.)
-app.use(express.static('public'));
+// 2. Middlewares esenciales (¡Cruciales para formularios y archivos estáticos!)
+app.use(express.urlencoded({ extended: true })); // Permite leer los datos enviados desde formularios POST
+app.use(express.json());                         // Permite procesar peticiones JSON
+app.use(express.static(path.join(__dirname, 'public'))); // Sirve tu custom.css y recursos
 
-// Ruta principal para probar servidor y base de datos
-app.get('/', async (req, res) => {
-  try {
-    // Intentar una consulta rápida a Neon para verificar conectividad
-    const client = await pool.connect();
-    const result = await client.query('SELECT NOW()');
-    const dbTime = result.rows[0].now;
-    client.release();
+// 3. Montar las rutas del sistema
+// (Asegúrate de crear la carpeta 'routes' y los archivos correspondientes)
+app.use('/', require('./routes/indexRoutes'));
+app.use('/auth', require('./routes/authRoutes'));
+app.use('/turnos', require('./routes/turnoRoutes'));
+app.use('/servicios', require('./routes/servicioRoutes'));
+app.use('/pacientes', require('./routes/pacienteRoutes'));
 
-    // Renderizar la vista pasando los datos de prueba
-    res.render('index', { dbTime, error: null });
-  } catch (err) {
-    console.error('Error al conectar con la base de datos:', err);
-    res.render('index', { dbTime: null, error: err.message });
-  }
-});
-
-// Iniciar el servidor (mantiene el proceso abierto)
+// 4. Iniciar el servidor
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
