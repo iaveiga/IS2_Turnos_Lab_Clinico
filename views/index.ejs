@@ -1,30 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema de Manejo de Turnos - Clínica San Francisco</title>
-  <!-- Pico CSS CDN -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clínica San Francisco - Laboratorio Clínico y Turnos</title>
+    <!-- Pico CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <!-- Tu CSS Personalizado -->
+    <link rel="stylesheet" href="/css/custom.css">
 </head>
 <body>
-  <main class="container">
-    <header style="padding-top: 2rem;">
-      <h1>Sistema de Manejo de Turnos - Clínica San Francisco</h1>
-      <p>Bienvenido al entorno de desarrollo con Node.js, Express y Neon PostgreSQL.</p>
+
+    <!-- Barra de Navegación Superior -->
+    <header class="container">
+        <nav>
+            <ul>
+                <li><strong>🏥 Clínica San Francisco</strong> <br><small style="color: #64748b;">Laboratorio clínico · Turnos</small></li>
+            </ul>
+            <ul>
+                <li><a href="/servicios">Exámenes</a></li>
+                <li><a href="/auth/login" class="outline">Iniciar Sesión</a></li>
+                <li><a href="/auth/registro" role="button">Crea tu cuenta</a></li>
+            </ul>
+        </nav>
     </header>
-    
-    <section>
-      <article>
-        <h3>Estado de la Conexión</h3>
-        <% if (error) { %>
-          <p style="color: #b71c1c;"><strong>Error de conexión:</strong> <%= error %></p>
-        <% } else if (dbTime) { %>
-          <p style="color: #2e7d32;"><strong>¡Conexión exitosa!</strong> La base de datos en Neon responde correctamente.</p>
-          <p>Hora oficial del servidor PostgreSQL: <code><%= dbTime %></code></p>
-        <% } %>
-      </article>
-    </section>
-  </main>
+
+    <!-- Contenido Principal -->
+    <main class="container" style="padding-top: 2rem;">
+        <div class="grid" style="align-items: center; min-height: 65vh;">
+            
+            <!-- Columna de Texto Principal -->
+            <div>
+                <h1 style="color: var(--pico-primary); font-weight: 800;">Tu cuidado comienza aquí.</h1>
+                <p style="font-size: 1.15rem; color: #475569;">
+                    Crea tu perfil de paciente para gestionar tus próximos turnos de laboratorio (Sangre, VIH, Orina, Alergias) en un solo lugar de forma rápida y segura.
+                </p>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <a href="/auth/registro" role="button">Registrarse</a>
+                    <a href="/auth/login" role="button" class="secondary outline">Iniciar Sesión</a>
+                </div>
+            </div>
+
+            <!-- Columna de Tarjeta Informativa -->
+            <div>
+                <div class="custom-card">
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.25rem;">Servicios Disponibles</h3>
+                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1.5rem;">Gestión centralizada de citas médicas:</p>
+                    <ul style="list-style: none; padding: 0; line-height: 2;">
+                        <li>🧪 Exámenes de Sangre y Hematología</li>
+                        <li>🧬 Pruebas de VIH y Inmunología</li>
+                        <li>🔬 Análisis de Orina y Coproanálisis</li>
+                        <li>🛡️ Pruebas de Alergias</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Pie de página -->
+    <footer class="container" style="text-align: center; font-size: 0.85rem; color: #64748b; padding: 3rem 0 1rem 0;">
+        <p>🔒 Portal exclusivo para pacientes y personal de laboratorio — Clínica San Francisco</p>
+    </footer>
+
 </body>
 </html>
