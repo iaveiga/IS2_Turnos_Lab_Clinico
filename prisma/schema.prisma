@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model atencion {
+  id_atencion           Int       @id @default(autoincrement())
+  id_turno              Int?
+  id_tecnico            Int?
+  fecha_hora_inicio     DateTime? @db.Timestamp(6)
+  fecha_hora_fin        DateTime? @db.Timestamp(6)
+  observacion_operativa String?   @db.VarChar
+  fecha_registro        DateTime? @default(now()) @db.Timestamp(6)
+  usuario               usuario?  @relation(fields: [id_tecnico], references: [id_usuario], onUpdate: NoAction)
+  turno                 turno?    @relation(fields: [id_turno], references: [id_turno], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model auditoria {
+  id_auditoria Int       @id @default(autoincrement())
+  id_usuario   Int?
+  accion       String    @db.VarChar
+  entidad      String    @db.VarChar
+  id_registro  Int?
+  detalle      String?   @db.VarChar
+  fecha_hora   DateTime? @default(now()) @db.Timestamp(6)
+  direccion_ip String?   @db.VarChar
+  usuario      usuario?  @relation(fields: [id_usuario], references: [id_usuario], onUpdate: NoAction)
+}
+
+model dia_no_laborable {
+  id_dia_no_laborable Int      @id @default(autoincrement())
+  fecha               DateTime @unique @db.Date
+  descripcion         String?  @db.VarChar
+  activo              Boolean? @default(true)
+}
+
+model estado_turno {
+  id_estado                                                        Int               @id @default(autoincrement())
+  codigo                                                           String            @unique @db.VarChar
+  nombre                                                           String            @db.VarChar
+  descripcion                                                      String?           @db.VarChar
+  consume_cupo                                                     Boolean?          @default(true)
+  historial_turno_historial_turno_id_estado_anteriorToestado_turno historial_turno[] @relation("historial_turno_id_estado_anteriorToestado_turno")
+  historial_turno_historial_turno_id_estado_nuevoToestado_turno    historial_turno[] @relation("historial_turno_id_estado_nuevoToestado_turno")
+  turno                                                            turno[]
+}
+
+model historial_turno {
+  id_historial                                                  Int           @id @default(autoincrement())
+  id_turno                                                      Int?
+  id_usuario                                                    Int?
+  id_estado_anterior                                            Int?
+  id_estado_nuevo                                               Int?
+  fecha_anterior                                                DateTime?     @db.Date
+  hora_anterior                                                 DateTime?     @db.Time(6)
+  fecha_nueva                                                   DateTime?     @db.Date
+  hora_nueva                                                    DateTime?     @db.Time(6)
+  accion                                                        String        @db.VarChar
+  motivo                                                        String?       @db.VarChar
+  fecha_evento                                                  DateTime?     @default(now()) @db.Timestamp(6)
+  estado_turno_historial_turno_id_estado_anteriorToestado_turno estado_turno? @relation("historial_turno_id_estado_anteriorToestado_turno", fields: [id_estado_anterior], references: [id_estado], onDelete: NoAction, onUpdate: NoAction)
+  estado_turno_historial_turno_id_estado_nuevoToestado_turno    estado_turno? @relation("historial_turno_id_estado_nuevoToestado_turno", fields: [id_estado_nuevo], references: [id_estado], onDelete: NoAction, onUpdate: NoAction)
+  turno                                                         turno?        @relation(fields: [id_turno], references: [id_turno], onDelete: Cascade, onUpdate: NoAction)
+  usuario                                                       usuario?      @relation(fields: [id_usuario], references: [id_usuario], onUpdate: NoAction)
+}
+
+model horario_servicio {
+  id_horario         Int       @id @default(autoincrement())
+  id_servicio        Int?
+  dia_semana         String    @db.VarChar
+  hora_inicio        DateTime  @db.Time(6)
+  hora_fin           DateTime  @db.Time(6)
+  duracion_turno_min Int
+  capacidad          Int
+  activo             Boolean?  @default(true)
+  servicio           servicio? @relation(fields: [id_servicio], references: [id_servicio], onDelete: Cascade, onUpdate: NoAction)
+  turno              turno[]
+}
+
+model paciente {
+  id_paciente    Int       @id @default(autoincrement())
+  identificacion String    @unique @db.VarChar
+  nombres        String    @db.VarChar
+  apellidos      String    @db.VarChar
+  telefono       String?   @db.VarChar
+  correo         String?   @db.VarChar
+  direccion      String?   @db.VarChar
+  fecha_registro DateTime? @default(now()) @db.Timestamp(6)
+  activo         Boolean?  @default(true)
+  turno          turno[]
+  usuario        usuario[]
+}
+
+model parametro_sistema {
+  id_parametro Int      @id @default(autoincrement())
+  clave        String   @unique @db.VarChar
+  valor        String   @db.VarChar
+  descripcion  String?  @db.VarChar
+  activo       Boolean? @default(true)
+}
+
+model permiso {
+  id_permiso  Int           @id @default(autoincrement())
+  codigo      String        @unique @db.VarChar
+  nombre      String        @db.VarChar
+  descripcion String?       @db.VarChar
+  rol_permiso rol_permiso[]
+}
+
+model rol {
+  id_rol      Int           @id @default(autoincrement())
+  nombre      String        @unique @db.VarChar
+  descripcion String?       @db.VarChar
+  activo      Boolean?      @default(true)
+  rol_permiso rol_permiso[]
+  usuario_rol usuario_rol[]
+}
+
+model rol_permiso {
+  id_rol     Int
+  id_permiso Int
+  permiso    permiso @relation(fields: [id_permiso], references: [id_permiso], onDelete: Cascade, onUpdate: NoAction)
+  rol        rol     @relation(fields: [id_rol], references: [id_rol], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([id_rol, id_permiso])
+}
+
+model servicio {
+  id_servicio      Int                @id @default(autoincrement())
+  nombre           String             @db.VarChar
+  descripcion      String?            @db.VarChar
+  activo           Boolean?           @default(true)
+  fecha_creacion   DateTime?          @default(now()) @db.Timestamp(6)
+  horario_servicio horario_servicio[]
+  turno            turno[]
+}
+
+model turno {
+  id_turno           Int               @id @default(autoincrement())
+  codigo_turno       String            @unique @db.VarChar
+  id_paciente        Int?
+  id_servicio        Int?
+  id_horario         Int?
+  id_estado          Int?
+  id_usuario_creador Int?
+  fecha_turno        DateTime          @db.Date
+  hora_inicio        DateTime          @db.Time(6)
+  hora_fin           DateTime          @db.Time(6)
+  fecha_creacion     DateTime?         @default(now()) @db.Timestamp(6)
+  observacion        String?           @db.VarChar
+  atencion           atencion[]
+  historial_turno    historial_turno[]
+  estado_turno       estado_turno?     @relation(fields: [id_estado], references: [id_estado], onDelete: Restrict, onUpdate: NoAction)
+  horario_servicio   horario_servicio? @relation(fields: [id_horario], references: [id_horario], onDelete: Restrict, onUpdate: NoAction)
+  paciente           paciente?         @relation(fields: [id_paciente], references: [id_paciente], onDelete: Restrict, onUpdate: NoAction)
+  servicio           servicio?         @relation(fields: [id_servicio], references: [id_servicio], onDelete: Restrict, onUpdate: NoAction)
+  usuario            usuario?          @relation(fields: [id_usuario_creador], references: [id_usuario], onUpdate: NoAction)
+}
+
+model usuario {
+  id_usuario      Int               @id @default(autoincrement())
+  id_paciente     Int?
+  nombre_usuario  String            @unique @db.VarChar
+  correo          String            @unique @db.VarChar
+  password_hash   String            @db.VarChar
+  activo          Boolean?          @default(true)
+  fecha_creacion  DateTime?         @default(now()) @db.Timestamp(6)
+  ultimo_acceso   DateTime?         @db.Timestamp(6)
+  atencion        atencion[]
+  auditoria       auditoria[]
+  historial_turno historial_turno[]
+  turno           turno[]
+  paciente        paciente?         @relation(fields: [id_paciente], references: [id_paciente], onUpdate: NoAction)
+  usuario_rol     usuario_rol[]
+}
+
+model usuario_rol {
+  id_usuario       Int
+  id_rol           Int
+  fecha_asignacion DateTime? @default(now()) @db.Timestamp(6)
+  activo           Boolean?  @default(true)
+  rol              rol       @relation(fields: [id_rol], references: [id_rol], onDelete: Cascade, onUpdate: NoAction)
+  usuario          usuario   @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([id_usuario, id_rol])
+}
