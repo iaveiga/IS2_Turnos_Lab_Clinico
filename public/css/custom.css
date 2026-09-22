@@ -1,0 +1,112 @@
+/* ==========================================================================
+   Personalización de Pico CSS - Clínica San Francisco
+   ========================================================================== */
+
+:root {
+  /* Colores principales basados en la identidad visual */
+  --pico-primary: #0b3c44;
+  --pico-primary-background: #0b3c44;
+  --pico-primary-hover: #072a30;
+  --pico-primary-focus: rgba(11, 60, 68, 0.25);
+  
+  /* Fondos y superficies */
+  --pico-background-color: #f4f8fb;
+  --pico-card-background-color: #ffffff;
+  --pico-form-element-background-color: #ffffff;
+  --pico-form-element-border-color: #cbd5e1;
+  --pico-form-element-focus-color: var(--pico-primary);
+  
+  /* Bordes redondeados más suaves y modernos */
+  --pico-border-radius: 12px;
+}
+
+/* Ajustes globales de tipografía y fondo */
+body {
+  background-color: var(--pico-background-color);
+  color: #1e293b;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ==========================================================================
+   1. Layout de Pantalla Partida (Template de Registro / Login)
+   ========================================================================== */
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.split-left-panel {
+  background: linear-gradient(145deg, #0b3c44 0%, #052026 100%);
+  color: #ffffff;
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.split-right-panel {
+  background-color: #ffffff;
+  padding: 3rem 5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+/* ==========================================================================
+   2. Tarjetas y Contenedores con Sombra Suave
+   ========================================================================== */
+.custom-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 1.5rem;
+}
+
+/* ==========================================================================
+   3. Componentes E específicos (Avatares y Badges)
+   ========================================================================== */
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  background-color: #0b3c44;
+  color: #ffffff;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.badge-role {
+  background-color: #fdf2f8;
+  color: #db2777;
+  padding: 0.2rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* ==========================================================================
+   4. Adaptabilidad Responsiva (Móviles y Tablets)
+   ========================================================================== */
+@media (max-width: 992px) {
+  .split-layout {
+    grid-template-columns: 1fr;
+  }
+  .split-left-panel {
+    display: none; /* Oculta el panel decorativo lateral en pantallas pequeñas */
+  }
+  .split-right-panel {
+    padding: 2rem 1.5rem;
+  }
+}
