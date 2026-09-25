@@ -31,8 +31,16 @@
             </div>
 
             <div class="nav-actions">
-                <a class="login-link" href="/auth/login"><i data-lucide="user-round" aria-hidden="true"></i><span>Iniciar sesión</span></a>
-                <a class="button button-small" href="/auth/registro">Regístrate</a>
+                <% if (locals.usuario) { %>
+                    <span style="display: flex; align-items: center; gap: 0.4rem; font-weight: 600; color: var(--pico-primary, #007a78); font-size: 0.9rem;">
+                        <i data-lucide="user-check" aria-hidden="true"></i> <%= locals.usuario.nombre.split(' ')[0] %>
+                    </span>
+                    <a class="button button-small" href="/turnos">Mis Turnos</a>
+                    <a class="login-link" href="/auth/logout"><i data-lucide="log-out" aria-hidden="true"></i><span>Salir</span></a>
+                <% } else { %>
+                    <a class="login-link" href="/auth/login"><i data-lucide="user-round" aria-hidden="true"></i><span>Iniciar sesión</span></a>
+                    <a class="button button-small" href="/auth/registro">Regístrate</a>
+                <% } %>
             </div>
         </nav>
     </header>
@@ -47,8 +55,13 @@
                     <h1>Resultados confiables para una vida más saludable</h1>
                     <p>Agenda tus turnos de laboratorio en línea de forma rápida, segura y desde cualquier lugar.</p>
                     <div class="hero-actions">
-                        <a class="button" href="/auth/registro"><i data-lucide="calendar-plus" aria-hidden="true"></i>Agendar mi turno</a>
-                        <a class="button button-outline" href="/auth/login">Iniciar sesión</a>
+                        <% if (locals.usuario) { %>
+                            <a class="button" href="/turnos/nuevo"><i data-lucide="calendar-plus" aria-hidden="true"></i>Agendar mi turno</a>
+                            <a class="button button-outline" href="/turnos">Ver mis citas</a>
+                        <% } else { %>
+                            <a class="button" href="/auth/registro"><i data-lucide="calendar-plus" aria-hidden="true"></i>Agendar mi turno</a>
+                            <a class="button button-outline" href="/auth/login">Iniciar sesión</a>
+                        <% } %>
                     </div>
                     <div class="hero-benefits" aria-label="Beneficios">
                         <span><i data-lucide="shield-check" aria-hidden="true"></i><strong>Seguro</strong><small>y confiable</small></span>
