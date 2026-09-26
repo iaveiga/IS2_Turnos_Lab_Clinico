@@ -2,9 +2,7 @@
 
 const path = require('path');
 
-// Apuntamos al archivo client.ts generado por Prisma
-const { PrismaClient } = require('../generated/prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../config/prisma');
 
 
 function verificarPermiso(codigoPermisoRequerido) {

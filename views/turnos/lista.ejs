@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Turnos | Clínica San Francisco</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body>
+    <header class="site-header">
+        <nav class="site-nav page-container" aria-label="Navegación principal">
+            <a class="brand" href="/" aria-label="Clínica San Francisco, inicio">
+                <span class="brand-mark"><i data-lucide="flask-conical" aria-hidden="true"></i></span>
+                <span class="brand-copy">
+                    <strong>Clínica San Francisco</strong>
+                    <small>Laboratorio clínico · Turnos</small>
+                </span>
+            </a>
+
+            <div class="nav-actions">
+                <% if (locals.usuario) { %>
+                    <span style="font-weight: 600; color: var(--pico-primary, #007a78); font-size: 0.9rem;">
+                        <i data-lucide="user-check"></i> <%= locals.usuario.nombre %> (<%= locals.usuario.rol %>)
+                    </span>
+                    <a class="login-link" href="/auth/logout"><i data-lucide="log-out"></i><span>Salir</span></a>
+                <% } else { %>
+                    <a class="login-link" href="/auth/login">Iniciar sesión</a>
+                <% } %>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-container" style="padding: 2.5rem 1rem; min-height: 70vh;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <p class="eyebrow" style="color: var(--pico-primary, #007a78); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; margin: 0;">PORTAL DE PACIENTES</p>
+                <h1 style="margin: 0.2rem 0; font-size: 1.8rem;">Mis Turnos de Laboratorio</h1>
+                <p style="color: #64748b; margin: 0;">Consulta el estado de tus citas o agenda una nueva toma de muestras.</p>
+            </div>
+            <div>
+                <a href="/turnos/nuevo" role="button" class="button" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="plus-circle"></i> Nuevo Turno
+                </a>
+            </div>
+        </div>
+
+        <section style="background: white; border-radius: 12px; padding: 2.5rem; text-align: center; border: 1px dashed #cbd5e1;">
+            <div style="max-width: 450px; margin: 0 auto;">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">📅</div>
+                <h3 style="margin-bottom: 0.5rem; color: #1e293b;">Aún no tienes turnos registrados</h3>
+                <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1.5rem;">
+                    Puedes programar tu cita para exámenes de sangre, orina, VIH o alergias de forma rápida.
+                </p>
+                <a href="/turnos/nuevo" class="button button-small" role="button">Agendar mi primer turno</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="page-container footer-inner">
+            <p>© 2026 Clínica San Francisco. Portal de turnos de laboratorio.</p>
+            <a href="/">Ir al inicio</a>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
