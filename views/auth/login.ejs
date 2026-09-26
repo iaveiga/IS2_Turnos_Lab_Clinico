@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | Clínica San Francisco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body class="auth-page">
+    <main class="auth-layout">
+        <!-- Panel Izquierdo Institucional -->
+        <section class="auth-brand-panel" aria-label="Clínica San Francisco">
+            <a class="brand brand-light" href="/" aria-label="Ir al inicio">
+                <span class="brand-mark"><i data-lucide="flask-conical" aria-hidden="true"></i></span>
+                <span class="brand-copy">
+                    <strong>Clínica San Francisco</strong>
+                    <small>Laboratorio clínico · Turnos</small>
+                </span>
+            </a>
+
+            <div class="auth-message">
+                <h1>Tu salud, en<br>tiempo real.</h1>
+                <p>Accede a tus turnos de laboratorio, consulta tus citas y gestiona tu atención de forma rápida y segura.</p>
+            </div>
+
+            <p class="secure-note"><i data-lucide="shield-check" aria-hidden="true"></i> Portal seguro para pacientes y personal</p>
+        </section>
+
+        <!-- Panel Derecho del Formulario de Login -->
+        <section class="auth-form-panel">
+            <div class="register-shell">
+                <header class="form-heading">
+                    <p class="eyebrow">ACCESO AL SISTEMA</p>
+                    <h1>Iniciar sesión</h1>
+                    <p>Ingresa con tu correo electrónico o cédula.</p>
+                </header>
+
+                <!-- Mensaje de cuenta creada exitosamente -->
+                <% if (registrado) { %>
+                    <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; color: #065f46; padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1.25rem; font-size: 0.9rem;">
+                        <strong>¡Registro exitoso!</strong> Tu cuenta ha sido creada. Ingresa con tus credenciales.
+                    </div>
+                <% } %>
+
+                <!-- Mensaje de cierre de sesión -->
+                <% if (salida) { %>
+                    <div style="background-color: #f0f9ff; border-left: 4px solid #0284c7; color: #075985; padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1.25rem; font-size: 0.9rem;">
+                        Has cerrado sesión correctamente.
+                    </div>
+                <% } %>
+
+                <!-- Mensaje de error si falla la autenticación -->
+                <% if (error) { %>
+                    <div class="form-alert" role="alert" style="margin-bottom: 1.25rem;">
+                        <%= error %>
+                    </div>
+                <% } %>
+
+                <form class="register-form" method="post" action="/auth/login" novalidate>
+                    <label>
+                        Correo electrónico o Cédula
+                        <input 
+                            type="text" 
+                            name="identificador" 
+                            value="<%= identificador %>" 
+                            placeholder="ejemplo@correo.com o 0912345678" 
+                            autocomplete="username" 
+                            required 
+                            autofocus
+                        >
+                    </label>
+
+                    <label>
+                        Contraseña
+                        <span class="password-control">
+                            <input 
+                                id="password" 
+                                type="password" 
+                                name="password" 
+                                placeholder="Ingresa tu contraseña" 
+                                autocomplete="current-password" 
+                                required
+                            >
+                            <button class="password-toggle" type="button" aria-label="Mostrar contraseña" id="togglePasswordBtn">
+                                <i data-lucide="eye" id="eyeIcon"></i>
+                            </button>
+                        </span>
+                    </label>
+
+                    <button class="primary-action" type="submit" style="margin-top: 1rem;">
+                        Ingresar a mi cuenta
+                    </button>
+
+                    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: #64748b;">
+                        ¿Aún no tienes una cuenta? 
+                        <a href="/auth/registro" style="color: var(--pico-primary); font-weight: 600; text-decoration: underline;">
+                            Regístrate aquí
+                        </a>
+                    </div>
+
+                    <a class="text-link" href="/" style="display: block; text-align: center; margin-top: 1rem;">
+                        ← Volver a la página principal
+                    </a>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // Alternar visualización de contraseña
+        const toggleBtn = document.getElementById('togglePasswordBtn');
+        const passInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        if (toggleBtn && passInput) {
+            toggleBtn.addEventListener('click', () => {
+                const esPassword = passInput.type === 'password';
+                passInput.type = esPassword ? 'text' : 'password';
+                toggleBtn.setAttribute('aria-label', esPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+            });
+        }
+    </script>
+</body>
+</html>

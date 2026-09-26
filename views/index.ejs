@@ -3,65 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clínica San Francisco - Laboratorio Clínico y Turnos</title>
-    <!-- Pico CSS CDN -->
+    <meta name="description" content="Agenda tus turnos de laboratorio en Clínica San Francisco.">
+    <title>Clínica San Francisco | Laboratorio clínico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-    <!-- Tu CSS Personalizado -->
     <link rel="stylesheet" href="/css/custom.css">
 </head>
-<body>
+<body class="home-page">
+    <header class="site-header">
+        <nav class="site-nav page-container" aria-label="Navegación principal">
+            <a class="brand" href="/" aria-label="Clínica San Francisco, inicio">
+                <span class="brand-mark"><i data-lucide="flask-conical" aria-hidden="true"></i></span>
+                <span class="brand-copy">
+                    <strong>Clínica San Francisco</strong>
+                    <small>Laboratorio clínico · Turnos</small>
+                </span>
+            </a>
 
-    <!-- Barra de Navegación Superior -->
-    <header class="container">
-        <nav>
-            <ul>
-                <li><strong>🏥 Clínica San Francisco</strong> <br><small style="color: #64748b;">Laboratorio clínico · Turnos</small></li>
-            </ul>
-            <ul>
-                <li><a href="/servicios">Exámenes</a></li>
-                <li><a href="/auth/login" class="outline">Iniciar Sesión</a></li>
-                <li><a href="/auth/registro" role="button">Crea tu cuenta</a></li>
-            </ul>
+            <div class="nav-links">
+                <a class="active" href="#inicio">Inicio</a>
+                <a href="#servicios">Servicios</a>
+                <a href="#como-funciona">Cómo funciona</a>
+                <a href="#preguntas">Preguntas frecuentes</a>
+                <a href="#contacto">Contacto</a>
+            </div>
+
+            <div class="nav-actions">
+                <% if (locals.usuario) { %>
+                    <span style="display: flex; align-items: center; gap: 0.4rem; font-weight: 600; color: var(--pico-primary, #007a78); font-size: 0.9rem;">
+                        <i data-lucide="user-check" aria-hidden="true"></i> <%= locals.usuario.nombre.split(' ')[0] %>
+                    </span>
+                    <a class="button button-small" href="/turnos">Mis Turnos</a>
+                    <a class="login-link" href="/auth/logout"><i data-lucide="log-out" aria-hidden="true"></i><span>Salir</span></a>
+                <% } else { %>
+                    <a class="login-link" href="/auth/login"><i data-lucide="user-round" aria-hidden="true"></i><span>Iniciar sesión</span></a>
+                    <a class="button button-small" href="/auth/registro">Regístrate</a>
+                <% } %>
+            </div>
         </nav>
     </header>
 
-    <!-- Contenido Principal -->
-    <main class="container" style="padding-top: 2rem;">
-        <div class="grid" style="align-items: center; min-height: 65vh;">
-            
-            <!-- Columna de Texto Principal -->
-            <div>
-                <h1 style="color: var(--pico-primary); font-weight: 800;">Tu cuidado comienza aquí.</h1>
-                <p style="font-size: 1.15rem; color: #475569;">
-                    Crea tu perfil de paciente para gestionar tus próximos turnos de laboratorio (Sangre, VIH, Orina, Alergias) en un solo lugar de forma rápida y segura.
-                </p>
-                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                    <a href="/auth/registro" role="button">Registrarse</a>
-                    <a href="/auth/login" role="button" class="secondary outline">Iniciar Sesión</a>
+    <main>
+        <section class="home-hero" id="inicio">
+            <img class="hero-photo" src="/images/laboratorio-hero.png" alt="Profesional del laboratorio de Clínica San Francisco">
+            <div class="hero-wash" aria-hidden="true"></div>
+            <div class="page-container hero-inner">
+                <div class="hero-copy">
+                    <p class="eyebrow">TU SALUD, NUESTRA PRIORIDAD</p>
+                    <h1>Resultados confiables para una vida más saludable</h1>
+                    <p>Agenda tus turnos de laboratorio en línea de forma rápida, segura y desde cualquier lugar.</p>
+                    <div class="hero-actions">
+                        <% if (locals.usuario) { %>
+                            <a class="button" href="/turnos/nuevo"><i data-lucide="calendar-plus" aria-hidden="true"></i>Agendar mi turno</a>
+                            <a class="button button-outline" href="/turnos">Ver mis citas</a>
+                        <% } else { %>
+                            <a class="button" href="/auth/registro"><i data-lucide="calendar-plus" aria-hidden="true"></i>Agendar mi turno</a>
+                            <a class="button button-outline" href="/auth/login">Iniciar sesión</a>
+                        <% } %>
+                    </div>
+                    <div class="hero-benefits" aria-label="Beneficios">
+                        <span><i data-lucide="shield-check" aria-hidden="true"></i><strong>Seguro</strong><small>y confiable</small></span>
+                        <span><i data-lucide="clock-3" aria-hidden="true"></i><strong>Rápido</strong><small>y sencillo</small></span>
+                        <span><i data-lucide="heart" aria-hidden="true"></i><strong>Cuidamos</strong><small>lo más importante</small></span>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Columna de Tarjeta Informativa -->
-            <div>
-                <div class="custom-card">
-                    <h3 style="margin-bottom: 0.5rem; font-size: 1.25rem;">Servicios Disponibles</h3>
-                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1.5rem;">Gestión centralizada de citas médicas:</p>
-                    <ul style="list-style: none; padding: 0; line-height: 2;">
-                        <li>🧪 Exámenes de Sangre y Hematología</li>
-                        <li>🧬 Pruebas de VIH y Inmunología</li>
-                        <li>🔬 Análisis de Orina y Coproanálisis</li>
-                        <li>🛡️ Pruebas de Alergias</li>
+                <aside class="hero-services" aria-label="Servicios disponibles">
+                    <h2>Servicios disponibles</h2>
+                    <ul>
+                        <li><span class="service-dot service-red"><i data-lucide="droplets" aria-hidden="true"></i></span>Exámenes de sangre</li>
+                        <li><span class="service-dot service-violet"><i data-lucide="scan-heart" aria-hidden="true"></i></span>VIH e inmunología</li>
+                        <li><span class="service-dot service-yellow"><i data-lucide="test-tube" aria-hidden="true"></i></span>Orina y coproanálisis</li>
+                        <li><span class="service-dot service-green"><i data-lucide="leaf" aria-hidden="true"></i></span>Pruebas de alergias</li>
                     </ul>
+                </aside>
+            </div>
+        </section>
+
+        <section class="services-section" id="servicios" aria-labelledby="services-title">
+            <div class="page-container">
+                <div class="section-heading centered">
+                    <p class="eyebrow">NUESTROS SERVICIOS</p>
+                    <h2 id="services-title">Análisis para cuidar de ti</h2>
+                </div>
+                <div class="service-grid">
+                    <article class="service-card">
+                        <span class="service-icon service-red"><i data-lucide="droplets" aria-hidden="true"></i></span>
+                        <h3>Exámenes de sangre</h3>
+                        <p>Perfil lipídico, glucosa, hemograma y más.</p>
+                    </article>
+                    <article class="service-card">
+                        <span class="service-icon service-violet"><i data-lucide="scan-heart" aria-hidden="true"></i></span>
+                        <h3>VIH e inmunología</h3>
+                        <p>Serología, pruebas rápidas y confirmatorias.</p>
+                    </article>
+                    <article class="service-card">
+                        <span class="service-icon service-yellow"><i data-lucide="test-tube" aria-hidden="true"></i></span>
+                        <h3>Orina y coproanálisis</h3>
+                        <p>Análisis generales y específicos.</p>
+                    </article>
+                    <article class="service-card">
+                        <span class="service-icon service-green"><i data-lucide="leaf" aria-hidden="true"></i></span>
+                        <h3>Pruebas de alergias</h3>
+                        <p>Paneles de alérgenos ambientales y alimentarios.</p>
+                    </article>
                 </div>
             </div>
+        </section>
 
-        </div>
+        <section class="process-section" id="como-funciona" aria-labelledby="process-title">
+            <div class="page-container process-layout">
+                <div class="process-content">
+                    <div class="section-heading">
+                        <p class="eyebrow">SIMPLE Y RÁPIDO</p>
+                        <h2 id="process-title">¿Cómo funciona?</h2>
+                        <p>Agenda tu turno en cuatro pasos.</p>
+                    </div>
+                    <ol class="steps-list">
+                        <li><span>1</span><i data-lucide="user-plus" aria-hidden="true"></i><strong>Regístrate</strong><small>Crea tu cuenta en menos de un minuto.</small></li>
+                        <li><span>2</span><i data-lucide="clipboard-list" aria-hidden="true"></i><strong>Selecciona</strong><small>Elige el examen que necesitas.</small></li>
+                        <li><span>3</span><i data-lucide="calendar-days" aria-hidden="true"></i><strong>Agenda</strong><small>Escoge una fecha y hora disponible.</small></li>
+                        <li><span>4</span><i data-lucide="circle-check-big" aria-hidden="true"></i><strong>¡Listo!</strong><small>Recibe la confirmación de tu turno.</small></li>
+                    </ol>
+                </div>
+
+                <aside class="professional-feature">
+                    <div class="feature-image" role="img" aria-label="Tubos y equipos de laboratorio"></div>
+                    <div>
+                        <h3>Resultados con respaldo profesional</h3>
+                        <p>Contamos con tecnología actual y un equipo especializado para garantizar resultados precisos y confiables.</p>
+                        <a href="#contacto">Conoce más sobre nosotros <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="trust-strip" id="preguntas" aria-label="Compromisos de la clínica">
+            <div class="page-container trust-grid">
+                <div><i data-lucide="users-round" aria-hidden="true"></i><span><strong>Profesionales certificados</strong><small>Tu salud en manos expertas</small></span></div>
+                <div><i data-lucide="shield-check" aria-hidden="true"></i><span><strong>Procesos seguros</strong><small>Protección de tus datos</small></span></div>
+                <div><i data-lucide="badge-check" aria-hidden="true"></i><span><strong>Resultados confiables</strong><small>Calidad garantizada</small></span></div>
+                <div><i data-lucide="map-pin" aria-hidden="true"></i><span><strong>Ubicación accesible</strong><small>Fácil acceso a nuestras sedes</small></span></div>
+            </div>
+        </section>
     </main>
 
-    <!-- Pie de página -->
-    <footer class="container" style="text-align: center; font-size: 0.85rem; color: #64748b; padding: 3rem 0 1rem 0;">
-        <p>🔒 Portal exclusivo para pacientes y personal de laboratorio — Clínica San Francisco</p>
+    <footer class="site-footer" id="contacto">
+        <div class="page-container footer-inner">
+            <p>© 2026 Clínica San Francisco. Portal de turnos de laboratorio.</p>
+            <a href="/auth/registro">Crear una cuenta</a>
+        </div>
     </footer>
 
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script>lucide.createIcons();</script>
 </body>
 </html>

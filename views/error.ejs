@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviso | Clínica San Francisco</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #f8fafc; font-family: system-ui, sans-serif;">
+    <main class="container" style="max-width: 520px; text-align: center; padding: 2rem; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+        <h2 style="color: #e11d48; margin-bottom: 1rem;">Acceso restringido</h2>
+        <p style="color: #475569; font-size: 1.05rem; margin-bottom: 2rem;">
+            <%= locals.mensaje || 'No tienes permisos para acceder a esta sección o la página no existe.' %>
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="/" role="button">Ir al inicio</a>
+            <a href="/auth/login" role="button" class="secondary outline">Iniciar sesión</a>
+        </div>
+    </main>
+</body>
+</html>
