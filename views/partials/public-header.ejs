@@ -1,0 +1,55 @@
+<% const esPaciente = Boolean(locals.usuario && ((locals.usuario.roles || []).includes('PACIENTE') || locals.usuario.rol === 'PACIENTE')); %>
+<header class="navbar navbar-expand-lg app-navbar d-print-none">
+    <div class="container-xl">
+        <a class="navbar-brand app-brand" href="/" aria-label="Clínica San Francisco, inicio">
+            <span class="app-brand-mark">CSF</span>
+            <span class="app-brand-copy">
+                <strong>Clínica San Francisco</strong>
+                <small>Laboratorio clínico</small>
+            </span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#public-navigation" aria-controls="public-navigation" aria-expanded="false" aria-label="Abrir navegación">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="public-navigation">
+            <ul class="navbar-nav app-main-nav">
+                <li class="nav-item"><a class="nav-link <%= locals.seccion === 'inicio' ? 'active' : '' %>" href="/">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link <%= locals.seccion === 'servicios' ? 'active' : '' %>" href="/servicios">Servicios</a></li>
+                <% if (esPaciente) { %>
+                    <li class="nav-item"><a class="nav-link <%= locals.seccion === 'turnos' ? 'active' : '' %>" href="/turnos">Mis turnos</a></li>
+                    <li class="nav-item"><a class="nav-link <%= locals.seccion === 'perfil' ? 'active' : '' %>" href="/pacientes/perfil">Mi perfil</a></li>
+                <% } %>
+            </ul>
+
+            <div class="navbar-nav flex-row ms-lg-auto app-session-nav">
+                <% if (locals.usuario) { %>
+                    <div class="nav-item dropdown">
+                        <a class="nav-link d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown" aria-label="Abrir menú de usuario">
+                            <span class="avatar avatar-sm app-user-avatar"><%= locals.usuario.nombre.split(' ').map((parte) => parte[0]).slice(0, 2).join('').toUpperCase() %></span>
+                            <span class="app-session-copy">
+                                <strong><%= locals.usuario.nombre.split(' ')[0] %></strong>
+                                <small><%= locals.usuario.rol === 'ADMINISTRADOR' ? 'Administrador' : esPaciente ? 'Paciente' : locals.usuario.rol %></small>
+                            </span>
+                            <i data-lucide="chevron-down" class="app-chevron"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                            <% if (locals.usuario.rol === 'ADMINISTRADOR') { %>
+                                <a class="dropdown-item" href="/admin/usuarios"><i data-lucide="shield-check"></i>Administración</a>
+                            <% } else if (esPaciente) { %>
+                                <a class="dropdown-item" href="/turnos"><i data-lucide="calendar-days"></i>Mis turnos</a>
+                                <a class="dropdown-item" href="/pacientes/perfil"><i data-lucide="user-round"></i>Mi perfil</a>
+                            <% } %>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="/auth/logout"><i data-lucide="log-out"></i>Cerrar sesión</a>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <a class="btn btn-ghost-secondary" href="/auth/login"><i data-lucide="log-in"></i>Iniciar sesión</a>
+                    <a class="btn btn-primary" href="/auth/registro"><i data-lucide="user-plus"></i>Crear cuenta</a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</header>

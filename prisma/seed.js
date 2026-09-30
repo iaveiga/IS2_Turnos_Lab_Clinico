@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const { crearPasswordHash } = require('../utils/password');
 
 async function seed() {
   console.log('--- Iniciando Seed ---');
@@ -26,7 +27,15 @@ async function seed() {
     { codigo: 'CREAR_TURNO', nombre: 'Crear Turno', descripcion: 'Permite reservar un nuevo turno' },
     { codigo: 'VER_PERFIL', nombre: 'Ver Perfil', descripcion: 'Permite consultar el perfil' },
     { codigo: 'EDITAR_PERFIL', nombre: 'Editar Perfil', descripcion: 'Permite modificar datos del perfil' },
-    { codigo: 'ACCEDER_CONSOLA', nombre: 'Acceso Consola', descripcion: 'Permite acceder al panel administrativo' }
+    { codigo: 'ACCEDER_CONSOLA', nombre: 'Acceso Consola', descripcion: 'Permite acceder al panel administrativo' },
+    { codigo: 'GESTIONAR_USUARIOS', nombre: 'Gestionar Usuarios', descripcion: 'Permite crear, modificar, activar y desactivar usuarios' },
+    { codigo: 'GESTIONAR_ROLES_PERMISOS', nombre: 'Gestionar Roles y Permisos', descripcion: 'Permite asignar roles y permisos' },
+    { codigo: 'GESTIONAR_SERVICIOS', nombre: 'Gestionar Servicios', descripcion: 'Permite administrar tipos de examen' },
+    { codigo: 'GESTIONAR_HORARIOS', nombre: 'Gestionar Horarios', descripcion: 'Permite configurar horarios y capacidad' },
+    { codigo: 'GESTIONAR_DIAS_NO_LABORABLES', nombre: 'Gestionar Días no Laborables', descripcion: 'Permite configurar fechas sin atención' },
+    { codigo: 'GESTIONAR_PARAMETROS', nombre: 'Gestionar Parámetros', descripcion: 'Permite configurar parámetros generales' },
+    { codigo: 'VER_REPORTES', nombre: 'Ver Reportes', descripcion: 'Permite consultar reportes administrativos' },
+    { codigo: 'VER_AUDITORIA', nombre: 'Ver Auditoría', descripcion: 'Permite consultar registros de auditoría' }
   ];
 
   for (const p of permisos) {
@@ -47,7 +56,21 @@ async function seed() {
     PACIENTE: ['VER_TURNOS', 'CREAR_TURNO', 'VER_PERFIL', 'EDITAR_PERFIL'],
     RECEPCIONISTA: ['VER_TURNOS', 'CREAR_TURNO', 'VER_PERFIL', 'EDITAR_PERFIL'],
     TECNICO: ['VER_TURNOS', 'VER_PERFIL'],
-    ADMINISTRADOR: ['ACCEDER_CONSOLA', 'VER_TURNOS', 'CREAR_TURNO', 'VER_PERFIL', 'EDITAR_PERFIL']
+    ADMINISTRADOR: [
+      'ACCEDER_CONSOLA',
+      'VER_TURNOS',
+      'CREAR_TURNO',
+      'VER_PERFIL',
+      'EDITAR_PERFIL',
+      'GESTIONAR_USUARIOS',
+      'GESTIONAR_ROLES_PERMISOS',
+      'GESTIONAR_SERVICIOS',
+      'GESTIONAR_HORARIOS',
+      'GESTIONAR_DIAS_NO_LABORABLES',
+      'GESTIONAR_PARAMETROS',
+      'VER_REPORTES',
+      'VER_AUDITORIA'
+    ]
   };
 
   for (const rol of rolesEnDb) {
@@ -99,7 +122,35 @@ async function seed() {
   }
   console.log('Servicios verificados/creados');
 
-  // 4. Asignar rol PACIENTE a usuarios existentes que no tengan rol
+  // 4. Horarios recurrentes para servicios activos
+  const diasLaborables = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
+  const serviciosActivos = await prisma.servicio.findMany({ where: { activo: true } });
+
+  for (const servicio of serviciosActivos) {
+    for (const dia of diasLaborables) {
+      const horarioExistente = await prisma.horario_servicio.findFirst({
+        where: { id_servicio: servicio.id_servicio, dia_semana: dia }
+      });
+
+      if (!horarioExistente) {
+        const esSabado = dia === 'SABADO';
+        await prisma.horario_servicio.create({
+          data: {
+            id_servicio: servicio.id_servicio,
+            dia_semana: dia,
+            hora_inicio: new Date(`1970-01-01T${esSabado ? '08:00' : '07:00'}:00.000Z`),
+            hora_fin: new Date(`1970-01-01T${esSabado ? '12:00' : '15:00'}:00.000Z`),
+            duracion_turno_min: 30,
+            capacidad: 3,
+            activo: true
+          }
+        });
+      }
+    }
+  }
+  console.log('Horarios de servicios verificados/creados');
+
+  // 5. Asignar rol PACIENTE a usuarios existentes que no tengan rol
   const rolPaciente = await prisma.rol.findFirst({ where: { nombre: 'PACIENTE' } });
   if (rolPaciente) {
     const usuarios = await prisma.usuario.findMany({
@@ -114,13 +165,8 @@ async function seed() {
       }
     }
 
-    // 5. Crear usuario de prueba paciente@uees.edu.ec si no existe
-    const crypto = require('crypto');
-    const { promisify } = require('util');
-    const scrypt = promisify(crypto.scrypt);
-    const salt = crypto.randomBytes(16).toString('hex');
-    const hash = await scrypt('password123', salt, 64);
-    const passwordHash = `scrypt$${salt}$${hash.toString('hex')}`;
+    // 6. Crear usuario de prueba paciente@uees.edu.ec si no existe
+    const passwordHash = await crearPasswordHash('password123');
 
     let pacienteDemo = await prisma.paciente.findFirst({
       where: { identificacion: '0999999999' }
@@ -159,6 +205,44 @@ async function seed() {
       });
       console.log('Usuario de prueba creado: paciente@uees.edu.ec / password123');
     }
+  }
+
+  // 7. Usuario administrador de prueba
+  const rolAdministrador = await prisma.rol.findFirst({ where: { nombre: 'ADMINISTRADOR' } });
+  if (rolAdministrador) {
+    let usuarioAdministrador = await prisma.usuario.findUnique({
+      where: { nombre_usuario: 'administrador' }
+    });
+
+    if (!usuarioAdministrador) {
+      usuarioAdministrador = await prisma.usuario.create({
+        data: {
+          identificacion: 'administrador',
+          nombres: 'Administrador',
+          apellidos: 'Sistema',
+          nombre_usuario: 'administrador',
+          correo: 'administrador@clinicasanfrancisco.local',
+          password_hash: await crearPasswordHash('administrador'),
+          activo: true
+        }
+      });
+      console.log('Usuario administrador creado: administrador / administrador');
+    }
+
+    await prisma.usuario_rol.upsert({
+      where: {
+        id_usuario_id_rol: {
+          id_usuario: usuarioAdministrador.id_usuario,
+          id_rol: rolAdministrador.id_rol
+        }
+      },
+      update: { activo: true },
+      create: {
+        id_usuario: usuarioAdministrador.id_usuario,
+        id_rol: rolAdministrador.id_rol,
+        activo: true
+      }
+    });
   }
 
   console.log('--- Seed completado exitosamente ---');

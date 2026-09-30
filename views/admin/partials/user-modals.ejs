@@ -1,0 +1,117 @@
+<div class="modal modal-blur fade" id="create-user-modal" tabindex="-1" aria-hidden="true" data-auto-open="<%= abrirCrear ? 'true' : 'false' %>">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" action="/admin/usuarios" class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="avatar bg-primary-lt text-primary"><i data-lucide="user-plus"></i></span>
+                    <div>
+                        <div class="text-uppercase text-primary fw-bold admin-modal-eyebrow">Nueva cuenta</div>
+                        <h2 class="modal-title">Crear usuario de personal</h2>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombres</label>
+                        <input class="form-control" name="nombres" value="<%= formulario.nombres || '' %>" autocomplete="given-name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Apellidos</label>
+                        <input class="form-control" name="apellidos" value="<%= formulario.apellidos || '' %>" autocomplete="family-name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Cédula</label>
+                        <input class="form-control" name="identificacion" value="<%= formulario.identificacion || '' %>" inputmode="numeric" maxlength="10" pattern="\d{10}" autocomplete="off" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Rol</label>
+                        <select class="form-select" name="id_rol" required>
+                            <option value="">Seleccionar rol</option>
+                            <% rolesPersonal.forEach((rol) => { %>
+                                <option value="<%= rol.id_rol %>" <%= String(formulario.id_rol || '') === String(rol.id_rol) ? 'selected' : '' %>><%= rol.nombre %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Correo institucional</label>
+                        <input class="form-control" type="email" name="correo" value="<%= formulario.correo || '' %>" autocomplete="email" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Clave temporal</label>
+                        <div class="input-group">
+                            <input class="form-control" type="password" name="password" minlength="8" autocomplete="new-password" required>
+                            <button class="btn btn-outline-secondary btn-icon" type="button" data-password-toggle aria-label="Mostrar clave">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-hint">Mínimo 8 caracteres.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary"><i data-lucide="user-plus"></i>Crear usuario</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="edit-user-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" class="modal-content" id="edit-user-form">
+            <div class="modal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="avatar bg-primary-lt text-primary"><i data-lucide="user-pen"></i></span>
+                    <div>
+                        <div class="text-uppercase text-primary fw-bold admin-modal-eyebrow">Cuenta de personal</div>
+                        <h2 class="modal-title">Editar usuario</h2>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombres</label>
+                        <input class="form-control" name="nombres" autocomplete="given-name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Apellidos</label>
+                        <input class="form-control" name="apellidos" autocomplete="family-name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Cédula</label>
+                        <input class="form-control" name="identificacion" autocomplete="off" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Rol</label>
+                        <select class="form-select" name="id_rol" required>
+                            <% rolesPersonal.forEach((rol) => { %>
+                                <option value="<%= rol.id_rol %>"><%= rol.nombre %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Correo institucional</label>
+                        <input class="form-control" type="email" name="correo" autocomplete="email" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Nueva clave <span class="form-label-description">Opcional</span></label>
+                        <div class="input-group">
+                            <input class="form-control" type="password" name="password" minlength="8" autocomplete="new-password">
+                            <button class="btn btn-outline-secondary btn-icon" type="button" data-password-toggle aria-label="Mostrar clave">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary"><i data-lucide="save"></i>Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+</div>

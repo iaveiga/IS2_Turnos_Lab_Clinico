@@ -14,7 +14,11 @@ app.set('view engine', 'ejs');
 // 2. Middlewares esenciales (¡Cruciales para formularios y archivos estáticos!)
 app.use(express.urlencoded({ extended: true })); // Permite leer los datos enviados desde formularios POST
 app.use(express.json());                         // Permite procesar peticiones JSON
-app.use(express.static(path.join(__dirname, 'public'))); // Sirve tu custom.css y recursos
+app.use(express.static(path.join(__dirname, 'public'))); // Sirve estilos, scripts e imágenes del portal
+app.use(
+  '/vendor/tabler',
+  express.static(path.join(__dirname, 'node_modules', '@tabler', 'core', 'dist'))
+);
 
 // 2.1. Configuración de sesiones de usuario
 app.use(session({
@@ -45,6 +49,7 @@ app.use('/auth', require('./routes/authRoutes'));
 app.use('/turnos', require('./routes/turnoRoutes'));
 app.use('/servicios', require('./routes/servicioRoutes'));
 app.use('/pacientes', require('./routes/pacienteRoutes'));
+app.use('/admin', require('./routes/adminRoutes'));
 
 // 4. Verificar la base de datos antes de iniciar el servidor
 async function iniciarServidor() {

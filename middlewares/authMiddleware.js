@@ -39,6 +39,7 @@ function verificarPermiso(codigoPermisoRequerido) {
 
             let tienePermiso = false;
             for (const ur of usuario.usuario_rol) {
+                if (!ur.activo || !ur.rol.activo) continue;
                 for (const rp of ur.rol.rol_permiso) {
                     if (rp.permiso.codigo === codigoPermisoRequerido) {
                         tienePermiso = true;

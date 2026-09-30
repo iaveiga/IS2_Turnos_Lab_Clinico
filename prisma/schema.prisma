@@ -166,6 +166,9 @@ model turno {
 model usuario {
   id_usuario      Int               @id @default(autoincrement())
   id_paciente     Int?
+  identificacion  String?           @unique @db.VarChar
+  nombres         String?           @db.VarChar
+  apellidos       String?           @db.VarChar
   nombre_usuario  String            @unique @db.VarChar
   correo          String            @unique @db.VarChar
   password_hash   String            @db.VarChar

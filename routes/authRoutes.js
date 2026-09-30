@@ -1,10 +1,8 @@
 const express = require('express');
-const crypto = require('crypto');
-const { promisify } = require('util');
 const prisma = require('../config/prisma');
+const { crearPasswordHash, verificarPassword } = require('../utils/password');
 
 const router = express.Router();
-const scrypt = promisify(crypto.scrypt);
 const opcionesSexo = ['FEMENINO', 'MASCULINO', 'OTRO', 'PREFIERO_NO_DECIR'];
 
 function datosFormulario(body = {}) {
@@ -32,31 +30,6 @@ function validarRegistro(datos, password) {
   if (!password || password.length < 8) errores.password = 'Usa al menos 8 caracteres.';
 
   return errores;
-}
-
-async function crearPasswordHash(password) {
-  const salt = crypto.randomBytes(16).toString('hex');
-  const hash = await scrypt(password, salt, 64);
-  return `scrypt$${salt}$${hash.toString('hex')}`;
-}
-
-async function verificarPassword(password, passwordHash) {
-  if (!password || !passwordHash) return false;
-  try {
-    if (passwordHash.startsWith('scrypt$')) {
-      const parts = passwordHash.split('$');
-      if (parts.length !== 3) return false;
-      const [, salt, originalHashHex] = parts;
-      const computedHash = await scrypt(password, salt, 64);
-      const originalBuffer = Buffer.from(originalHashHex, 'hex');
-      if (originalBuffer.length !== computedHash.length) return false;
-      return crypto.timingSafeEqual(originalBuffer, computedHash);
-    }
-    return password === passwordHash;
-  } catch (err) {
-    console.error('Error al verificar hash de contraseña:', err);
-    return false;
-  }
 }
 
 router.get('/login', (req, res) => {
@@ -90,7 +63,7 @@ router.post('/login', async (req, res) => {
       where: {
         OR: [
           { correo: { equals: identificador, mode: 'insensitive' } },
-          { nombre_usuario: { equals: identificador, mode: 'insensitive' } },
+          { identificacion: { equals: identificador, mode: 'insensitive' } },
           { paciente: { identificacion: identificador } }
         ]
       },
@@ -122,6 +95,25 @@ router.post('/login', async (req, res) => {
       });
     }
 
+    const roles = (usuario.usuario_rol || [])
+      .filter((asignacion) => asignacion.activo && asignacion.rol.activo)
+      .map((asignacion) => asignacion.rol.nombre);
+    const esPaciente = roles.includes('PACIENTE');
+    const identificadorNormalizado = identificador.toLowerCase();
+    const accesoPermitido = esPaciente
+      ? usuario.correo.toLowerCase() === identificadorNormalizado
+        || usuario.paciente?.identificacion === identificador
+      : usuario.identificacion?.toLowerCase() === identificadorNormalizado;
+
+    if (!accesoPermitido) {
+      return res.status(401).render('auth/login', {
+        error: 'Credenciales inválidas para el tipo de usuario.',
+        identificador,
+        registrado: false,
+        salida: false
+      });
+    }
+
     const passwordValida = await verificarPassword(password, usuario.password_hash);
     if (!passwordValida) {
       return res.status(401).render('auth/login', {
@@ -138,12 +130,10 @@ router.post('/login', async (req, res) => {
       data: { ultimo_acceso: new Date() }
     }).catch(err => console.warn('Aviso: no se pudo actualizar último acceso:', err.message));
 
-    // Obtener roles asociados al usuario
-    const roles = (usuario.usuario_rol || []).map(ur => ur.rol.nombre);
-    const rolPrincipal = roles[0] || 'PACIENTE';
+    const rolPrincipal = roles.includes('ADMINISTRADOR') ? 'ADMINISTRADOR' : roles[0] || 'PACIENTE';
     const nombreCompleto = usuario.paciente
       ? `${usuario.paciente.nombres} ${usuario.paciente.apellidos}`
-      : usuario.nombre_usuario;
+      : [usuario.nombres, usuario.apellidos].filter(Boolean).join(' ') || usuario.nombre_usuario;
 
     // Guardar sesión
     req.session.userId = usuario.id_usuario;
@@ -153,12 +143,13 @@ router.post('/login', async (req, res) => {
       nombre: nombreCompleto,
       rol: rolPrincipal,
       roles: roles,
+      identificacion: usuario.identificacion,
       id_paciente: usuario.id_paciente
     };
 
     // Redirigir según el rol
     if (roles.includes('ADMINISTRADOR')) {
-      return res.redirect('/admin/console');
+      return res.redirect('/admin/usuarios');
     }
     return res.redirect('/turnos');
 

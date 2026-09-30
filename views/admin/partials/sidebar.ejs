@@ -1,0 +1,62 @@
+<% const seccionAdminActual = locals.seccionAdmin || ''; %>
+<aside class="navbar navbar-vertical navbar-expand-lg admin-navbar" data-bs-theme="dark">
+    <div class="container-fluid">
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#admin-sidebar-menu"
+            aria-controls="admin-sidebar-menu"
+            aria-expanded="false"
+            aria-label="Abrir navegación"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <h1 class="navbar-brand navbar-brand-autodark">
+            <a href="/admin/usuarios" class="admin-brand-link">
+                <span class="admin-brand-mark">CSF</span>
+                <span class="admin-brand-copy">
+                    <strong>Clínica San Francisco</strong>
+                    <small>Administración</small>
+                </span>
+            </a>
+        </h1>
+
+        <div class="collapse navbar-collapse" id="admin-sidebar-menu">
+            <ul class="navbar-nav pt-lg-3">
+                <li class="nav-item"><span class="nav-link disabled"><span class="nav-link-icon"><i data-lucide="layout-dashboard"></i></span><span class="nav-link-title">Resumen</span></span></li>
+                <li class="nav-item"><span class="nav-link disabled"><span class="nav-link-icon"><i data-lucide="calendar-days"></i></span><span class="nav-link-title">Turnos</span></span></li>
+                <li class="nav-item <%= seccionAdminActual === 'pacientes' ? 'active' : '' %>">
+                    <a class="nav-link" href="/admin/pacientes">
+                        <span class="nav-link-icon"><i data-lucide="users-round"></i></span>
+                        <span class="nav-link-title">Pacientes</span>
+                    </a>
+                </li>
+                <li class="nav-item"><span class="nav-link disabled"><span class="nav-link-icon"><i data-lucide="flask-conical"></i></span><span class="nav-link-title">Servicios</span></span></li>
+                <li class="nav-item"><span class="nav-link disabled"><span class="nav-link-icon"><i data-lucide="clock-3"></i></span><span class="nav-link-title">Horarios y capacidad</span></span></li>
+                <li class="nav-item <%= seccionAdminActual === 'usuarios' ? 'active' : '' %>">
+                    <a class="nav-link" href="/admin/usuarios">
+                        <span class="nav-link-icon"><i data-lucide="user-cog"></i></span>
+                        <span class="nav-link-title">Usuarios administrativos</span>
+                    </a>
+                </li>
+                <li class="nav-item"><span class="nav-link disabled"><span class="nav-link-icon"><i data-lucide="calendar-off"></i></span><span class="nav-link-title">Días no laborables</span></span></li>
+                <li class="nav-item"><span class="nav-link disabled"><span class="nav-link-icon"><i data-lucide="chart-no-axes-combined"></i></span><span class="nav-link-title">Reportes</span></span></li>
+                <li class="nav-item"><span class="nav-link disabled"><span class="nav-link-icon"><i data-lucide="scroll-text"></i></span><span class="nav-link-title">Auditoría</span></span></li>
+                <li class="nav-item"><span class="nav-link disabled"><span class="nav-link-icon"><i data-lucide="settings"></i></span><span class="nav-link-title">Parámetros</span></span></li>
+            </ul>
+
+            <div class="admin-sidebar-user mt-auto">
+                <span class="avatar avatar-sm admin-profile-avatar"><%= locals.usuario.nombre.split(' ').map((parte) => parte[0]).slice(0, 2).join('').toUpperCase() %></span>
+                <span class="admin-sidebar-user-copy">
+                    <strong><%= locals.usuario.nombre %></strong>
+                    <small>Administrador</small>
+                </span>
+                <a class="btn btn-icon btn-ghost-light btn-sm" href="/auth/logout" aria-label="Cerrar sesión" title="Cerrar sesión">
+                    <i data-lucide="log-out"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</aside>

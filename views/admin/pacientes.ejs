@@ -1,0 +1,156 @@
+<%- include('../partials/head', {
+    titulo: 'Pacientes',
+    descripcion: 'Administración de pacientes del Laboratorio Clínico San Francisco',
+    estilos: ['/css/admin-tabler.css']
+}) %>
+<body class="layout-fluid admin-tabler-page">
+    <div class="page">
+        <%- include('partials/sidebar', { seccionAdmin: 'pacientes' }) %>
+
+        <div class="page-wrapper">
+            <%- include('partials/topbar') %>
+
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <div class="page-pretitle">Administración del sistema</div>
+                            <h2 class="page-title">Pacientes</h2>
+                            <div class="text-secondary mt-1">Consulta las personas registradas para atención y sus cuentas de acceso.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <div class="container-xl">
+                    <%- include('partials/alerts') %>
+
+                    <section class="card admin-users-card" aria-labelledby="patients-table-title">
+                        <form class="card-body border-bottom admin-filter-form" method="get" action="/admin/pacientes" data-auto-submit-filters>
+                            <div class="row g-2 align-items-end">
+                                <div class="col-12 col-lg">
+                                    <label class="form-label visually-hidden" for="patient-search">Buscar pacientes</label>
+                                    <div class="input-icon">
+                                        <span class="input-icon-addon"><i data-lucide="search"></i></span>
+                                        <input id="patient-search" class="form-control" type="search" name="buscar" value="<%= filtros.buscar %>" placeholder="Buscar nombre, cédula, teléfono o correo">
+                                    </div>
+                                </div>
+                                <div class="col-8 col-md-4 col-lg-2">
+                                    <label class="form-label" for="patient-status-filter">Estado</label>
+                                    <select id="patient-status-filter" class="form-select" name="estado">
+                                        <option value="">Todos</option>
+                                        <option value="activo" <%= filtros.estado === 'activo' ? 'selected' : '' %>>Activo</option>
+                                        <option value="inactivo" <%= filtros.estado === 'inactivo' ? 'selected' : '' %>>Inactivo</option>
+                                    </select>
+                                </div>
+                                <div class="col-8 col-md-auto">
+                                    <button class="btn btn-outline-secondary w-100" type="submit"><i data-lucide="list-filter"></i>Filtrar</button>
+                                </div>
+                                <% if (filtros.buscar || filtros.estado) { %>
+                                    <div class="col-4 col-md-auto">
+                                        <a class="btn btn-icon btn-outline-secondary w-100" href="/admin/pacientes" title="Limpiar filtros" aria-label="Limpiar filtros"><i data-lucide="filter-x"></i></a>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </form>
+
+                        <div class="table-responsive">
+                            <table class="table table-vcenter table-hover card-table admin-users-table admin-patients-table">
+                                <thead>
+                                    <tr>
+                                        <th id="patients-table-title">Paciente</th>
+                                        <th>Identificación</th>
+                                        <th>Contacto</th>
+                                        <th>Cuenta</th>
+                                        <th>Turnos</th>
+                                        <th>Estado</th>
+                                        <th class="w-1"><span class="visually-hidden">Acciones</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (pacientes.length === 0) { %>
+                                        <tr>
+                                            <td colspan="7">
+                                                <div class="empty py-5">
+                                                    <div class="empty-icon"><i data-lucide="user-search"></i></div>
+                                                    <p class="empty-title">No se encontraron pacientes</p>
+                                                    <p class="empty-subtitle text-secondary">Revisa los criterios de búsqueda seleccionados.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                    <% pacientes.forEach((paciente) => { %>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-3 admin-user-cell">
+                                                    <span class="avatar avatar-sm bg-cyan-lt text-cyan"><%= paciente.nombre.split(' ').map((parte) => parte[0]).slice(0, 2).join('').toUpperCase() %></span>
+                                                    <div class="min-w-0">
+                                                        <div class="fw-semibold text-body text-truncate"><%= paciente.nombre %></div>
+                                                        <div class="small text-secondary text-truncate">Registrado: <%= paciente.fechaRegistro %></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="text-secondary text-nowrap"><%= paciente.identificacion %></span></td>
+                                            <td>
+                                                <span class="admin-user-email"><%= paciente.correo %></span>
+                                                <span class="small text-secondary"><%= paciente.telefono %></span>
+                                            </td>
+                                            <td>
+                                                <% if (paciente.tieneCuenta) { %>
+                                                    <span class="badge <%= paciente.cuentaActiva ? 'bg-azure-lt' : 'bg-secondary-lt' %>"><i data-lucide="<%= paciente.cuentaActiva ? 'user-check' : 'user-x' %>"></i><%= paciente.cuentaActiva ? 'Habilitada' : 'Inactiva' %></span>
+                                                <% } else { %>
+                                                    <span class="badge bg-secondary-lt"><i data-lucide="user-minus"></i>Sin cuenta</span>
+                                                <% } %>
+                                            </td>
+                                            <td><span class="badge bg-purple-lt"><i data-lucide="calendar-days"></i><%= paciente.turnos %></span></td>
+                                            <td>
+                                                <span class="badge <%= paciente.activo ? 'bg-green-lt' : 'bg-red-lt' %>">
+                                                    <span class="status-dot <%= paciente.activo ? 'status-dot-animated bg-green' : 'bg-red' %> me-1"></span>
+                                                    <%= paciente.activo ? 'Activo' : 'Inactivo' %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-icon btn-ghost-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Acciones de <%= paciente.nombre %>"><i data-lucide="ellipsis-vertical"></i></button>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        <form method="post" action="/admin/pacientes/<%= paciente.id %>/estado">
+                                                            <input type="hidden" name="activo" value="<%= paciente.activo ? 'false' : 'true' %>">
+                                                            <button type="submit" class="dropdown-item <%= paciente.activo ? 'text-danger' : 'text-success' %>">
+                                                                <i data-lucide="<%= paciente.activo ? 'user-x' : 'user-check' %>"></i>
+                                                                <span><%= paciente.activo ? 'Desactivar' : 'Activar' %></span>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="card-footer d-flex align-items-center admin-table-footer">
+                            <p class="m-0 text-secondary">Mostrando <%= paginacion.desde %>–<%= paginacion.hasta %> de <%= paginacion.total %> pacientes</p>
+                            <ul class="pagination m-0 ms-auto">
+                                <% const queryBase = 'buscar=' + encodeURIComponent(filtros.buscar) + '&estado=' + encodeURIComponent(filtros.estado); %>
+                                <li class="page-item <%= paginacion.pagina === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link" href="/admin/pacientes?<%= queryBase %>&pagina=<%= Math.max(paginacion.pagina - 1, 1) %>" aria-label="Página anterior"><i data-lucide="chevron-left"></i></a>
+                                </li>
+                                <% for (let numero = 1; numero <= paginacion.totalPaginas; numero += 1) { %>
+                                    <li class="page-item <%= numero === paginacion.pagina ? 'active' : '' %>"><a class="page-link" href="/admin/pacientes?<%= queryBase %>&pagina=<%= numero %>"><%= numero %></a></li>
+                                <% } %>
+                                <li class="page-item <%= paginacion.pagina === paginacion.totalPaginas ? 'disabled' : '' %>">
+                                    <a class="page-link" href="/admin/pacientes?<%= queryBase %>&pagina=<%= Math.min(paginacion.pagina + 1, paginacion.totalPaginas) %>" aria-label="Página siguiente"><i data-lucide="chevron-right"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/scripts') %>
+</body>
+</html>
