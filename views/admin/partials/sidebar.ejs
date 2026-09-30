@@ -26,14 +26,24 @@
         <div class="collapse navbar-collapse" id="admin-sidebar-menu">
             <ul class="navbar-nav pt-lg-3">
                 <li class="nav-item"><span class="nav-link disabled"><span class="nav-link-icon"><i data-lucide="layout-dashboard"></i></span><span class="nav-link-title">Resumen</span></span></li>
-                <li class="nav-item"><span class="nav-link disabled"><span class="nav-link-icon"><i data-lucide="calendar-days"></i></span><span class="nav-link-title">Turnos</span></span></li>
+                <li class="nav-item <%= seccionAdminActual === 'turnos' ? 'active' : '' %>">
+                    <a class="nav-link" href="/admin/turnos">
+                        <span class="nav-link-icon"><i data-lucide="calendar-days"></i></span>
+                        <span class="nav-link-title">Turnos</span>
+                    </a>
+                </li>
                 <li class="nav-item <%= seccionAdminActual === 'pacientes' ? 'active' : '' %>">
                     <a class="nav-link" href="/admin/pacientes">
                         <span class="nav-link-icon"><i data-lucide="users-round"></i></span>
                         <span class="nav-link-title">Pacientes</span>
                     </a>
                 </li>
-                <li class="nav-item"><span class="nav-link disabled"><span class="nav-link-icon"><i data-lucide="flask-conical"></i></span><span class="nav-link-title">Servicios</span></span></li>
+                <li class="nav-item <%= seccionAdminActual === 'servicios' ? 'active' : '' %>">
+                    <a class="nav-link" href="/admin/servicios">
+                        <span class="nav-link-icon"><i data-lucide="flask-conical"></i></span>
+                        <span class="nav-link-title">Servicios</span>
+                    </a>
+                </li>
                 <li class="nav-item"><span class="nav-link disabled"><span class="nav-link-icon"><i data-lucide="clock-3"></i></span><span class="nav-link-title">Horarios y capacidad</span></span></li>
                 <li class="nav-item <%= seccionAdminActual === 'usuarios' ? 'active' : '' %>">
                     <a class="nav-link" href="/admin/usuarios">

@@ -354,6 +354,180 @@ body.admin-tabler-page {
   height: 13px;
 }
 
+.admin-services-table {
+  min-width: 1040px;
+}
+
+.admin-service-cell {
+  width: 220px;
+}
+
+.admin-service-cell .avatar svg {
+  width: 18px;
+  height: 18px;
+}
+
+.admin-service-description {
+  display: -webkit-box;
+  max-width: 310px;
+  overflow: hidden;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.admin-services-table .badge {
+  display: inline-flex;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.admin-services-table .badge svg {
+  width: 13px;
+  height: 13px;
+}
+
+.admin-appointments-table {
+  min-width: 1120px;
+}
+
+.admin-appointment-code,
+.admin-appointment-date,
+.admin-appointment-service {
+  display: grid;
+  min-width: 0;
+}
+
+.admin-appointment-code {
+  width: 190px;
+}
+
+.admin-appointment-code strong,
+.admin-appointment-date strong,
+.admin-appointment-service strong {
+  overflow: hidden;
+  color: #193d50;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-appointment-code small,
+.admin-appointment-date small,
+.admin-appointment-service small {
+  margin-top: 0.2rem;
+  overflow: hidden;
+  color: #6d818d;
+  font-size: 0.58rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-appointment-date {
+  width: 145px;
+}
+
+.admin-patient-cell {
+  width: 220px;
+}
+
+.admin-appointment-service {
+  width: 235px;
+}
+
+.admin-appointments-table .badge {
+  display: inline-flex;
+  white-space: nowrap;
+}
+
+.admin-appointment-detail {
+  padding: 0;
+}
+
+.admin-detail-section {
+  padding: 1.15rem 1.4rem;
+  border-bottom: 1px solid #e3ebef;
+}
+
+.admin-detail-section:last-child {
+  border-bottom: 0;
+}
+
+.admin-detail-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.85rem;
+  color: #193d50;
+  font-size: 0.78rem;
+}
+
+.admin-detail-section h3 svg {
+  width: 17px;
+  height: 17px;
+  color: #078b9b;
+}
+
+.admin-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.admin-detail-grid > div,
+.admin-detail-stack {
+  min-height: 60px;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #e0e9ed;
+  border-radius: 6px;
+  background: #f8fafb;
+}
+
+.admin-detail-grid small,
+.admin-detail-grid strong,
+.admin-detail-stack strong,
+.admin-detail-stack span {
+  display: block;
+}
+
+.admin-detail-grid small {
+  color: #718692;
+  font-size: 0.58rem;
+}
+
+.admin-detail-grid strong,
+.admin-detail-stack strong {
+  margin-top: 0.25rem;
+  overflow-wrap: anywhere;
+  color: #294c5e;
+  font-size: 0.68rem;
+}
+
+.admin-detail-stack span {
+  margin-top: 0.35rem;
+  color: #6d818d;
+  font-size: 0.64rem;
+  line-height: 1.5;
+}
+
+.admin-status-summary {
+  display: grid;
+  margin-bottom: 1rem;
+  padding: 0.8rem 0.9rem;
+  border-left: 3px solid #078b9b;
+  background: #edf6f7;
+}
+
+.admin-status-summary strong {
+  color: #193d50;
+  font-size: 0.72rem;
+}
+
+.admin-status-summary span {
+  margin-top: 0.2rem;
+  color: #617985;
+  font-size: 0.62rem;
+}
+
 .admin-users-table .dropdown-menu {
   min-width: 170px;
   padding: 0.35rem;
@@ -518,5 +692,9 @@ body.admin-tabler-page {
 
   .admin-tabler-page .modal-dialog {
     margin: 0.75rem;
+  }
+
+  .admin-detail-grid {
+    grid-template-columns: 1fr;
   }
 }
