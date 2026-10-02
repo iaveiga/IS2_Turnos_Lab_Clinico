@@ -2,6 +2,9 @@
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 <script>window.lucide?.createIcons();</script>
 <script src="/js/filters.js"></script>
+<% if (locals.usuario) { %>
+    <script src="/js/session-history.js"></script>
+<% } %>
 <% (locals.scripts || []).forEach((script) => { %>
     <script src="<%= script %>"></script>
 <% }); %>

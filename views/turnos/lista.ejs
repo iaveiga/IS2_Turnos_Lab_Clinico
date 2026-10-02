@@ -2,6 +2,7 @@
     titulo: 'Mis turnos',
     descripcion: 'Consulta y agenda tus turnos de laboratorio.'
 }) %>
+<% const puedeCrearTurno = (locals.permisosUsuario || locals.usuario?.permisos || []).includes('CREAR_TURNO'); %>
 <body class="patient-page">
     <%- include('../partials/public-header', { seccion: 'turnos' }) %>
 
@@ -22,9 +23,11 @@
                 <h1>Mis turnos de laboratorio</h1>
                 <p>Consulta tus citas y reserva un horario disponible para tus exámenes.</p>
             </div>
-            <button class="btn btn-primary" type="button" data-open-booking <%= !paciente || !hayServiciosDisponibles ? 'disabled' : '' %>>
-                <i data-lucide="calendar-plus"></i>Agendar turno
-            </button>
+            <% if (puedeCrearTurno) { %>
+                <button class="btn btn-primary" type="button" data-open-booking <%= !paciente || !hayServiciosDisponibles ? 'disabled' : '' %>>
+                    <i data-lucide="calendar-plus"></i>Agendar turno
+                </button>
+            <% } %>
         </header>
 
         <% if (!paciente) { %>
@@ -50,7 +53,7 @@
                     <span class="avatar bg-azure-lt text-azure"><i data-lucide="calendar-days"></i></span>
                     <h3>No tienes turnos registrados</h3>
                     <p>Elige un tipo de examen, una fecha y uno de los horarios con cupo.</p>
-                    <% if (paciente && hayServiciosDisponibles) { %>
+                    <% if (puedeCrearTurno && paciente && hayServiciosDisponibles) { %>
                         <button class="btn btn-primary" type="button" data-open-booking><i data-lucide="plus"></i>Agendar mi primer turno</button>
                     <% } %>
                 </div>
@@ -75,6 +78,7 @@
         </section>
     </main>
 
+    <% if (puedeCrearTurno) { %>
     <div class="modal modal-blur fade booking-modal" id="booking-modal" tabindex="-1" aria-hidden="true" data-auto-open="<%= abrirModal && paciente && hayServiciosDisponibles ? 'true' : 'false' %>">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <form class="modal-content" id="booking-form" novalidate>
@@ -149,6 +153,7 @@
             </form>
         </div>
     </div>
+    <% } %>
 
     <%- include('../partials/footer') %>
     <%- include('../partials/scripts', { scripts: ['/js/turnos.js'] }) %>

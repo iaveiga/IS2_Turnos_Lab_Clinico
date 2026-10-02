@@ -43,7 +43,7 @@
                         </div>
                     <% } %>
 
-                    <form class="auth-form" method="post" action="/auth/registro" novalidate>
+                    <form class="auth-form" method="post" action="/auth/registro">
                         <div class="auth-form-grid">
                             <div>
                                 <label class="form-label" for="first-name">Nombres</label>
@@ -57,7 +57,7 @@
                             </div>
                             <div>
                                 <label class="form-label" for="identification">Cédula</label>
-                                <input id="identification" class="form-control <%= errores.identificacion ? 'is-invalid' : '' %>" type="text" name="identificacion" value="<%= datos.identificacion %>" placeholder="0912345678" inputmode="numeric" maxlength="10" autocomplete="off" required>
+                                <input id="identification" class="form-control <%= errores.identificacion ? 'is-invalid' : '' %>" type="text" name="identificacion" value="<%= datos.identificacion %>" placeholder="0912345678" inputmode="numeric" minlength="10" maxlength="10" pattern="\d{10}" autocomplete="off" required>
                                 <% if (errores.identificacion) { %><small class="field-error"><%= errores.identificacion %></small><% } %>
                             </div>
                             <div>
@@ -84,7 +84,7 @@
                         </div>
                         <div>
                             <label class="form-label" for="email">Correo electrónico</label>
-                            <input id="email" class="form-control <%= errores.correo ? 'is-invalid' : '' %>" type="email" name="correo" value="<%= datos.correo %>" placeholder="nombre@correo.com" autocomplete="email" required>
+                            <input id="email" class="form-control <%= errores.correo ? 'is-invalid' : '' %>" type="email" name="correo" value="<%= datos.correo %>" placeholder="nombre@correo.com" autocomplete="email" maxlength="254" required>
                             <% if (errores.correo) { %><small class="field-error"><%= errores.correo %></small><% } %>
                         </div>
                         <div>

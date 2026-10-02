@@ -120,6 +120,9 @@
                                                 <div class="dropdown">
                                                     <button class="btn btn-icon btn-ghost-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Acciones de <%= servicio.nombre %>"><i data-lucide="ellipsis-vertical"></i></button>
                                                     <div class="dropdown-menu dropdown-menu-end">
+                                                        <a class="dropdown-item" href="/admin/horarios?servicio=<%= servicio.id %>">
+                                                            <i data-lucide="calendar-clock"></i><span>Administrar horarios</span>
+                                                        </a>
                                                         <button class="dropdown-item" type="button" data-edit-service data-id="<%= servicio.id %>" data-name="<%= servicio.nombre %>" data-description="<%= servicio.descripcion %>">
                                                             <i data-lucide="pencil"></i><span>Editar</span>
                                                         </button>

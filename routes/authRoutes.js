@@ -1,9 +1,25 @@
 const express = require('express');
 const prisma = require('../config/prisma');
+const { evitarCachePrivada } = require('../middlewares/authMiddleware');
 const { crearPasswordHash, verificarPassword } = require('../utils/password');
+const { validarCedulaEcuatoriana, validarCorreoElectronico } = require('../utils/validation');
 
 const router = express.Router();
 const opcionesSexo = ['FEMENINO', 'MASCULINO', 'OTRO', 'PREFIERO_NO_DECIR'];
+
+router.use(evitarCachePrivada);
+
+function renovarSesion(req) {
+  return new Promise((resolve, reject) => {
+    req.session.regenerate((error) => (error ? reject(error) : resolve()));
+  });
+}
+
+function guardarSesion(req) {
+  return new Promise((resolve, reject) => {
+    req.session.save((error) => (error ? reject(error) : resolve()));
+  });
+}
 
 function datosFormulario(body = {}) {
   return {
@@ -22,11 +38,13 @@ function validarRegistro(datos, password) {
 
   if (datos.nombres.length < 2) errores.nombres = 'Ingresa tus nombres.';
   if (datos.apellidos.length < 2) errores.apellidos = 'Ingresa tus apellidos.';
-  if (!/^\d{10}$/.test(datos.identificacion)) errores.identificacion = 'La cedula debe tener 10 digitos.';
+  if (!validarCedulaEcuatoriana(datos.identificacion)) {
+    errores.identificacion = 'Ingresa una cédula ecuatoriana válida.';
+  }
   if (!/^\d+$/.test(datos.edad) || Number(datos.edad) < 1 || Number(datos.edad) > 120) errores.edad = 'Ingresa una edad valida.';
   if (!opcionesSexo.includes(datos.sexo)) errores.sexo = 'Selecciona una opcion.';
   if (!/^[\d\s()+-]{7,20}$/.test(datos.telefono)) errores.telefono = 'Ingresa un telefono valido.';
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo)) errores.correo = 'Ingresa un correo valido.';
+  if (!validarCorreoElectronico(datos.correo)) errores.correo = 'Ingresa un correo electrónico válido.';
   if (!password || password.length < 8) errores.password = 'Usa al menos 8 caracteres.';
 
   return errores;
@@ -71,7 +89,13 @@ router.post('/login', async (req, res) => {
         paciente: true,
         usuario_rol: {
           include: {
-            rol: true
+            rol: {
+              include: {
+                rol_permiso: {
+                  include: { permiso: true }
+                }
+              }
+            }
           }
         }
       }
@@ -98,6 +122,9 @@ router.post('/login', async (req, res) => {
     const roles = (usuario.usuario_rol || [])
       .filter((asignacion) => asignacion.activo && asignacion.rol.activo)
       .map((asignacion) => asignacion.rol.nombre);
+    const permisos = [...new Set((usuario.usuario_rol || [])
+      .filter((asignacion) => asignacion.activo && asignacion.rol.activo)
+      .flatMap((asignacion) => asignacion.rol.rol_permiso.map((relacion) => relacion.permiso.codigo)))];
     const esPaciente = roles.includes('PACIENTE');
     const identificadorNormalizado = identificador.toLowerCase();
     const accesoPermitido = esPaciente
@@ -135,7 +162,8 @@ router.post('/login', async (req, res) => {
       ? `${usuario.paciente.nombres} ${usuario.paciente.apellidos}`
       : [usuario.nombres, usuario.apellidos].filter(Boolean).join(' ') || usuario.nombre_usuario;
 
-    // Guardar sesión
+    // Evita reutilizar el identificador de una sesión previa al autenticar.
+    await renovarSesion(req);
     req.session.userId = usuario.id_usuario;
     req.session.user = {
       id: usuario.id_usuario,
@@ -143,13 +171,15 @@ router.post('/login', async (req, res) => {
       nombre: nombreCompleto,
       rol: rolPrincipal,
       roles: roles,
+      permisos,
       identificacion: usuario.identificacion,
       id_paciente: usuario.id_paciente
     };
+    await guardarSesion(req);
 
     // Redirigir según el rol
-    if (roles.includes('ADMINISTRADOR')) {
-      return res.redirect('/admin/usuarios');
+    if (permisos.includes('ACCEDER_CONSOLA')) {
+      return res.redirect('/admin');
     }
     return res.redirect('/turnos');
 
@@ -232,9 +262,18 @@ router.post('/registro', async (req, res) => {
   }
 });
 
-router.get('/logout', (req, res) => {
-  if (!req.session) return res.redirect('/auth/login');
-  req.session.destroy(() => res.redirect('/auth/login?salida=1'));
+router.get('/logout', (req, res, next) => {
+  const finalizar = () => {
+    res.clearCookie('connect.sid', { path: '/' });
+    return res.redirect('/auth/login?salida=1');
+  };
+
+  if (!req.session) return finalizar();
+
+  return req.session.destroy((error) => {
+    if (error) return next(error);
+    return finalizar();
+  });
 });
 
 module.exports = router;

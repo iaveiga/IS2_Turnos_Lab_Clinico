@@ -625,6 +625,496 @@ body.admin-tabler-page {
   gap: 0.5rem;
 }
 
+.admin-section-tabs {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-section-tab {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 0.45rem;
+  border-bottom: 2px solid transparent;
+  color: #617985;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-section-tab:hover {
+  color: #087b89;
+  text-decoration: none;
+}
+
+.admin-section-tab.active {
+  border-bottom-color: #078b9b;
+  color: #087b89;
+}
+
+.admin-section-tab svg {
+  width: 17px;
+  height: 17px;
+}
+
+.admin-schedules-table {
+  min-width: 960px;
+}
+
+.admin-schedules-table .badge,
+.admin-closed-days-table .badge {
+  display: inline-flex;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.admin-schedules-table .badge svg {
+  width: 13px;
+  height: 13px;
+}
+
+.admin-schedule-service,
+.admin-schedule-time,
+.admin-schedule-capacity,
+.admin-closed-day-date {
+  display: grid;
+  min-width: 0;
+}
+
+.admin-schedule-service {
+  width: 230px;
+}
+
+.admin-schedule-time {
+  width: 140px;
+}
+
+.admin-schedule-capacity {
+  width: 145px;
+}
+
+.admin-schedule-days {
+  display: flex;
+  width: 300px;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.admin-day-checks {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.admin-day-check {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid #cfdce3;
+  border-radius: 6px;
+  background: #fbfcfd;
+  color: #3f5c6b;
+  cursor: pointer;
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+
+.admin-day-check:has(.form-check-input:checked) {
+  border-color: #4ba9b4;
+  background: #edf7f8;
+  color: #087b89;
+}
+
+.admin-day-check .form-check-input {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.admin-schedule-service strong,
+.admin-schedule-time strong,
+.admin-schedule-capacity strong,
+.admin-closed-day-date strong {
+  overflow: hidden;
+  color: #294c5e;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-schedule-service small,
+.admin-schedule-time small,
+.admin-schedule-capacity small,
+.admin-closed-day-date small {
+  margin-top: 0.18rem;
+  color: #718692;
+  font-size: 0.56rem;
+}
+
+.admin-closed-days-table {
+  min-width: 820px;
+}
+
+.admin-closed-day-date {
+  width: 230px;
+  text-transform: capitalize;
+}
+
+.admin-closed-day-description {
+  display: block;
+  max-width: 480px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-role-card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.admin-role-toolbar {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.8fr);
+  gap: 1.25rem;
+  align-items: end;
+  padding: 1rem 1.15rem;
+  border-bottom: 1px solid var(--admin-border);
+  background: #fbfcfd;
+}
+
+.admin-role-selector {
+  min-width: 0;
+}
+
+.admin-role-summary {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-left: 1.25rem;
+  border-left: 2px solid #078b9b;
+}
+
+.admin-role-summary-copy {
+  min-width: 0;
+}
+
+.admin-role-summary-copy strong {
+  color: #193d50;
+  font-size: 0.76rem;
+}
+
+.admin-role-summary-copy > span {
+  display: block;
+  margin-top: 0.25rem;
+  overflow: hidden;
+  color: #6d818d;
+  font-size: 0.61rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-role-metrics {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.5rem;
+}
+
+.admin-role-metrics span {
+  min-width: 88px;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid #dce6eb;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #718692;
+  font-size: 0.55rem;
+  text-align: center;
+}
+
+.admin-role-metrics strong {
+  display: block;
+  margin-bottom: 0.1rem;
+  color: #294c5e;
+  font-size: 0.72rem;
+}
+
+.admin-permission-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.admin-permission-heading h3 {
+  margin: 0 0 0.25rem;
+  color: #193d50;
+  font-size: 0.86rem;
+}
+
+.admin-permission-heading p {
+  font-size: 0.62rem;
+}
+
+.admin-transfer-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr);
+  gap: 0.85rem;
+  padding: 0 1.15rem 1.15rem;
+}
+
+.admin-permission-panel {
+  display: flex;
+  min-width: 0;
+  min-height: 440px;
+  flex-direction: column;
+  border: 1px solid #d7e3e8;
+  border-radius: 7px;
+  background: #f8fafb;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.admin-permission-panel-enabled {
+  background: #f4faf9;
+}
+
+.admin-permission-panel.is-drag-over {
+  border-color: #078b9b;
+  background: #eaf6f7;
+}
+
+.admin-permission-panel > header {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.85rem;
+  border-bottom: 1px solid #dce6eb;
+}
+
+.admin-permission-panel > header > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-permission-panel h4 {
+  margin: 0;
+  color: #294c5e;
+  font-size: 0.7rem;
+}
+
+.admin-permission-panel [data-permission-count] {
+  display: grid;
+  min-width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 999px;
+  background: #dfecef;
+  color: #3f5c6b;
+  font-size: 0.57rem;
+  font-weight: 800;
+}
+
+.admin-permission-list {
+  display: grid;
+  max-height: 365px;
+  align-content: start;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  overflow-y: auto;
+}
+
+.admin-permission-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.65rem;
+  padding: 0.7rem;
+  border: 1px solid #dce6eb;
+  border-radius: 6px;
+  background: #ffffff;
+  cursor: grab;
+  user-select: none;
+}
+
+.admin-permission-item:has(.form-check-input:checked) {
+  border-color: #4ba9b4;
+  background: #edf7f8;
+}
+
+.admin-permission-item.is-dragging {
+  opacity: 0.45;
+}
+
+.admin-permission-item.is-locked {
+  cursor: default;
+}
+
+.admin-permission-item > svg {
+  width: 16px;
+  height: 16px;
+  margin-top: 0.15rem;
+  color: #8aa0aa;
+}
+
+.admin-permission-item.is-locked > svg {
+  color: #078b9b;
+}
+
+.admin-permission-item .form-check-input {
+  margin: 0.12rem 0 0;
+}
+
+.admin-permission-copy {
+  min-width: 0;
+}
+
+.admin-permission-copy strong,
+.admin-permission-copy small,
+.admin-permission-copy code {
+  display: block;
+}
+
+.admin-permission-copy strong {
+  color: #294c5e;
+  font-size: 0.66rem;
+}
+
+.admin-permission-copy small {
+  margin-top: 0.2rem;
+  color: #718692;
+  font-size: 0.56rem;
+  line-height: 1.4;
+}
+
+.admin-permission-copy code {
+  margin-top: 0.35rem;
+  color: #087b89;
+  font-size: 0.52rem;
+}
+
+.admin-permission-empty {
+  display: flex;
+  min-height: 250px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1rem;
+  color: #82959e;
+  font-size: 0.6rem;
+}
+
+.admin-permission-empty[hidden] {
+  display: none;
+}
+
+.admin-permission-empty svg {
+  width: 28px;
+  height: 28px;
+  stroke-width: 1.5;
+}
+
+.admin-transfer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.admin-audit-table {
+  min-width: 1180px;
+}
+
+.admin-audit-card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.admin-audit-table .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.admin-audit-table .badge svg,
+.admin-audit-ip svg {
+  width: 13px;
+  height: 13px;
+}
+
+.admin-audit-date,
+.admin-audit-actor,
+.admin-audit-entity {
+  display: grid;
+  min-width: 0;
+}
+
+.admin-audit-date {
+  width: 175px;
+}
+
+.admin-audit-actor {
+  width: 210px;
+}
+
+.admin-audit-entity {
+  width: 150px;
+}
+
+.admin-audit-date strong,
+.admin-audit-actor strong,
+.admin-audit-entity strong {
+  overflow: hidden;
+  color: #294c5e;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-audit-date small,
+.admin-audit-actor small,
+.admin-audit-entity small {
+  margin-top: 0.18rem;
+  overflow: hidden;
+  color: #718692;
+  font-size: 0.56rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-audit-description {
+  display: -webkit-box;
+  width: 300px;
+  overflow: hidden;
+  color: #526d7b;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.admin-audit-ip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #617985;
+  white-space: nowrap;
+}
+
+.admin-users-table.admin-empty-table {
+  min-width: 100%;
+}
+
+.admin-users-table.admin-empty-table thead {
+  display: none;
+}
+
 @media (min-width: 992px) {
   .admin-navbar.navbar-vertical.navbar-expand-lg {
     width: 244px;
@@ -668,6 +1158,36 @@ body.admin-tabler-page {
   .admin-tabler-page .page-header {
     padding-top: 1.25rem;
   }
+
+  .admin-role-toolbar {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .admin-role-summary {
+    padding-top: 0.85rem;
+    padding-left: 0;
+    border-top: 1px solid #dce6eb;
+    border-left: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .admin-transfer-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-transfer-actions {
+    flex-direction: row;
+  }
+
+  .admin-permission-panel {
+    min-height: 360px;
+  }
+
+  .admin-permission-list {
+    max-height: 290px;
+  }
 }
 
 @media (max-width: 575.98px) {
@@ -696,5 +1216,40 @@ body.admin-tabler-page {
 
   .admin-detail-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-section-tabs {
+    gap: 1rem;
+    overflow-x: auto;
+  }
+
+  .admin-section-tab {
+    flex: 0 0 auto;
+  }
+
+  .admin-day-checks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-role-summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-role-metrics {
+    width: 100%;
+  }
+
+  .admin-role-metrics span {
+    flex: 1;
+  }
+
+  .admin-permission-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-permission-heading .btn {
+    width: 100%;
   }
 }

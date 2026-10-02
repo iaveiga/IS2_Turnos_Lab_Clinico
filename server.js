@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const prisma = require('./config/prisma');
+const { sincronizarAutorizacion } = require('./middlewares/authMiddleware');
 
 const session = require('express-session');
 
@@ -32,11 +33,8 @@ app.use(session({
   }
 }));
 
-// 2.2. Pasar información de la sesión a las vistas
-app.use((req, res, next) => {
-  res.locals.usuario = req.session?.user || null;
-  next();
-});
+// 2.2. Mantener roles y permisos sincronizados con la base de datos
+app.use(sincronizarAutorizacion);
 
 // Redirecciones directas de conveniencia
 app.get('/login', (req, res) => res.redirect('/auth/login'));

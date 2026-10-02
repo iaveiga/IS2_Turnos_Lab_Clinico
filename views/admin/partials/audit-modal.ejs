@@ -1,0 +1,38 @@
+<div class="modal modal-blur fade" id="audit-detail-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="avatar bg-primary-lt text-primary"><i data-lucide="file-search"></i></span>
+                    <div><div class="text-uppercase text-primary fw-bold admin-modal-eyebrow">Trazabilidad del sistema</div><h2 class="modal-title">Evento <span data-audit-field="id"></span></h2></div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body admin-appointment-detail">
+                <section class="admin-detail-section" aria-labelledby="audit-event-title">
+                    <h3 id="audit-event-title"><i data-lucide="activity"></i>Movimiento registrado</h3>
+                    <div class="admin-detail-grid">
+                        <div><small>Fecha y hora</small><strong data-audit-field="date"></strong></div>
+                        <div><small>Dirección IP / origen</small><strong data-audit-field="ip"></strong></div>
+                        <div><small>Acción</small><strong data-audit-field="action"></strong></div>
+                        <div><small>Entidad afectada</small><strong><span data-audit-field="entity"></span> · #<span data-audit-field="record"></span></strong></div>
+                    </div>
+                </section>
+                <section class="admin-detail-section" aria-labelledby="audit-actor-title">
+                    <h3 id="audit-actor-title"><i data-lucide="user-round"></i>Actor responsable</h3>
+                    <div class="admin-detail-grid">
+                        <div><small>Usuario</small><strong data-audit-field="actor"></strong></div>
+                        <div><small>Rol</small><strong data-audit-field="role"></strong></div>
+                        <div><small>Identificación</small><strong data-audit-field="identification"></strong></div>
+                        <div><small>Correo</small><strong data-audit-field="email"></strong></div>
+                    </div>
+                </section>
+                <section class="admin-detail-section" aria-labelledby="audit-description-title">
+                    <h3 id="audit-description-title"><i data-lucide="notebook-text"></i>Detalle de la transacción</h3>
+                    <div class="admin-detail-stack"><span data-audit-field="detail"></span></div>
+                </section>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar detalle</button></div>
+        </div>
+    </div>
+</div>

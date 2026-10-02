@@ -1,4 +1,7 @@
-<% const esPaciente = Boolean(locals.usuario && ((locals.usuario.roles || []).includes('PACIENTE') || locals.usuario.rol === 'PACIENTE')); %>
+<%
+const esPaciente = Boolean(locals.usuario && ((locals.usuario.roles || []).includes('PACIENTE') || locals.usuario.rol === 'PACIENTE'));
+const permisosNavegacion = new Set(locals.permisosUsuario || locals.usuario?.permisos || []);
+%>
 <header class="navbar navbar-expand-lg app-navbar d-print-none">
     <div class="container-xl">
         <a class="navbar-brand app-brand" href="/" aria-label="Clínica San Francisco, inicio">
@@ -17,8 +20,10 @@
             <ul class="navbar-nav app-main-nav">
                 <li class="nav-item"><a class="nav-link <%= locals.seccion === 'inicio' ? 'active' : '' %>" href="/">Inicio</a></li>
                 <li class="nav-item"><a class="nav-link <%= locals.seccion === 'servicios' ? 'active' : '' %>" href="/servicios">Servicios</a></li>
-                <% if (esPaciente) { %>
+                <% if (esPaciente && permisosNavegacion.has('VER_TURNOS')) { %>
                     <li class="nav-item"><a class="nav-link <%= locals.seccion === 'turnos' ? 'active' : '' %>" href="/turnos">Mis turnos</a></li>
+                <% } %>
+                <% if (esPaciente && permisosNavegacion.has('VER_PERFIL')) { %>
                     <li class="nav-item"><a class="nav-link <%= locals.seccion === 'perfil' ? 'active' : '' %>" href="/pacientes/perfil">Mi perfil</a></li>
                 <% } %>
             </ul>
@@ -35,11 +40,11 @@
                             <i data-lucide="chevron-down" class="app-chevron"></i>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                            <% if (locals.usuario.rol === 'ADMINISTRADOR') { %>
-                                <a class="dropdown-item" href="/admin/usuarios"><i data-lucide="shield-check"></i>Administración</a>
+                            <% if (permisosNavegacion.has('ACCEDER_CONSOLA')) { %>
+                                <a class="dropdown-item" href="/admin"><i data-lucide="shield-check"></i>Administración</a>
                             <% } else if (esPaciente) { %>
-                                <a class="dropdown-item" href="/turnos"><i data-lucide="calendar-days"></i>Mis turnos</a>
-                                <a class="dropdown-item" href="/pacientes/perfil"><i data-lucide="user-round"></i>Mi perfil</a>
+                                <% if (permisosNavegacion.has('VER_TURNOS')) { %><a class="dropdown-item" href="/turnos"><i data-lucide="calendar-days"></i>Mis turnos</a><% } %>
+                                <% if (permisosNavegacion.has('VER_PERFIL')) { %><a class="dropdown-item" href="/pacientes/perfil"><i data-lucide="user-round"></i>Mi perfil</a><% } %>
                             <% } %>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item text-danger" href="/auth/logout"><i data-lucide="log-out"></i>Cerrar sesión</a>
