@@ -181,6 +181,9 @@ router.post('/login', async (req, res) => {
     if (permisos.includes('ACCEDER_CONSOLA')) {
       return res.redirect('/admin');
     }
+    if (permisos.includes('ACCEDER_RECEPCION')) {
+      return res.redirect('/recepcion');
+    }
     return res.redirect('/turnos');
 
   } catch (error) {

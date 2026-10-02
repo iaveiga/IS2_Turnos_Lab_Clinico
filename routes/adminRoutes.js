@@ -54,6 +54,74 @@ function fechaLocalISO(fecha = new Date()) {
   return `${valor('year')}-${valor('month')}-${valor('day')}`;
 }
 
+function fechaISOValida(valor) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(valor || '')) return false;
+  const fecha = new Date(`${valor}T00:00:00.000Z`);
+  return !Number.isNaN(fecha.getTime()) && fecha.toISOString().slice(0, 10) === valor;
+}
+
+function fechaUTCDesdeISO(valor) {
+  return new Date(`${valor}T00:00:00.000Z`);
+}
+
+function sumarDiasISO(valor, dias) {
+  const fecha = fechaUTCDesdeISO(valor);
+  fecha.setUTCDate(fecha.getUTCDate() + dias);
+  return fecha.toISOString().slice(0, 10);
+}
+
+function rangoMesAnteriorISO(hoy = fechaLocalISO()) {
+  const fecha = fechaUTCDesdeISO(hoy);
+  const anio = fecha.getUTCMonth() === 0 ? fecha.getUTCFullYear() - 1 : fecha.getUTCFullYear();
+  const mes = fecha.getUTCMonth() === 0 ? 11 : fecha.getUTCMonth() - 1;
+  const inicio = new Date(Date.UTC(anio, mes, 1));
+  const fin = new Date(Date.UTC(anio, mes + 1, 0));
+  return {
+    desde: inicio.toISOString().slice(0, 10),
+    hasta: fin.toISOString().slice(0, 10)
+  };
+}
+
+function rangoSemanaAnteriorISO(hoy = fechaLocalISO()) {
+  const fecha = fechaUTCDesdeISO(hoy);
+  const diasDesdeLunes = (fecha.getUTCDay() + 6) % 7;
+  const lunesActual = sumarDiasISO(hoy, -diasDesdeLunes);
+  return {
+    desde: sumarDiasISO(lunesActual, -7),
+    hasta: sumarDiasISO(lunesActual, -1)
+  };
+}
+
+function rangoReporteDesdeConsulta(query = {}) {
+  const periodo = ['semana_anterior', 'dia_anterior', 'mes_anterior', 'personalizado'].includes(query.periodo)
+    ? query.periodo
+    : 'semana_anterior';
+  const hoy = fechaLocalISO();
+  let rango;
+  let error = null;
+
+  if (periodo === 'dia_anterior') {
+    const ayer = sumarDiasISO(hoy, -1);
+    rango = { desde: ayer, hasta: ayer };
+  } else if (periodo === 'mes_anterior') {
+    rango = rangoMesAnteriorISO(hoy);
+  } else if (periodo === 'personalizado') {
+    const desde = fechaISOValida(query.desde) ? query.desde : '';
+    const hasta = fechaISOValida(query.hasta) ? query.hasta : '';
+    rango = desde && hasta ? { desde, hasta } : rangoSemanaAnteriorISO(hoy);
+    if (!desde || !hasta) error = 'Selecciona una fecha de inicio y una fecha de fin válidas.';
+  } else {
+    rango = rangoSemanaAnteriorISO(hoy);
+  }
+
+  if (rango.desde > rango.hasta) {
+    error = 'La fecha de inicio no puede ser posterior a la fecha de fin.';
+    rango = rangoSemanaAnteriorISO(hoy);
+  }
+
+  return { periodo, ...rango, error };
+}
+
 function horaDesdeTexto(valor) {
   if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(valor || '')) return null;
   return new Date(`1970-01-01T${valor}:00.000Z`);
@@ -280,6 +348,7 @@ function rutaAdministrativaInicial(permisos = []) {
     ['GESTIONAR_SERVICIOS', '/admin/servicios'],
     ['GESTIONAR_HORARIOS', '/admin/horarios'],
     ['GESTIONAR_ROLES_PERMISOS', '/admin/roles'],
+    ['VER_REPORTES', '/admin/reportes'],
     ['VER_AUDITORIA', '/admin/auditoria']
   ];
   return rutas.find(([permiso]) => disponibles.has(permiso))?.[1] || null;
@@ -613,6 +682,143 @@ async function cargarPaginaTurnos(req) {
       desde: total ? (pagina - 1) * PAGE_SIZE + 1 : 0,
       hasta: Math.min(pagina * PAGE_SIZE, total)
     }
+  };
+}
+
+function generoPacienteLegible(valor) {
+  const genero = String(valor || '').trim().toUpperCase();
+  if (['M', 'MASCULINO', 'HOMBRE'].includes(genero)) return 'Masculino';
+  if (['F', 'FEMENINO', 'MUJER'].includes(genero)) return 'Femenino';
+  return 'No especificado';
+}
+
+function porcentajeReporte(valor, total) {
+  if (!total) return 0;
+  return Math.round((valor / total) * 100);
+}
+
+async function cargarPaginaReportes(req) {
+  const rango = rangoReporteDesdeConsulta(req.query);
+  const desde = fechaUTCDesdeISO(rango.desde);
+  const hastaExclusivo = fechaUTCDesdeISO(sumarDiasISO(rango.hasta, 1));
+  const estadoAtendido = await prisma.estado_turno.findUnique({
+    where: { codigo: 'ATENDIDO' },
+    select: { id_estado: true }
+  });
+
+  if (!estadoAtendido) {
+    return {
+      filtros: rango,
+      resumen: { pacientes: 0, turnos: 0, servicios: 0, generos: 0 },
+      usuariosPorServicio: [],
+      usuariosPorGeneroServicio: [],
+      detalleServicios: [],
+      fechaMaxima: fechaLocalISO(),
+      errorReporte: 'No existe el estado ATENDIDO en la base de datos.'
+    };
+  }
+
+  const turnos = await prisma.turno.findMany({
+    where: {
+      id_estado: estadoAtendido.id_estado,
+      fecha_turno: { gte: desde, lt: hastaExclusivo }
+    },
+    include: {
+      paciente: true,
+      servicio: true
+    },
+    orderBy: [{ fecha_turno: 'desc' }, { hora_inicio: 'asc' }, { codigo_turno: 'asc' }]
+  });
+
+  const serviciosMap = new Map();
+  const generoServicioMap = new Map();
+  const pacientesUnicos = new Set();
+  const serviciosUnicos = new Set();
+  const generosUnicos = new Set();
+
+  for (const turno of turnos) {
+    const servicioId = turno.id_servicio || 'sin-servicio';
+    const servicioNombre = turno.servicio?.nombre || 'Servicio no disponible';
+    const pacienteId = turno.id_paciente || `turno-${turno.id_turno}`;
+    const pacienteNombre = turno.paciente ? `${turno.paciente.nombres} ${turno.paciente.apellidos}` : 'Paciente no disponible';
+    const genero = generoPacienteLegible(turno.paciente?.sexo);
+
+    pacientesUnicos.add(pacienteId);
+    serviciosUnicos.add(servicioId);
+    generosUnicos.add(genero);
+
+    if (!serviciosMap.has(servicioId)) {
+      serviciosMap.set(servicioId, {
+        id: servicioId,
+        servicio: servicioNombre,
+        descripcion: turno.servicio?.descripcion || 'Sin descripción registrada',
+        turnos: 0,
+        pacientes: new Set()
+      });
+    }
+    const servicio = serviciosMap.get(servicioId);
+    servicio.turnos += 1;
+    servicio.pacientes.add(pacienteId);
+
+    const claveGenero = `${servicioId}|${genero}`;
+    if (!generoServicioMap.has(claveGenero)) {
+      generoServicioMap.set(claveGenero, {
+        servicio: servicioNombre,
+        genero,
+        turnos: 0,
+        pacientes: new Set(),
+        usuarios: new Map()
+      });
+    }
+    const generoServicio = generoServicioMap.get(claveGenero);
+    generoServicio.turnos += 1;
+    generoServicio.pacientes.add(pacienteId);
+    generoServicio.usuarios.set(pacienteId, {
+      nombre: pacienteNombre,
+      identificacion: turno.paciente?.identificacion || 'Sin identificación'
+    });
+  }
+
+  const usuariosPorServicio = [...serviciosMap.values()]
+    .map((servicio) => ({
+      ...servicio,
+      pacientes: servicio.pacientes.size,
+      porcentaje: porcentajeReporte(servicio.pacientes.size, pacientesUnicos.size)
+    }))
+    .sort((a, b) => b.pacientes - a.pacientes || a.servicio.localeCompare(b.servicio, 'es'));
+
+  const usuariosPorGeneroServicio = [...generoServicioMap.values()]
+    .map((item) => ({
+      ...item,
+      pacientes: item.pacientes.size,
+      usuarios: [...item.usuarios.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es')),
+      porcentaje: porcentajeReporte(item.pacientes.size, pacientesUnicos.size)
+    }))
+    .sort((a, b) => a.servicio.localeCompare(b.servicio, 'es') || a.genero.localeCompare(b.genero, 'es'));
+
+  return {
+    filtros: rango,
+    resumen: {
+      pacientes: pacientesUnicos.size,
+      turnos: turnos.length,
+      servicios: serviciosUnicos.size,
+      generos: generosUnicos.size
+    },
+    usuariosPorServicio,
+    usuariosPorGeneroServicio,
+    detalleServicios: turnos.map((turno) => ({
+      id: turno.id_turno,
+      codigo: turno.codigo_turno,
+      fecha: fechaTurnoLegible(turno.fecha_turno),
+      fechaISO: turno.fecha_turno.toISOString().slice(0, 10),
+      hora: `${horaTurnoLegible(turno.hora_inicio)}-${horaTurnoLegible(turno.hora_fin)}`,
+      paciente: turno.paciente ? `${turno.paciente.nombres} ${turno.paciente.apellidos}` : 'Paciente no disponible',
+      identificacion: turno.paciente?.identificacion || 'Sin identificación',
+      genero: generoPacienteLegible(turno.paciente?.sexo),
+      servicio: turno.servicio?.nombre || 'Servicio no disponible'
+    })),
+    fechaMaxima: fechaLocalISO(),
+    errorReporte: rango.error
   };
 }
 
@@ -1141,6 +1347,15 @@ router.get('/turnos', verificarPermiso('GESTIONAR_TURNOS'), async (req, res, nex
       mensaje: req.query.estado === 'actualizado' ? 'Estado del turno actualizado correctamente.' : null,
       error: erroresConsulta[req.query.error] || null
     });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.get('/reportes', verificarPermiso('VER_REPORTES'), async (req, res, next) => {
+  try {
+    const datos = await cargarPaginaReportes(req);
+    return res.render('admin/reportes', datos);
   } catch (error) {
     return next(error);
   }

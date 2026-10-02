@@ -47,6 +47,7 @@ app.use('/auth', require('./routes/authRoutes'));
 app.use('/turnos', require('./routes/turnoRoutes'));
 app.use('/servicios', require('./routes/servicioRoutes'));
 app.use('/pacientes', require('./routes/pacienteRoutes'));
+app.use('/recepcion', require('./routes/recepcionRoutes'));
 app.use('/admin', require('./routes/adminRoutes'));
 
 // 4. Verificar la base de datos antes de iniciar el servidor

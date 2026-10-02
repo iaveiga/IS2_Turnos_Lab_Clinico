@@ -1,0 +1,213 @@
+<%- include('../partials/head', {
+    titulo: 'Reportes',
+    descripcion: 'Reportes administrativos del Laboratorio Clínico San Francisco',
+    estilos: ['/css/admin-tabler.css']
+}) %>
+<body class="layout-fluid admin-tabler-page">
+    <div class="page">
+        <%- include('partials/sidebar', { seccionAdmin: 'reportes' }) %>
+
+        <div class="page-wrapper">
+            <%- include('partials/topbar') %>
+
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <div class="page-pretitle">Administración del sistema</div>
+                            <h2 class="page-title">Reportes</h2>
+                            <div class="text-secondary mt-1">Indicadores de usuarios y servicios atendidos por rango de fecha.</div>
+                        </div>
+                        <div class="col-auto ms-auto d-print-none">
+                            <button class="btn btn-outline-secondary" type="button" data-print-report><i data-lucide="printer"></i>Imprimir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <div class="container-xl">
+                    <% if (errorReporte) { %>
+                        <div class="alert alert-warning" role="alert">
+                            <div class="alert-icon"><i data-lucide="triangle-alert"></i></div>
+                            <div><%= errorReporte %></div>
+                        </div>
+                    <% } %>
+
+                    <form class="card admin-report-filter mb-3 d-print-none" method="get" action="/admin/reportes" data-report-filters>
+                        <div class="card-body">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-12 col-md-4 col-xl-3">
+                                    <label class="form-label" for="report-period">Periodo</label>
+                                    <select id="report-period" class="form-select" name="periodo">
+                                        <option value="semana_anterior" <%= filtros.periodo === 'semana_anterior' ? 'selected' : '' %>>Semana anterior</option>
+                                        <option value="dia_anterior" <%= filtros.periodo === 'dia_anterior' ? 'selected' : '' %>>Día anterior</option>
+                                        <option value="mes_anterior" <%= filtros.periodo === 'mes_anterior' ? 'selected' : '' %>>Mes anterior</option>
+                                        <option value="personalizado" <%= filtros.periodo === 'personalizado' ? 'selected' : '' %>>Personalizado</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-6 col-xl-4 admin-report-date-group">
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <label class="form-label" for="report-start">Fecha inicio</label>
+                                            <input id="report-start" class="form-control" type="date" name="desde" value="<%= filtros.desde %>" max="<%= fechaMaxima %>">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label" for="report-end">Fecha fin</label>
+                                            <input id="report-end" class="form-control" type="date" name="hasta" value="<%= filtros.hasta %>" max="<%= fechaMaxima %>">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-auto">
+                                    <button class="btn btn-primary w-100" type="submit"><i data-lucide="bar-chart-3"></i>Generar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <section class="admin-report-summary" aria-label="Resumen del periodo">
+                        <article class="card admin-report-metric">
+                            <div class="card-body">
+                                <span class="avatar bg-cyan-lt text-cyan"><i data-lucide="users-round"></i></span>
+                                <div>
+                                    <strong><%= resumen.pacientes %></strong>
+                                    <span>Usuarios atendidos</span>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="card admin-report-metric">
+                            <div class="card-body">
+                                <span class="avatar bg-green-lt text-green"><i data-lucide="calendar-check"></i></span>
+                                <div>
+                                    <strong><%= resumen.turnos %></strong>
+                                    <span>Turnos atendidos</span>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="card admin-report-metric">
+                            <div class="card-body">
+                                <span class="avatar bg-purple-lt text-purple"><i data-lucide="flask-conical"></i></span>
+                                <div>
+                                    <strong><%= resumen.servicios %></strong>
+                                    <span>Servicios solicitados</span>
+                                </div>
+                            </div>
+                        </article>
+                    </section>
+
+                    <section class="admin-report-section" aria-labelledby="service-users-title">
+                        <div class="admin-report-heading">
+                            <div>
+                                <h3 id="service-users-title">Número de usuarios atendidos por servicio</h3>
+                                <p><%= filtros.desde %> a <%= filtros.hasta %></p>
+                            </div>
+                        </div>
+                        <% if (usuariosPorServicio.length === 0) { %>
+                            <div class="empty admin-report-empty">
+                                <div class="empty-icon"><i data-lucide="file-search"></i></div>
+                                <p class="empty-title">No hay usuarios atendidos en este rango</p>
+                                <p class="empty-subtitle text-secondary">Selecciona otro periodo para consultar actividad registrada.</p>
+                            </div>
+                        <% } else { %>
+                            <div class="admin-report-card-grid">
+                                <% usuariosPorServicio.forEach((item) => { %>
+                                    <article class="card admin-report-card">
+                                        <div class="card-body">
+                                            <div class="admin-report-card-top">
+                                                <span class="avatar bg-cyan-lt text-cyan"><i data-lucide="flask-conical"></i></span>
+                                                <span class="badge bg-azure-lt"><%= item.porcentaje %>%</span>
+                                            </div>
+                                            <h4 title="<%= item.servicio %>"><%= item.servicio %></h4>
+                                            <strong><%= item.pacientes %></strong>
+                                            <span><%= item.turnos %> turnos atendidos</span>
+                                            <div class="progress progress-sm mt-3">
+                                                <div class="progress-bar bg-cyan" style="width: <%= item.porcentaje %>%"></div>
+                                            </div>
+                                        </div>
+                                    </article>
+                                <% }); %>
+                            </div>
+                        <% } %>
+                    </section>
+
+                    <section class="admin-report-section" aria-labelledby="gender-service-title">
+                        <div class="admin-report-heading">
+                            <div>
+                                <h3 id="gender-service-title">Listado de usuarios por género y servicio solicitado</h3>
+                                <p><%= filtros.desde %> a <%= filtros.hasta %></p>
+                            </div>
+                        </div>
+                        <% if (usuariosPorGeneroServicio.length === 0) { %>
+                            <div class="empty admin-report-empty">
+                                <div class="empty-icon"><i data-lucide="users-round"></i></div>
+                                <p class="empty-title">No hay usuarios para listar</p>
+                                <p class="empty-subtitle text-secondary">El cruce por género y servicio aparecerá cuando existan atenciones.</p>
+                            </div>
+                        <% } else { %>
+                            <div class="admin-report-card-grid admin-report-card-grid-wide">
+                                <% usuariosPorGeneroServicio.forEach((item) => { %>
+                                    <article class="card admin-report-card admin-report-list-card">
+                                        <div class="card-body">
+                                            <div class="admin-report-card-top">
+                                                <span class="badge bg-purple-lt"><i data-lucide="user-round"></i><%= item.genero %></span>
+                                                <span class="badge bg-cyan-lt"><%= item.pacientes %> usuarios</span>
+                                            </div>
+                                            <h4 title="<%= item.servicio %>"><%= item.servicio %></h4>
+                                            <div class="admin-report-user-list">
+                                                <% item.usuarios.forEach((usuario) => { %>
+                                                    <div>
+                                                        <strong><%= usuario.nombre %></strong>
+                                                        <span>CI <%= usuario.identificacion %></span>
+                                                    </div>
+                                                <% }); %>
+                                            </div>
+                                        </div>
+                                    </article>
+                                <% }); %>
+                            </div>
+                        <% } %>
+                    </section>
+
+                    <section class="admin-report-section" aria-labelledby="service-detail-title">
+                        <div class="admin-report-heading">
+                            <div>
+                                <h3 id="service-detail-title">Detalle de servicios atendidos por rango de fecha</h3>
+                                <p><%= filtros.desde %> a <%= filtros.hasta %></p>
+                            </div>
+                        </div>
+                        <% if (detalleServicios.length === 0) { %>
+                            <div class="empty admin-report-empty">
+                                <div class="empty-icon"><i data-lucide="calendar-x-2"></i></div>
+                                <p class="empty-title">No hay servicios atendidos</p>
+                                <p class="empty-subtitle text-secondary">Cambia el rango para revisar atenciones anteriores.</p>
+                            </div>
+                        <% } else { %>
+                            <div class="admin-report-card-grid admin-report-card-grid-wide">
+                                <% detalleServicios.forEach((turno) => { %>
+                                    <article class="card admin-report-detail-card">
+                                        <div class="card-body">
+                                            <div class="admin-report-card-top">
+                                                <span class="badge bg-green-lt"><i data-lucide="circle-check"></i>Atendido</span>
+                                                <span class="text-secondary"><%= turno.codigo %></span>
+                                            </div>
+                                            <h4 title="<%= turno.servicio %>"><%= turno.servicio %></h4>
+                                            <dl>
+                                                <div><dt>Fecha</dt><dd><%= turno.fecha %> · <%= turno.hora %></dd></div>
+                                                <div><dt>Paciente</dt><dd><%= turno.paciente %></dd></div>
+                                                <div><dt>Identificación</dt><dd><%= turno.identificacion %></dd></div>
+                                                <div><dt>Género</dt><dd><%= turno.genero %></dd></div>
+                                            </dl>
+                                        </div>
+                                    </article>
+                                <% }); %>
+                            </div>
+                        <% } %>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/scripts', { scripts: ['/js/admin-reports.js'] }) %>
+</body>
+</html>

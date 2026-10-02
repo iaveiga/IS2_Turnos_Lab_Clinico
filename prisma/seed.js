@@ -36,7 +36,11 @@ async function seed() {
     { codigo: 'GESTIONAR_DIAS_NO_LABORABLES', nombre: 'Gestionar Días no Laborables', descripcion: 'Permite configurar fechas sin atención' },
     { codigo: 'GESTIONAR_PARAMETROS', nombre: 'Gestionar Parámetros', descripcion: 'Permite configurar parámetros generales' },
     { codigo: 'VER_REPORTES', nombre: 'Ver Reportes', descripcion: 'Permite consultar reportes administrativos' },
-    { codigo: 'VER_AUDITORIA', nombre: 'Ver Auditoría', descripcion: 'Permite consultar registros de auditoría' }
+    { codigo: 'VER_AUDITORIA', nombre: 'Ver Auditoría', descripcion: 'Permite consultar registros de auditoría' },
+    { codigo: 'ACCEDER_RECEPCION', nombre: 'Acceso Recepción', descripcion: 'Permite acceder al módulo operativo de recepción' },
+    { codigo: 'REGISTRAR_LLEGADA', nombre: 'Registrar Llegada', descripcion: 'Permite registrar la llegada de pacientes agendados' },
+    { codigo: 'REGISTRAR_PACIENTES', nombre: 'Registrar Pacientes', descripcion: 'Permite crear fichas de nuevos pacientes' },
+    { codigo: 'VER_RESULTADOS', nombre: 'Ver Resultados', descripcion: 'Permite consultar resultados de exámenes publicados' }
   ];
 
   for (const p of permisos) {
@@ -55,7 +59,16 @@ async function seed() {
 
   const matrizRolPermiso = {
     PACIENTE: ['VER_TURNOS', 'CREAR_TURNO', 'VER_PERFIL', 'EDITAR_PERFIL'],
-    RECEPCIONISTA: ['VER_TURNOS', 'CREAR_TURNO', 'VER_PERFIL', 'EDITAR_PERFIL'],
+    RECEPCIONISTA: [
+      'ACCEDER_RECEPCION',
+      'REGISTRAR_LLEGADA',
+      'REGISTRAR_PACIENTES',
+      'VER_RESULTADOS',
+      'VER_TURNOS',
+      'CREAR_TURNO',
+      'VER_PERFIL',
+      'EDITAR_PERFIL'
+    ],
     TECNICO: ['VER_TURNOS', 'VER_PERFIL'],
     ADMINISTRADOR: [
       'ACCEDER_CONSOLA',
@@ -71,7 +84,11 @@ async function seed() {
       'GESTIONAR_DIAS_NO_LABORABLES',
       'GESTIONAR_PARAMETROS',
       'VER_REPORTES',
-      'VER_AUDITORIA'
+      'VER_AUDITORIA',
+      'ACCEDER_RECEPCION',
+      'REGISTRAR_LLEGADA',
+      'REGISTRAR_PACIENTES',
+      'VER_RESULTADOS'
     ]
   };
 
