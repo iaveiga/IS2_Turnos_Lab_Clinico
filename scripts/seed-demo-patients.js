@@ -298,12 +298,18 @@ async function main() {
         where: { correo: data.correo },
         update: {
           id_paciente: patient.id_paciente,
+          identificacion: patient.identificacion,
+          nombres: patient.nombres,
+          apellidos: patient.apellidos,
           nombre_usuario: data.correo,
           password_hash: passwordHash,
           activo: true
         },
         create: {
           id_paciente: patient.id_paciente,
+          identificacion: patient.identificacion,
+          nombres: patient.nombres,
+          apellidos: patient.apellidos,
           nombre_usuario: data.correo,
           correo: data.correo,
           password_hash: passwordHash,

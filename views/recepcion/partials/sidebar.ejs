@@ -14,9 +14,6 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="/recepcion"><span class="nav-link-icon"><i data-lucide="clipboard-check"></i></span><span class="nav-link-title">Control de recepción</span></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#turnos-dia"><span class="nav-link-icon"><i data-lucide="calendar-days"></i></span><span class="nav-link-title">Turnos del día</span></a>
-                </li>
                 <% if ((locals.permisosUsuario || []).includes('ACCEDER_CONSOLA')) { %>
                     <li class="nav-item mt-lg-3">
                         <a class="nav-link" href="/admin"><span class="nav-link-icon"><i data-lucide="shield-check"></i></span><span class="nav-link-title">Administración</span></a>
