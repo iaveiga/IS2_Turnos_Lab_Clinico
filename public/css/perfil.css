@@ -1,0 +1,350 @@
+/* ==========================================================================
+   perfil.css  ·  Vista: paciente/editarPerfil.ejs
+   Autónomo: NO necesita Pico CSS. Si /css/custom.css está cargado usa sus
+   colores; si no, usa los mismos valores como respaldo.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  --p-primary: var(--color-primary, #0d6efd);
+  --p-primary-dark: var(--color-primary-dark, #0756ca);
+  --p-secondary: var(--color-secondary, #17a2b8);
+  --p-secondary-dark: var(--color-secondary-dark, #0e8193);
+  --p-violet: var(--color-violet, #7952d9);
+  --p-bg: var(--color-background, #f5f9ff);
+  --p-surface: var(--color-surface, #ffffff);
+  --p-text: var(--color-text, #1f2d3d);
+  --p-muted: var(--color-muted, #6c757d);
+  --p-border: var(--color-border, #d9e5f2);
+  --p-title: #12355b;
+  --p-field-bg: #f8fbff;
+  --p-field-border: #c9d9e8;
+  --p-shadow-soft: var(--shadow-soft, 0 12px 32px rgba(28, 72, 120, 0.09));
+  --p-shadow-button: var(--shadow-button, 0 8px 18px rgba(13, 110, 253, 0.22));
+  --p-ring: rgba(13, 110, 253, 0.18);
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--p-text);
+  background-color: var(--p-bg);
+  background-image:
+    radial-gradient(900px 380px at 12% -8%, rgba(23, 162, 184, 0.14), transparent 70%),
+    radial-gradient(800px 360px at 95% 0%, rgba(13, 110, 253, 0.12), transparent 70%);
+  background-repeat: no-repeat;
+}
+
+.container {
+  width: 100%;
+  margin-inline: auto;
+  padding: 0 1.25rem 3rem;
+}
+
+/* ---------- Encabezado ---------- */
+.header-title {
+  margin-bottom: 0.5rem;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--p-secondary-dark);
+}
+
+.container > h1 {
+  margin-top: 0;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--p-title);
+}
+
+.container > p {
+  margin-top: 0;
+  line-height: 1.5;
+}
+
+/* ---------- Tarjetas ---------- */
+.card-custom {
+  margin-bottom: 1.5rem;
+  padding: 1.75rem 1.9rem;
+  background: var(--p-surface);
+  border: 1px solid rgba(217, 229, 242, 0.75);
+  border-radius: 24px;
+  box-shadow: var(--p-shadow-soft);
+}
+
+.section-title {
+  margin-bottom: 1.4rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--p-title);
+}
+
+/* ---------- Cabecera: avatar + datos ---------- */
+.avatar-circle {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--p-secondary-dark), var(--p-primary));
+  color: #ffffff;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 22px rgba(13, 110, 253, 0.24);
+}
+
+.avatar-badge {
+  position: absolute;
+  right: -8px;
+  bottom: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--p-surface);
+  border-radius: 50%;
+  background: var(--p-violet);
+  color: #ffffff;
+  font-size: 0.65rem;
+  letter-spacing: 0;
+}
+
+.card-custom h3 {
+  font-weight: 700;
+  color: var(--p-title);
+}
+
+.user-info-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+  font-size: 0.82rem;
+  color: var(--p-muted);
+}
+
+.user-info-list span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.badge-role {
+  padding: 0.15rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(121, 82, 217, 0.12);
+  color: var(--p-violet);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+/* ---------- Formulario ---------- */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem 1.5rem;
+  margin-bottom: 1.1rem;
+}
+
+.card-custom .grid-2:last-child {
+  margin-bottom: 0;
+}
+
+.grid-2 label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--p-text);
+}
+
+.grid-2 input,
+.grid-2 select {
+  width: 100%;
+  height: 46px;
+  margin: 0;
+  padding: 0 1rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--p-text);
+  background-color: var(--p-field-bg);
+  border: 1px solid var(--p-field-border);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.grid-2 input::placeholder {
+  color: #9aabbd;
+}
+
+.grid-2 input:hover,
+.grid-2 select:hover {
+  border-color: #aac3dc;
+}
+
+.grid-2 input:focus,
+.grid-2 select:focus {
+  background-color: #ffffff;
+  border-color: var(--p-primary);
+  box-shadow: 0 0 0 4px var(--p-ring);
+}
+
+.grid-2 select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2.6rem;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236c7f95' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+
+/* ---------- Seguridad de la cuenta ---------- */
+.security-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: #f4f9fd;
+  border: 1px solid rgba(217, 229, 242, 0.7);
+  border-radius: 16px;
+}
+
+.security-box strong {
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+.security-box p {
+  max-width: 470px;
+  line-height: 1.45;
+}
+
+/* ---------- Botones ---------- */
+.btn-cancel,
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  margin: 0;
+  padding: 0 1.5rem;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+              box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.btn-cancel {
+  color: var(--p-text);
+  background: var(--p-surface);
+  border: 1px solid var(--p-border);
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: #f0f6fc;
+  border-color: #aac3dc;
+}
+
+.btn-cancel:disabled {
+  color: #8a9bad;
+  background: #eef3f8;
+  border-color: transparent;
+}
+
+.btn-save {
+  color: #ffffff;
+  background: var(--p-primary);
+  border: 1px solid var(--p-primary);
+  font-weight: 700;
+  box-shadow: var(--p-shadow-button);
+}
+
+.btn-save:hover {
+  background: var(--p-primary-dark);
+  border-color: var(--p-primary-dark);
+  box-shadow: 0 10px 22px rgba(13, 110, 253, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-save:active {
+  transform: translateY(0);
+}
+
+.btn-save:focus-visible,
+.btn-cancel:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--p-ring);
+}
+
+.actions-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-save:hover {
+    transform: none;
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  .card-custom {
+    padding: 1.4rem 1.2rem;
+    border-radius: 20px;
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .security-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .security-box .btn-cancel {
+    width: 100%;
+  }
+
+  .actions-container {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}

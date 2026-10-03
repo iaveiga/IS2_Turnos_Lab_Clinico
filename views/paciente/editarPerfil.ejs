@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil del paciente - Clínica San Francisco</title>
+    <!-- Pico CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos locales separados -->
+    <link rel="stylesheet" href="/css/perfil.css">
+</head>
+<body>
+
+    <main class="container" style="max-width: 850px; margin-top: 2rem;">
+        <div class="header-title">TU CUENTA</div>
+        <h1 style="margin-bottom: 0.2rem; font-size: 2rem;">Perfil del paciente</h1>
+        <p style="color: #666; font-size: 0.95rem; margin-bottom: 1.8rem;">Actualiza tus datos personales. La contraseña no se puede modificar desde aquí.</p>
+
+        <!-- TARJETA CABECERA PERFIL -->
+        <div class="card-custom">
+            <div style="display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;">
+                <div class="avatar-circle">
+                    <%= (paciente && paciente.nombres ? paciente.nombres[0] : 'M') + (paciente && paciente.apellidos ? paciente.apellidos[0] : 'E') %>
+                    <div class="avatar-badge"><i class="fa-solid fa-user"></i></div>
+                </div>
+                <div>
+                    <h3 style="margin: 0 0 0.3rem 0; font-size: 1.3rem;">
+                        <%= paciente ? paciente.nombres + ' ' + paciente.apellidos : 'María Elena González Pérez' %>
+                    </h3>
+                    <div class="user-info-list">
+                        <span class="badge-role">Paciente</span>
+                        <span><i class="fa-regular fa-envelope"></i> <%= (paciente && paciente.correo) || 'maria.gonzalez@correo.com' %></span>
+                        <span><i class="fa-solid fa-phone"></i> <%= (paciente && paciente.telefono) || '099 123 4567' %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORMULARIO DE EDICIÓN -->
+        <form action="/paciente/perfil" method="POST">
+            <div class="card-custom">
+                <div class="section-title">Información personal</div>
+                
+                <div class="grid-2">
+                    <label>
+                        Nombres
+                        <input type="text" name="nombres" value="<%= paciente ? paciente.nombres : 'María Elena' %>" required>
+                    </label>
+                    <label>
+                        Apellidos
+                        <input type="text" name="apellidos" value="<%= paciente ? paciente.apellidos : 'González Pérez' %>" required>
+                    </label>
+                </div>
+
+                <div class="grid-2">
+                    <label>
+                        Cédula
+                        <input type="tel" name="identificacion" value="<%= paciente ? paciente.identificacion : '0012345678' %>" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="10" required>
+                    </label>
+                    <label>
+                        Edad
+                        <input type="number" name="edad" value="<%= paciente ? paciente.edad : '34' %>" placeholder="Ej. 34">
+                    </label>
+                </div>
+
+                <div class="grid-2">
+                    <label>
+                        Sexo
+                        <select name="sexo">
+                            <option value="" <%= (!paciente || !paciente.sexo) ? 'selected' : '' %>>Seleccione...</option>
+                            <option value="Femenino" <%= (paciente && paciente.sexo === 'Femenino') || !paciente ? 'selected' : '' %>>Femenino</option>
+                            <option value="Masculino" <%= paciente && paciente.sexo === 'Masculino' ? 'selected' : '' %>>Masculino</option>
+                            <option value="Otro" <%= paciente && paciente.sexo === 'Otro' ? 'selected' : '' %>>Otro</option>
+                        </select>
+                    </label>
+                    <label>
+                        Celular / Teléfono
+                        <input type="tel" name="telefono" value="<%= paciente ? paciente.telefono : '0991234567' %>" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="10" placeholder="0991234567">
+                    </label>
+                </div>
+
+                <div class="grid-2">
+                    <label>
+                        Correo electrónico
+                        <input type="email" name="correo" value="<%= paciente ? paciente.correo : 'maria.gonzalez@correo.com' %>" placeholder="ejemplo@correo.com">
+                    </label>
+                    <label>
+                        Dirección
+                        <input type="text" name="direccion" value="<%= paciente ? paciente.direccion : '' %>" placeholder="Av. Principal y Calle 2">
+                    </label>
+                </div>
+            </div>
+
+            <!-- SEGURIDAD DE LA CUENTA -->
+            <div class="card-custom">
+                <div class="section-title">Seguridad de la cuenta</div>
+                <div class="security-box">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="background: #edf2f7; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #4a5568;">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <div>
+                            <strong style="font-size: 0.95rem; color: #2d3748;">Contraseña</strong>
+                            <p style="margin: 0; font-size: 0.8rem; color: #718096;">Para tu seguridad, la contraseña no se puede actualizar desde esta pantalla. Contacta a recepción si necesitas restablecerla.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-cancel" style="font-size: 0.85rem; margin: 0; cursor: not-allowed;" disabled>Cambiar contraseña</button>
+                </div>
+            </div>
+
+            <!-- BOTONES -->
+            <div class="actions-container">
+                <a href="/" role="button" class="btn-cancel">Cancelar</a>
+                <button type="submit" class="btn-save">Guardar cambios</button>
+            </div>
+        </form>
+    </main>
+
+</body>
+</html>
