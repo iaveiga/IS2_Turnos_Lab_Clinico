@@ -4,6 +4,8 @@
     estilos: ['/css/admin-tabler.css', '/css/tecnico.css']
 }) %>
 <body class="layout-fluid admin-tabler-page technician-page">
+    <% const seccionActual = typeof seccion === 'undefined' ? 'confirmados' : seccion; %>
+    <% const rutaSeccionActual = typeof rutaSeccion === 'undefined' ? '/tecnico' : rutaSeccion; %>
     <div class="page">
         <header class="navbar navbar-expand-md d-print-none technician-navbar">
             <div class="container-xl">
@@ -12,16 +14,18 @@
                     <span><strong>Clínica San Francisco</strong><small class="d-block">Técnico de laboratorio · Turnos</small></span>
                 </a>
                 <div class="navbar-nav flex-row ms-auto align-items-center gap-2">
-                    <a class="btn btn-outline-primary" href="/pacientes/perfil"><i data-lucide="settings-2"></i>Editar perfil</a>
+                    
                     <a class="btn btn-ghost-secondary" href="/auth/logout"><i data-lucide="log-out"></i>Cerrar sesión</a>
                 </div>
             </div>
         </header>
         <div class="page-wrapper">
             <div class="page-header d-print-none">
-                <div class="container-xl">
+                <div class="container-xl technician-container">
                     <div class="page-pretitle">Panel del técnico</div>
+                    <br>
                     <h1 class="page-title">Turnos asignados</h1>
+                    <br>
                     <div class="text-secondary mt-1">Atiende los turnos que recepción confirmó y registra tus observaciones.</div>
                 </div>
             </div>
@@ -30,14 +34,14 @@
                     <% if (mensaje) { %><div class="alert alert-success" role="status"><i data-lucide="circle-check"></i><%= mensaje %></div><% } %>
                     <% if (error) { %><div class="alert alert-danger" role="alert"><i data-lucide="circle-alert"></i><%= error %></div><% } %>
 
-                    <section class="technician-kpis" aria-label="Resumen de turnos">
-                        <article class="technician-kpi is-assigned"><strong><%= kpis.asignados %></strong><span>Confirmados para atención</span></article>
-                        <article class="technician-kpi"><strong><%= kpis.pendientes %></strong><span>Pendientes</span></article>
-                        <article class="technician-kpi"><strong><%= kpis.atendidos %></strong><span>Atendidos</span></article>
-                        <article class="technician-kpi"><strong><%= kpis.cancelados %></strong><span>Cancelados</span></article>
-                    </section>
+                    <nav class="technician-tabs" aria-label="Turnos por estado">
+                        <a class="<%= seccionActual === 'confirmados' ? 'is-active' : '' %>" href="/tecnico?fecha=<%= fecha %>">Confirmados para atención <span><%= kpis.asignados %></span></a>
+                        <a class="<%= seccionActual === 'pendientes' ? 'is-active' : '' %>" href="/tecnico/pendientes?fecha=<%= fecha %>">Pendientes <span><%= kpis.pendientes %></span></a>
+                        <a class="<%= seccionActual === 'atendidos' ? 'is-active' : '' %>" href="/tecnico/atendidos?fecha=<%= fecha %>">Atendidos <span><%= kpis.atendidos %></span></a>
+                        <a class="<%= seccionActual === 'cancelados' ? 'is-active' : '' %>" href="/tecnico/cancelados?fecha=<%= fecha %>">Cancelados <span><%= kpis.cancelados %></span></a>
+                    </nav>
 
-                    <form class="technician-filters" method="get" action="/tecnico">
+                    <form class="technician-filters" method="get" action="<%= rutaSeccionActual %>">
                         <label><span>Buscar paciente o turno</span><input class="form-control" type="search" name="buscar" value="<%= buscar %>" placeholder="Nombre, cédula o código"></label>
                         <label><span>Fecha de atención</span><input class="form-control" type="date" name="fecha" value="<%= fecha %>"></label>
                         <button class="btn btn-primary" type="submit"><i data-lucide="search"></i>Filtrar</button>
@@ -46,7 +50,7 @@
 
                     <section class="technician-turn-list" aria-label="Turnos asignados">
                         <% if (!turnos.length) { %>
-                            <div class="technician-empty"><i data-lucide="calendar-check-2"></i><h2>No hay turnos para esta fecha</h2><p>Los turnos aparecerán aquí cuando recepción registre la llegada del paciente.</p></div>
+                            <div class="technician-empty"><i data-lucide="calendar-check-2"></i><h2>No hay turnos en este apartado</h2><p><%= seccionActual === 'confirmados' ? 'Los turnos aparecerán aquí cuando recepción registre la llegada del paciente.' : 'Cuando actualices un turno a este estado, aparecerá aquí.' %></p></div>
                         <% } %>
                         <% turnos.forEach((turno) => { const estadoClase = turno.estadoCodigo === 'ATENDIDO' ? 'is-done' : turno.estadoCodigo === 'CANCELADO' ? 'is-cancelled' : turno.estadoCodigo === 'PENDIENTE' ? 'is-pending' : 'is-confirmed'; %>
                             <article class="technician-card">
@@ -65,6 +69,12 @@
                                             <button class="btn btn-primary" type="submit"><i data-lucide="save"></i>Guardar atención</button>
                                         </div>
                                     </form>
+                                    <% if (turno.estadoCodigo === 'CONFIRMADO') { %>
+                                        <form class="technician-delete-form" method="post" action="/tecnico/turnos/<%= turno.id %>/eliminar" onsubmit="return confirm('¿Eliminar definitivamente este turno? Esta acción no se puede deshacer.');">
+                                            <input type="hidden" name="fecha" value="<%= fecha %>">
+                                            <button class="btn btn-outline-danger" type="submit"><i data-lucide="trash-2"></i>Eliminar turno</button>
+                                        </form>
+                                    <% } %>
                                 <% } %>
                             </article>
                         <% }); %>

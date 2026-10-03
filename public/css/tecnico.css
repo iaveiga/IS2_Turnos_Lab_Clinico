@@ -16,6 +16,7 @@
   font-size: 1rem;
 }
 
+
 .technician-navbar .navbar-brand small {
   color: #5a7887;
   font-size: 0.78rem;
@@ -49,38 +50,51 @@
   font-weight: 800;
 }
 
-.technician-kpis {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  margin: 1.5rem 0;
-}
-
-.technician-kpi {
-  display: grid;
-  min-height: 100px;
-  align-content: center;
-  gap: 0.2rem;
-  padding: 1.1rem 1.25rem;
-  border: 1px solid #cfe4eb;
-  border-radius: 20px;
-  background: #fff;
-}
-
-.technician-kpi.is-assigned {
-  border-color: #8c1254;
-  background: #e0e2ed;
-}
-
-.technician-kpi strong {
-  color: var(--technician-ink);
-  font-size: 1.55rem;
-}
-
-.technician-kpi span,
 .technician-date {
   color: #4d6876;
   font-size: 0.85rem;
+}
+
+.technician-tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin: 1.25rem 0;
+  padding: 0.35rem;
+  overflow-x: auto;
+  border: 1px solid #cfe4eb;
+  border-radius: 14px;
+  background: #f7fbfc;
+}
+
+.technician-tabs a {
+  display: inline-flex;
+  min-height: 42px;
+  flex: 1 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 10px;
+  color: #456371;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.technician-tabs a.is-active {
+  background: #fff;
+  color: #007f86;
+  box-shadow: 0 2px 8px rgba(17, 60, 80, 0.1);
+}
+
+.technician-tabs a span {
+  display: inline-grid;
+  min-width: 1.45rem;
+  height: 1.45rem;
+  place-items: center;
+  border-radius: 999px;
+  background: #e4eef1;
+  font-size: 0.68rem;
 }
 
 .technician-filters {
@@ -152,9 +166,18 @@
   font-weight: 700;
 }
 
-.technician-status.is-done { background: #e3f6eb; color: #18764c; }
-.technician-status.is-pending { background: #fff3d7; color: #946300; }
-.technician-status.is-cancelled { background: #fde8e8; color: #a43c42; }
+.technician-status.is-done {
+  background: #e3f6eb;
+  color: #18764c;
+}
+.technician-status.is-pending {
+  background: #fff3d7;
+  color: #946300;
+}
+.technician-status.is-cancelled {
+  background: #fde8e8;
+  color: #a43c42;
+}
 
 .technician-service {
   display: flex;
@@ -170,7 +193,10 @@
 }
 
 .technician-service svg,
-.technician-attendance-form > label svg { width: 17px; height: 17px; }
+.technician-attendance-form > label svg {
+  width: 17px;
+  height: 17px;
+}
 
 .technician-attendance-form {
   display: grid;
@@ -196,6 +222,12 @@
   font-size: 1rem;
 }
 
+.technician-delete-form {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.65rem;
+}
+
 .technician-form-actions {
   display: flex;
   align-items: end;
@@ -203,33 +235,68 @@
   gap: 0.75rem;
 }
 
-.technician-state-select { max-width: 210px; }
+.technician-state-select {
+  max-width: 210px;
+}
 
 .technician-empty {
   padding: 3rem 1rem;
   border: 1px dashed #b9d3dc;
   border-radius: 20px;
-  background: rgba(255,255,255,.7);
+  background: rgba(255, 255, 255, 0.7);
   color: #66808c;
   text-align: center;
 }
 
-.technician-empty svg { width: 34px; height: 34px; color: var(--technician-accent); }
-.technician-empty h2 { margin: 0.8rem 0 0.3rem; color: var(--technician-ink); font-size: 1rem; }
-.technician-empty p { margin: 0; }
+.technician-empty svg {
+  width: 34px;
+  height: 34px;
+  color: var(--technician-accent);
+}
+.technician-empty h2 {
+  margin: 0.8rem 0 0.3rem;
+  color: var(--technician-ink);
+  font-size: 1rem;
+}
+.technician-empty p {
+  margin: 0;
+}
 
 @media (max-width: 767.98px) {
-  .technician-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .technician-filters { align-items: stretch; flex-direction: column; }
-  .technician-filters label { flex: auto; }
-  .technician-form-actions { align-items: stretch; flex-direction: column; }
-  .technician-state-select { max-width: none; }
+  .technician-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .technician-filters label {
+    flex: auto;
+  }
+  .technician-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .technician-state-select {
+    max-width: none;
+  }
 }
 
 @media (max-width: 480px) {
-  .technician-navbar .btn { padding: 0.4rem 0.55rem; font-size: 0.7rem; }
-  .technician-navbar .navbar-brand { gap: 0.5rem !important; font-size: 0.8rem; }
-  .technician-brand-mark { width: 40px; height: 40px; }
-  .technician-card { padding: 1rem; border-radius: 18px; }
-  .technician-card-heading { flex-direction: column; }
+  .technician-navbar .btn {
+    padding: 0.4rem 0.55rem;
+    font-size: 0.7rem;
+  }
+  .technician-navbar .navbar-brand {
+    gap: 0.5rem !important;
+    font-size: 0.8rem;
+  }
+  .technician-brand-mark {
+    width: 40px;
+    height: 40px;
+  }
+  .technician-card {
+    padding: 1rem;
+    border-radius: 18px;
+  }
+  .technician-card-heading {
+    flex-direction: column;
+  }
 }
