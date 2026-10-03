@@ -40,7 +40,11 @@ async function seed() {
     { codigo: 'ACCEDER_RECEPCION', nombre: 'Acceso Recepción', descripcion: 'Permite acceder al módulo operativo de recepción' },
     { codigo: 'REGISTRAR_LLEGADA', nombre: 'Registrar Llegada', descripcion: 'Permite registrar la llegada de pacientes agendados' },
     { codigo: 'REGISTRAR_PACIENTES', nombre: 'Registrar Pacientes', descripcion: 'Permite crear fichas de nuevos pacientes' },
-    { codigo: 'VER_RESULTADOS', nombre: 'Ver Resultados', descripcion: 'Permite consultar resultados de exámenes publicados' }
+    { codigo: 'VER_RESULTADOS', nombre: 'Ver Resultados', descripcion: 'Permite consultar resultados de exámenes publicados' },
+    { codigo: 'ACCEDER_LABORATORIO', nombre: 'Acceso Laboratorio', descripcion: 'Permite acceder al módulo operativo del laboratorio' },
+    { codigo: 'TOMAR_TURNOS', nombre: 'Tomar Turnos', descripcion: 'Permite iniciar la atención de turnos confirmados' },
+    { codigo: 'REGISTRAR_RESULTADOS', nombre: 'Registrar Resultados', descripcion: 'Permite guardar resultados de exámenes en borrador' },
+    { codigo: 'PUBLICAR_RESULTADOS', nombre: 'Publicar Resultados', descripcion: 'Permite publicar resultados y finalizar atenciones' }
   ];
 
   for (const p of permisos) {
@@ -69,7 +73,14 @@ async function seed() {
       'VER_PERFIL',
       'EDITAR_PERFIL'
     ],
-    TECNICO: ['VER_TURNOS', 'VER_PERFIL'],
+    TECNICO: [
+      'ACCEDER_LABORATORIO',
+      'TOMAR_TURNOS',
+      'REGISTRAR_RESULTADOS',
+      'PUBLICAR_RESULTADOS',
+      'VER_TURNOS',
+      'VER_PERFIL'
+    ],
     ADMINISTRADOR: [
       'ACCEDER_CONSOLA',
       'VER_TURNOS',
@@ -88,7 +99,11 @@ async function seed() {
       'ACCEDER_RECEPCION',
       'REGISTRAR_LLEGADA',
       'REGISTRAR_PACIENTES',
-      'VER_RESULTADOS'
+      'VER_RESULTADOS',
+      'ACCEDER_LABORATORIO',
+      'TOMAR_TURNOS',
+      'REGISTRAR_RESULTADOS',
+      'PUBLICAR_RESULTADOS'
     ]
   };
 

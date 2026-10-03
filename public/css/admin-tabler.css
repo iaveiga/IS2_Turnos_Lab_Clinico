@@ -1246,73 +1246,103 @@ body.admin-tabler-page {
   height: 13px;
 }
 
-.admin-report-user-list {
+.admin-report-gender-list {
   display: grid;
-  max-height: 280px;
-  gap: 0.45rem;
-  padding-right: 0.2rem;
-  overflow-y: auto;
+  gap: 0.7rem;
 }
 
-.admin-report-user-list div {
+.admin-report-gender-row {
   display: grid;
-  min-height: 42px;
-  padding: 0.55rem 0.65rem;
-  border: 1px solid #e0e9ed;
-  border-radius: 6px;
-  background: #f8fafb;
-}
-
-.admin-report-user-list strong,
-.admin-report-user-list span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.admin-report-user-list strong {
-  color: #294c5e;
-  font-size: 0.64rem;
-}
-
-.admin-report-user-list span,
-.admin-report-user-list small {
-  color: #718692;
-  font-size: 0.56rem;
-}
-
-.admin-report-detail-card dl {
-  display: grid;
-  gap: 0.45rem;
-  margin: 0;
-}
-
-.admin-report-detail-card dl > div {
-  display: grid;
-  grid-template-columns: 105px minmax(0, 1fr);
-  gap: 0.75rem;
-  padding: 0.55rem 0;
+  gap: 0.4rem;
+  padding-top: 0.65rem;
   border-top: 1px solid #e6edf1;
 }
 
-.admin-report-detail-card dt,
-.admin-report-detail-card dd {
-  margin: 0;
-  min-width: 0;
-  font-size: 0.62rem;
+.admin-report-gender-count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
-.admin-report-detail-card dt {
-  color: #718692;
-  font-weight: 700;
-}
-
-.admin-report-detail-card dd {
-  overflow: hidden;
+.admin-report-gender-count > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   color: #294c5e;
+  font-size: 0.64rem;
   font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.admin-report-gender-count svg {
+  width: 14px;
+  height: 14px;
+}
+
+.admin-report-gender-count strong {
+  color: #193d50;
+  font-size: 0.78rem;
+}
+
+.admin-report-gender-count small {
+  color: #718692;
+  font-size: 0.56rem;
+  font-weight: 600;
+}
+
+.admin-report-date-card .card-body {
+  min-height: 150px;
+}
+
+.admin-report-date-card .avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 7px;
+}
+
+.admin-report-date-summary {
+  display: flex;
+  min-width: 0;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid #e6edf1;
+}
+
+.admin-report-date-summary > div:first-child {
+  min-width: 0;
+}
+
+.admin-report-date-summary > div:first-child > span {
+  color: #718692;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.admin-report-date-summary h4 {
+  margin-top: 0.3rem;
+  font-size: 0.82rem;
+}
+
+.admin-report-date-total {
+  display: grid;
+  flex: 0 0 auto;
+  justify-items: end;
+}
+
+.admin-report-date-total strong {
+  color: #193d50;
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.admin-report-date-total span {
+  margin-top: 0.25rem;
+  color: #617985;
+  font-size: 0.58rem;
+  font-weight: 700;
 }
 
 .admin-report-empty {

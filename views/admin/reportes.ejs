@@ -133,7 +133,7 @@
                     <section class="admin-report-section" aria-labelledby="gender-service-title">
                         <div class="admin-report-heading">
                             <div>
-                                <h3 id="gender-service-title">Listado de usuarios por género y servicio solicitado</h3>
+                                <h3 id="gender-service-title">Pacientes atendidos por género y servicio</h3>
                                 <p><%= filtros.desde %> a <%= filtros.hasta %></p>
                             </div>
                         </div>
@@ -146,18 +146,24 @@
                         <% } else { %>
                             <div class="admin-report-card-grid admin-report-card-grid-wide">
                                 <% usuariosPorGeneroServicio.forEach((item) => { %>
-                                    <article class="card admin-report-card admin-report-list-card">
+                                    <article class="card admin-report-card admin-report-gender-card">
                                         <div class="card-body">
                                             <div class="admin-report-card-top">
-                                                <span class="badge bg-purple-lt"><i data-lucide="user-round"></i><%= item.genero %></span>
-                                                <span class="badge bg-cyan-lt"><%= item.pacientes %> usuarios</span>
+                                                <span class="avatar bg-purple-lt text-purple"><i data-lucide="users-round"></i></span>
+                                                <span class="badge bg-cyan-lt"><%= item.pacientes %> <%= item.pacientes === 1 ? 'paciente' : 'pacientes' %></span>
                                             </div>
                                             <h4 title="<%= item.servicio %>"><%= item.servicio %></h4>
-                                            <div class="admin-report-user-list">
-                                                <% item.usuarios.forEach((usuario) => { %>
-                                                    <div>
-                                                        <strong><%= usuario.nombre %></strong>
-                                                        <span>CI <%= usuario.identificacion %></span>
+                                            <div class="admin-report-gender-list">
+                                                <% item.generos.forEach((genero) => { %>
+                                                    <% const generoColor = genero.genero === 'Masculino' ? 'bg-azure' : genero.genero === 'Femenino' ? 'bg-purple' : 'bg-secondary'; %>
+                                                    <div class="admin-report-gender-row">
+                                                        <div class="admin-report-gender-count">
+                                                            <span><i data-lucide="user-round"></i><%= genero.genero %></span>
+                                                            <strong><%= genero.pacientes %> <small><%= genero.pacientes === 1 ? 'paciente' : 'pacientes' %></small></strong>
+                                                        </div>
+                                                        <div class="progress progress-sm">
+                                                            <div class="progress-bar <%= generoColor %>" style="width: <%= genero.porcentaje %>%"></div>
+                                                        </div>
                                                     </div>
                                                 <% }); %>
                                             </div>
@@ -183,20 +189,23 @@
                             </div>
                         <% } else { %>
                             <div class="admin-report-card-grid admin-report-card-grid-wide">
-                                <% detalleServicios.forEach((turno) => { %>
-                                    <article class="card admin-report-detail-card">
+                                <% detalleServicios.forEach((dia) => { %>
+                                    <article class="card admin-report-detail-card admin-report-date-card">
                                         <div class="card-body">
                                             <div class="admin-report-card-top">
+                                                <span class="avatar bg-green-lt text-green"><i data-lucide="calendar-check-2"></i></span>
                                                 <span class="badge bg-green-lt"><i data-lucide="circle-check"></i>Atendido</span>
-                                                <span class="text-secondary"><%= turno.codigo %></span>
                                             </div>
-                                            <h4 title="<%= turno.servicio %>"><%= turno.servicio %></h4>
-                                            <dl>
-                                                <div><dt>Fecha</dt><dd><%= turno.fecha %> · <%= turno.hora %></dd></div>
-                                                <div><dt>Paciente</dt><dd><%= turno.paciente %></dd></div>
-                                                <div><dt>Identificación</dt><dd><%= turno.identificacion %></dd></div>
-                                                <div><dt>Género</dt><dd><%= turno.genero %></dd></div>
-                                            </dl>
+                                            <div class="admin-report-date-summary">
+                                                <div>
+                                                    <span>Fecha de atención</span>
+                                                    <h4 title="<%= dia.fecha %>"><%= dia.fecha %></h4>
+                                                </div>
+                                                <div class="admin-report-date-total">
+                                                    <strong><%= dia.serviciosAtendidos %></strong>
+                                                    <span><%= dia.serviciosAtendidos === 1 ? 'servicio atendido' : 'servicios atendidos' %></span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </article>
                                 <% }); %>

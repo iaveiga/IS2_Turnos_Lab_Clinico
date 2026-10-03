@@ -1,0 +1,75 @@
+<%- include('../partials/head', {
+    titulo: 'Laboratorio',
+    descripcion: 'Procesamiento de turnos y resultados del Laboratorio Clínico San Francisco',
+    estilos: ['/css/admin-tabler.css', '/css/laboratory.css']
+}) %>
+<body class="layout-fluid admin-tabler-page laboratory-page">
+    <div class="page">
+        <%- include('partials/sidebar') %>
+        <div class="page-wrapper">
+            <%- include('partials/topbar') %>
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-3 align-items-center">
+                        <div class="col">
+                            <div class="page-pretitle">Laboratorio clínico</div>
+                            <h2 class="page-title">Procesamiento de exámenes</h2>
+                            <div class="text-secondary mt-1"><%= fechaLegible %> · Turnos confirmados, atenciones y resultados.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <div class="container-xl">
+                    <% if (mensaje) { %><div class="alert alert-success alert-dismissible" role="alert"><div class="d-flex"><i data-lucide="circle-check"></i><div><%= mensaje %></div></div><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button></div><% } %>
+                    <% if (error) { %><div class="alert alert-danger alert-dismissible" role="alert"><div class="d-flex"><i data-lucide="circle-alert"></i><div><%= error %></div></div><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button></div><% } %>
+
+                    <section class="laboratory-kpi-grid" aria-label="Resumen del laboratorio">
+                        <article class="card laboratory-kpi"><div class="card-body"><span class="laboratory-kpi-icon bg-yellow-lt text-yellow"><i data-lucide="users-round"></i></span><div><span>Por atender</span><strong><%= kpis.espera %></strong></div></div></article>
+                        <article class="card laboratory-kpi"><div class="card-body"><span class="laboratory-kpi-icon bg-azure-lt text-azure"><i data-lucide="activity"></i></span><div><span>En proceso</span><strong><%= kpis.proceso %></strong></div></div></article>
+                        <article class="card laboratory-kpi"><div class="card-body"><span class="laboratory-kpi-icon bg-green-lt text-green"><i data-lucide="circle-check"></i></span><div><span>Atendidos</span><strong><%= kpis.atendidos %></strong></div></div></article>
+                        <article class="card laboratory-kpi"><div class="card-body"><span class="laboratory-kpi-icon bg-purple-lt text-purple"><i data-lucide="file-check-2"></i></span><div><span>Publicados</span><strong><%= kpis.publicados %></strong></div></div></article>
+                    </section>
+
+                    <section class="card laboratory-worklist" aria-labelledby="laboratory-list-title">
+                        <div class="card-header"><div><h3 id="laboratory-list-title" class="card-title">Lista de trabajo</h3><div class="text-secondary laboratory-card-subtitle"><%= turnos.length %> examen<%= turnos.length === 1 ? '' : 'es' %> en la selección actual</div></div></div>
+                        <form class="card-body border-bottom admin-filter-form" method="get" action="/laboratorio" data-auto-submit-filters>
+                            <div class="row g-2 align-items-end">
+                                <div class="col-12 col-lg"><label class="form-label visually-hidden" for="laboratory-search">Buscar</label><div class="input-icon"><span class="input-icon-addon"><i data-lucide="search"></i></span><input id="laboratory-search" class="form-control" type="search" name="buscar" value="<%= filtros.buscar %>" placeholder="Paciente, cédula, código o examen"></div></div>
+                                <div class="col-7 col-sm-5 col-lg-3"><label class="form-label" for="laboratory-date">Fecha de atención</label><input id="laboratory-date" class="form-control" type="date" name="fecha" value="<%= filtros.fecha %>"></div>
+                                <div class="col-5 col-sm-4 col-lg-2"><label class="form-label" for="laboratory-status">Flujo</label><select id="laboratory-status" class="form-select" name="estado"><option value="">Todos</option><option value="espera" <%= filtros.estado === 'espera' ? 'selected' : '' %>>Por atender</option><option value="en_proceso" <%= filtros.estado === 'en_proceso' ? 'selected' : '' %>>En proceso</option><option value="atendidos" <%= filtros.estado === 'atendidos' ? 'selected' : '' %>>Atendidos</option></select></div>
+                            </div>
+                        </form>
+                        <div class="table-responsive laboratory-table-wrap">
+                            <table class="table table-vcenter admin-users-table laboratory-table">
+                                <thead><tr><th>Hora</th><th>Paciente</th><th>Examen</th><th>Flujo</th><th>Responsable / resultado</th><th class="text-end">Acciones</th></tr></thead>
+                                <tbody>
+                                    <% if (!turnos.length) { %><tr><td colspan="6"><div class="empty py-5"><div class="empty-icon"><i data-lucide="microscope"></i></div><p class="empty-title">No hay exámenes en esta selección</p><p class="empty-subtitle text-secondary">La lista se actualizará cuando recepción confirme nuevas llegadas.</p></div></td></tr><% } %>
+                                    <% turnos.forEach((turno) => { const clase = turno.estadoCodigo === 'PUBLICADO' ? 'bg-purple-lt' : turno.estadoCodigo === 'ATENDIDO' ? 'bg-green-lt' : turno.estadoCodigo === 'EN_PROCESO' ? 'bg-azure-lt' : 'bg-yellow-lt'; %>
+                                        <tr>
+                                            <td><div class="laboratory-time"><strong><%= turno.horaInicio %></strong><small>hasta <%= turno.horaFin %></small></div></td>
+                                            <td><div class="d-flex align-items-center gap-3 laboratory-patient-cell"><span class="avatar avatar-sm bg-cyan-lt text-cyan"><%= turno.paciente.split(' ').map((parte) => parte[0]).slice(0, 2).join('').toUpperCase() %></span><div class="min-w-0"><div class="fw-semibold text-body text-truncate"><%= turno.paciente %></div><div class="small text-secondary text-truncate">CI <%= turno.identificacion %></div></div></div></td>
+                                            <td><div class="laboratory-service"><strong title="<%= turno.servicio %>"><%= turno.servicio %></strong><small><%= turno.codigo %></small></div></td>
+                                            <td><span class="badge <%= clase %>"><%= turno.estado %></span></td>
+                                            <td><div class="laboratory-owner"><strong><%= turno.tecnicoId ? turno.tecnico : 'Disponible' %></strong><small><%= turno.resultadoPublicado ? 'Resultado publicado' : turno.resultado ? 'Borrador guardado' : turno.inicioAtencion ? 'Atención iniciada' : 'Sin resultado' %></small></div></td>
+                                            <td><div class="laboratory-actions">
+                                                <button class="btn btn-icon btn-ghost-secondary btn-sm" type="button" data-view-lab-turn="<%= turno.id %>" aria-label="Ver detalle del turno" title="Ver detalle"><i data-lucide="eye"></i></button>
+                                                <% if (turno.puedeTomar) { %><button class="btn btn-primary btn-sm" type="button" data-take-turn="<%= turno.id %>"><i data-lucide="hand"></i><span>Tomar turno</span></button><% } %>
+                                                <% if (turno.puedeGestionarResultado) { %><button class="btn btn-success btn-sm" type="button" data-manage-result="<%= turno.id %>"><i data-lucide="file-pen-line"></i><span><%= turno.resultado ? 'Continuar' : 'Registrar resultado' %></span></button><% } %>
+                                            </div></td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script id="laboratory-turn-data" type="application/json"><%- turnosJson %></script>
+    <%- include('partials/modals') %>
+    <%- include('../partials/scripts', { scripts: ['/js/laboratory.js'] }) %>
+</body>
+</html>

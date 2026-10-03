@@ -894,6 +894,146 @@ body.profile-page {
   color: var(--app-muted);
 }
 
+.exam-history-card {
+  margin-top: 1.5rem;
+}
+
+.exam-history-row {
+  display: grid;
+  grid-template-columns: 150px minmax(260px, 1fr) 190px 150px;
+  gap: 1.25rem;
+  align-items: center;
+  min-height: 94px;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e4ecef;
+}
+
+.exam-history-row:last-child {
+  border-bottom: 0;
+}
+
+.exam-result-state {
+  display: grid;
+  justify-items: start;
+  gap: 0.35rem;
+}
+
+.exam-result-state .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.exam-result-state .badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.exam-result-state small {
+  color: var(--app-muted);
+  font-size: 0.72rem;
+}
+
+.exam-result-action {
+  justify-content: center;
+  min-width: 150px;
+}
+
+.patient-result-modal .modal-content {
+  overflow: hidden;
+  border: 0;
+  box-shadow: 0 20px 60px rgb(21 52 84 / 18%);
+}
+
+.patient-result-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.patient-result-heading .app-eyebrow {
+  margin-bottom: 0.15rem;
+}
+
+.patient-result-heading .modal-title {
+  color: var(--app-ink);
+  font-size: 1.15rem;
+}
+
+.patient-result-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-left: 3px solid var(--app-cyan);
+  background: #f1f8fa;
+}
+
+.patient-result-summary > div {
+  display: grid;
+  min-width: 0;
+  gap: 0.25rem;
+}
+
+.patient-result-summary span,
+.patient-result-meta {
+  color: var(--app-muted);
+  font-size: 0.75rem;
+}
+
+.patient-result-summary strong {
+  overflow-wrap: anywhere;
+  color: var(--app-ink);
+  font-size: 0.86rem;
+}
+
+.patient-result-section {
+  margin-top: 1.35rem;
+}
+
+.patient-result-section h3 {
+  margin: 0 0 0.55rem;
+  color: var(--app-ink);
+  font-size: 0.86rem;
+}
+
+.patient-result-text {
+  min-height: 76px;
+  padding: 1rem;
+  border: 1px solid #dce8ec;
+  border-radius: 6px;
+  background: #fff;
+  color: #28455f;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.patient-result-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e4ecef;
+}
+
+.patient-result-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.patient-result-meta svg {
+  width: 16px;
+  height: 16px;
+  color: var(--app-cyan);
+}
+
+.patient-result-print {
+  display: none;
+}
+
 .booking-modal .modal-dialog {
   max-width: min(960px, calc(100vw - 2rem));
 }
@@ -1468,6 +1608,19 @@ body.profile-page {
     justify-self: start;
   }
 
+  .exam-history-row {
+    grid-template-columns: 100px minmax(0, 1fr) 150px;
+  }
+
+  .exam-result-state {
+    grid-column: 2;
+  }
+
+  .exam-result-action {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+
   .booking-modal .modal-dialog {
     max-width: none;
     min-height: 100%;
@@ -1575,6 +1728,34 @@ body.profile-page {
     align-items: baseline;
   }
 
+  .exam-history-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .exam-result-state,
+  .exam-result-action {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .exam-result-action {
+    width: 100%;
+  }
+
+  .patient-result-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .patient-result-modal .modal-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .patient-result-modal .modal-footer .btn {
+    width: 100%;
+  }
+
   .time-slots {
     grid-template-columns: repeat(2, minmax(76px, 1fr));
   }
@@ -1598,6 +1779,156 @@ body.profile-page {
     justify-content: center;
     padding-top: 1rem;
     padding-bottom: 1rem;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+
+  body.patient-result-print-active {
+    min-height: auto;
+    background: #ffffff !important;
+  }
+
+  body.patient-result-print-active > *:not(.patient-result-print) {
+    display: none !important;
+  }
+
+  body.patient-result-print-active > .patient-result-print {
+    display: block !important;
+    width: 100%;
+    color: #18394b;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .patient-result-print-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20mm;
+    padding-bottom: 7mm;
+    border-bottom: 2px solid #0795a8;
+  }
+
+  .patient-result-print-brand {
+    display: flex;
+    align-items: center;
+    gap: 4mm;
+  }
+
+  .patient-result-print-logo {
+    display: grid;
+    width: 14mm;
+    height: 14mm;
+    place-items: center;
+    border-radius: 3mm;
+    background: #078da0 !important;
+    color: #ffffff !important;
+    font-size: 11pt;
+    font-weight: 800;
+  }
+
+  .patient-result-print-brand div,
+  .patient-result-print-title {
+    display: grid;
+    gap: 1mm;
+  }
+
+  .patient-result-print-brand strong {
+    font-size: 13pt;
+  }
+
+  .patient-result-print-brand span:not(.patient-result-print-logo),
+  .patient-result-print-title span,
+  .patient-result-print-meta span,
+  .patient-result-print-footer span {
+    color: #617985;
+    font-size: 8pt;
+  }
+
+  .patient-result-print-title {
+    justify-items: end;
+    text-align: right;
+  }
+
+  .patient-result-print-title strong {
+    font-size: 14pt;
+  }
+
+  .patient-result-print-meta {
+    display: flex;
+    justify-content: flex-end;
+    gap: 3mm;
+    margin-top: 4mm;
+  }
+
+  .patient-result-print-section {
+    margin-top: 7mm;
+    break-inside: avoid;
+  }
+
+  .patient-result-print-section h2 {
+    margin: 0 0 3mm;
+    padding-bottom: 2mm;
+    border-bottom: 1px solid #ccdde3;
+    color: #0b7181;
+    font-size: 10pt;
+    text-transform: uppercase;
+  }
+
+  .patient-result-print-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4mm 8mm;
+    margin: 0;
+  }
+
+  .patient-result-print-grid > div {
+    min-width: 0;
+  }
+
+  .patient-result-print-grid dt {
+    margin: 0 0 1mm;
+    color: #617985;
+    font-size: 8pt;
+  }
+
+  .patient-result-print-grid dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    color: #18394b;
+    font-weight: 700;
+  }
+
+  .patient-result-print-content {
+    min-height: 24mm;
+    padding: 4mm;
+    border: 1px solid #ccdde3;
+    border-radius: 1.5mm;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+
+  .patient-result-print-footer {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8mm;
+    margin-top: 12mm;
+    padding-top: 4mm;
+    border-top: 1px solid #9fb9c3;
+    break-inside: avoid;
+  }
+
+  .patient-result-print-footer div {
+    display: grid;
+    gap: 1mm;
   }
 }
 

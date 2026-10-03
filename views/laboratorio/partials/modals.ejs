@@ -1,0 +1,61 @@
+<div class="modal modal-blur fade" id="lab-detail-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header"><div><div class="page-pretitle">Detalle del turno</div><h2 class="modal-title" data-detail-patient>Paciente</h2></div><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div>
+            <div class="modal-body">
+                <section class="laboratory-detail-section" aria-labelledby="lab-patient-title">
+                    <h3 id="lab-patient-title"><i data-lucide="contact"></i>Información del paciente</h3>
+                    <dl class="laboratory-detail-grid">
+                        <div><dt>Cédula</dt><dd data-detail-field="identificacion"></dd></div>
+                        <div><dt>Edad</dt><dd data-detail-field="edad"></dd></div>
+                        <div><dt>Sexo</dt><dd data-detail-field="sexo"></dd></div>
+                        <div><dt>Teléfono</dt><dd data-detail-field="telefono"></dd></div>
+                        <div><dt>Correo</dt><dd data-detail-field="correo"></dd></div>
+                        <div><dt>Código de turno</dt><dd data-detail-field="codigo"></dd></div>
+                    </dl>
+                </section>
+                <section class="laboratory-detail-section" aria-labelledby="lab-exam-title">
+                    <h3 id="lab-exam-title"><i data-lucide="flask-conical"></i>Examen agendado</h3>
+                    <div class="laboratory-exam-detail"><div><strong data-detail-field="servicio"></strong><span data-detail-field="servicioDescripcion"></span></div><dl><div><dt>Horario</dt><dd data-detail-time></dd></div><div><dt>Flujo</dt><dd data-detail-field="estado"></dd></div><div><dt>Técnico</dt><dd data-detail-field="tecnico"></dd></div></dl><p data-detail-field="observacion"></p></div>
+                </section>
+                <section class="laboratory-detail-section" data-detail-result-section aria-labelledby="lab-result-title">
+                    <h3 id="lab-result-title"><i data-lucide="file-check-2"></i>Resultado</h3>
+                    <div class="laboratory-published-result"><p data-detail-field="resultado"></p><p data-detail-field="observacionesResultado"></p><small data-detail-result-meta></small></div>
+                </section>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="take-turn-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h2 class="modal-title">Tomar turno</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div>
+            <form method="post" data-take-form>
+                <div class="modal-body"><div class="laboratory-confirm-icon"><i data-lucide="microscope"></i></div><p class="mb-1 fw-bold text-center" data-take-patient></p><p class="mb-0 text-secondary text-center"><span data-take-service></span><br>La atención quedará asignada a tu usuario.</p></div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-primary"><i data-lucide="play"></i>Iniciar atención</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="result-modal" tabindex="-1" aria-hidden="true" data-auto-open-id="<%= abrirResultadoId || '' %>">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <form class="modal-content" method="post" data-result-form>
+            <div class="modal-header"><div><div class="page-pretitle">Procesamiento del examen</div><h2 class="modal-title" data-result-service>Registrar resultado</h2><div class="text-secondary laboratory-modal-patient" data-result-patient></div></div><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div>
+            <div class="modal-body">
+                <input type="hidden" name="fecha" value="<%= filtros.fecha %>">
+                <input type="hidden" name="accion" value="borrador" data-result-action-value>
+                <div class="laboratory-result-context"><span><i data-lucide="ticket-check"></i><strong data-result-code></strong></span><span><i data-lucide="clock-3"></i><strong data-result-time></strong></span></div>
+                <div class="mb-3"><label class="form-label" for="exam-result">Resultado del examen</label><textarea id="exam-result" class="form-control" name="resultado" rows="8" maxlength="20000" required><%= formularioResultado.resultado || '' %></textarea></div>
+                <div><label class="form-label" for="exam-observations">Observaciones <span class="text-secondary fw-normal">(opcional)</span></label><textarea id="exam-observations" class="form-control" name="observaciones" rows="3" maxlength="5000"><%= formularioResultado.observaciones || '' %></textarea></div>
+            </div>
+            <div class="modal-footer laboratory-result-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-outline-primary" data-result-action="borrador"><i data-lucide="save"></i>Guardar borrador</button>
+                <% if (puedePublicarResultados) { %><button type="submit" class="btn btn-success" data-result-action="publicar"><i data-lucide="send"></i>Publicar resultado</button><% } %>
+            </div>
+        </form>
+    </div>
+</div>

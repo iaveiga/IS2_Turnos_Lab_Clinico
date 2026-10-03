@@ -731,21 +731,30 @@ async function cargarPaginaReportes(req) {
   });
 
   const serviciosMap = new Map();
-  const generoServicioMap = new Map();
   const pacientesUnicos = new Set();
   const serviciosUnicos = new Set();
   const generosUnicos = new Set();
+  const serviciosPorFecha = new Map();
 
   for (const turno of turnos) {
     const servicioId = turno.id_servicio || 'sin-servicio';
     const servicioNombre = turno.servicio?.nombre || 'Servicio no disponible';
     const pacienteId = turno.id_paciente || `turno-${turno.id_turno}`;
-    const pacienteNombre = turno.paciente ? `${turno.paciente.nombres} ${turno.paciente.apellidos}` : 'Paciente no disponible';
     const genero = generoPacienteLegible(turno.paciente?.sexo);
 
     pacientesUnicos.add(pacienteId);
     serviciosUnicos.add(servicioId);
     generosUnicos.add(genero);
+
+    const fechaISO = turno.fecha_turno.toISOString().slice(0, 10);
+    if (!serviciosPorFecha.has(fechaISO)) {
+      serviciosPorFecha.set(fechaISO, {
+        fechaISO,
+        fecha: fechaTurnoLegible(turno.fecha_turno),
+        serviciosAtendidos: 0
+      });
+    }
+    serviciosPorFecha.get(fechaISO).serviciosAtendidos += 1;
 
     if (!serviciosMap.has(servicioId)) {
       serviciosMap.set(servicioId, {
@@ -753,30 +762,16 @@ async function cargarPaginaReportes(req) {
         servicio: servicioNombre,
         descripcion: turno.servicio?.descripcion || 'Sin descripción registrada',
         turnos: 0,
-        pacientes: new Set()
+        pacientes: new Set(),
+        pacientesPorGenero: new Map()
       });
     }
     const servicio = serviciosMap.get(servicioId);
     servicio.turnos += 1;
     servicio.pacientes.add(pacienteId);
 
-    const claveGenero = `${servicioId}|${genero}`;
-    if (!generoServicioMap.has(claveGenero)) {
-      generoServicioMap.set(claveGenero, {
-        servicio: servicioNombre,
-        genero,
-        turnos: 0,
-        pacientes: new Set(),
-        usuarios: new Map()
-      });
-    }
-    const generoServicio = generoServicioMap.get(claveGenero);
-    generoServicio.turnos += 1;
-    generoServicio.pacientes.add(pacienteId);
-    generoServicio.usuarios.set(pacienteId, {
-      nombre: pacienteNombre,
-      identificacion: turno.paciente?.identificacion || 'Sin identificación'
-    });
+    if (!servicio.pacientesPorGenero.has(genero)) servicio.pacientesPorGenero.set(genero, new Set());
+    servicio.pacientesPorGenero.get(genero).add(pacienteId);
   }
 
   const usuariosPorServicio = [...serviciosMap.values()]
@@ -787,14 +782,21 @@ async function cargarPaginaReportes(req) {
     }))
     .sort((a, b) => b.pacientes - a.pacientes || a.servicio.localeCompare(b.servicio, 'es'));
 
-  const usuariosPorGeneroServicio = [...generoServicioMap.values()]
-    .map((item) => ({
-      ...item,
-      pacientes: item.pacientes.size,
-      usuarios: [...item.usuarios.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es')),
-      porcentaje: porcentajeReporte(item.pacientes.size, pacientesUnicos.size)
+  const generosReporte = ['Masculino', 'Femenino', 'No especificado'];
+  const usuariosPorGeneroServicio = [...serviciosMap.values()]
+    .map((servicio) => ({
+      servicio: servicio.servicio,
+      pacientes: servicio.pacientes.size,
+      generos: generosReporte.map((genero) => {
+        const pacientes = servicio.pacientesPorGenero.get(genero)?.size || 0;
+        return {
+          genero,
+          pacientes,
+          porcentaje: porcentajeReporte(pacientes, servicio.pacientes.size)
+        };
+      })
     }))
-    .sort((a, b) => a.servicio.localeCompare(b.servicio, 'es') || a.genero.localeCompare(b.genero, 'es'));
+    .sort((a, b) => b.pacientes - a.pacientes || a.servicio.localeCompare(b.servicio, 'es'));
 
   return {
     filtros: rango,
@@ -806,17 +808,7 @@ async function cargarPaginaReportes(req) {
     },
     usuariosPorServicio,
     usuariosPorGeneroServicio,
-    detalleServicios: turnos.map((turno) => ({
-      id: turno.id_turno,
-      codigo: turno.codigo_turno,
-      fecha: fechaTurnoLegible(turno.fecha_turno),
-      fechaISO: turno.fecha_turno.toISOString().slice(0, 10),
-      hora: `${horaTurnoLegible(turno.hora_inicio)}-${horaTurnoLegible(turno.hora_fin)}`,
-      paciente: turno.paciente ? `${turno.paciente.nombres} ${turno.paciente.apellidos}` : 'Paciente no disponible',
-      identificacion: turno.paciente?.identificacion || 'Sin identificación',
-      genero: generoPacienteLegible(turno.paciente?.sexo),
-      servicio: turno.servicio?.nombre || 'Servicio no disponible'
-    })),
+    detalleServicios: [...serviciosPorFecha.values()],
     fechaMaxima: fechaLocalISO(),
     errorReporte: rango.error
   };

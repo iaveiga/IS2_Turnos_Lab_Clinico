@@ -182,3 +182,84 @@
 
   if (dialog.dataset.autoOpen === 'true') openDialog();
 })();
+
+(() => {
+  const dialog = document.querySelector('#patient-result-modal');
+  const dataElement = document.querySelector('#patient-results-data');
+  if (!dialog || !dataElement) return;
+
+  let results = {};
+  try {
+    results = JSON.parse(dataElement.textContent || '{}');
+  } catch (error) {
+    console.error('No fue posible cargar los resultados publicados.', error);
+    return;
+  }
+
+  const modal = window.tabler?.Modal?.getOrCreateInstance(dialog);
+  const observationsSection = dialog.querySelector('[data-result-observations-section]');
+  const printReport = document.querySelector('.patient-result-print');
+  const printButton = dialog.querySelector('[data-print-result]');
+  let selectedExam = null;
+
+  function setText(selector, value) {
+    const element = dialog.querySelector(selector);
+    if (element) element.textContent = value || '';
+  }
+
+  function setPrintText(selector, value) {
+    const element = printReport?.querySelector(selector);
+    if (element) element.textContent = value || '';
+  }
+
+  function populatePrintReport(exam) {
+    const patient = exam.resultado.paciente;
+    const printDate = new Intl.DateTimeFormat('es-EC', {
+      timeZone: 'America/Guayaquil',
+      dateStyle: 'long',
+      timeStyle: 'short'
+    }).format(new Date());
+
+    setPrintText('[data-print-code]', exam.codigo);
+    setPrintText('[data-print-date]', printDate);
+    setPrintText('[data-print-patient]', patient.nombre);
+    setPrintText('[data-print-identification]', patient.identificacion);
+    setPrintText('[data-print-age]', patient.edad);
+    setPrintText('[data-print-sex]', patient.sexo);
+    setPrintText('[data-print-service]', exam.servicio);
+    setPrintText('[data-print-service-date]', `${exam.fecha}, ${exam.hora}`);
+    setPrintText('[data-print-result-text]', exam.resultado.resultado);
+    setPrintText('[data-print-observations]', exam.resultado.observaciones || 'Sin observaciones registradas.');
+    setPrintText('[data-print-technician]', exam.resultado.tecnico);
+    setPrintText('[data-print-published]', exam.resultado.fechaPublicacion);
+  }
+
+  document.querySelectorAll('[data-view-result]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const exam = results[button.dataset.viewResult];
+      if (!exam?.resultado) return;
+      selectedExam = exam;
+
+      setText('[data-result-service]', exam.servicio);
+      setText('[data-result-code]', exam.codigo);
+      setText('[data-result-date]', `${exam.fecha}, ${exam.hora}`);
+      setText('[data-result-text]', exam.resultado.resultado);
+      setText('[data-result-observations]', exam.resultado.observaciones);
+      setText('[data-result-technician]', `Responsable: ${exam.resultado.tecnico}`);
+      setText('[data-result-published]', `Publicado: ${exam.resultado.fechaPublicacion}`);
+      observationsSection.hidden = !exam.resultado.observaciones;
+      modal?.show();
+    });
+  });
+
+  printButton?.addEventListener('click', () => {
+    if (!selectedExam || !printReport) return;
+    populatePrintReport(selectedExam);
+    document.body.classList.add('patient-result-print-active');
+    window.print();
+  });
+
+  window.addEventListener('afterprint', () => {
+    document.body.classList.remove('patient-result-print-active');
+  });
+})();
