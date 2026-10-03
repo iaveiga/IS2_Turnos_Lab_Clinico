@@ -38,6 +38,8 @@ async function seed() {
     { codigo: 'VER_REPORTES', nombre: 'Ver Reportes', descripcion: 'Permite consultar reportes administrativos' },
     { codigo: 'VER_AUDITORIA', nombre: 'Ver Auditoría', descripcion: 'Permite consultar registros de auditoría' },
     { codigo: 'ACCEDER_RECEPCION', nombre: 'Acceso Recepción', descripcion: 'Permite acceder al módulo operativo de recepción' },
+    { codigo: 'ACCEDER_TECNICO', nombre: 'Acceso Técnico', descripcion: 'Permite acceder al panel de atención de turnos confirmados' },
+    { codigo: 'REGISTRAR_ATENCION', nombre: 'Registrar atención', descripcion: 'Permite registrar observaciones y actualizar el estado de una atención' },
     { codigo: 'REGISTRAR_LLEGADA', nombre: 'Registrar Llegada', descripcion: 'Permite registrar la llegada de pacientes agendados' },
     { codigo: 'REGISTRAR_PACIENTES', nombre: 'Registrar Pacientes', descripcion: 'Permite crear fichas de nuevos pacientes' },
     { codigo: 'VER_RESULTADOS', nombre: 'Ver Resultados', descripcion: 'Permite consultar resultados de exámenes publicados' }
@@ -69,7 +71,7 @@ async function seed() {
       'VER_PERFIL',
       'EDITAR_PERFIL'
     ],
-    TECNICO: ['VER_TURNOS', 'VER_PERFIL'],
+    TECNICO: ['ACCEDER_TECNICO', 'REGISTRAR_ATENCION', 'VER_TURNOS', 'VER_PERFIL'],
     ADMINISTRADOR: [
       'ACCEDER_CONSOLA',
       'VER_TURNOS',

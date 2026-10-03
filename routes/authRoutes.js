@@ -184,6 +184,9 @@ router.post('/login', async (req, res) => {
     if (permisos.includes('ACCEDER_RECEPCION')) {
       return res.redirect('/recepcion');
     }
+    if (permisos.includes('ACCEDER_TECNICO')) {
+      return res.redirect('/tecnico');
+    }
     return res.redirect('/turnos');
 
   } catch (error) {

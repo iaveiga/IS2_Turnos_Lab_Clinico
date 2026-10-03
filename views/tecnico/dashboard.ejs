@@ -1,0 +1,78 @@
+<%- include('../partials/head', {
+    titulo: 'Panel del técnico',
+    descripcion: 'Turnos confirmados asignados al personal técnico del laboratorio.',
+    estilos: ['/css/admin-tabler.css', '/css/tecnico.css']
+}) %>
+<body class="layout-fluid admin-tabler-page technician-page">
+    <div class="page">
+        <header class="navbar navbar-expand-md d-print-none technician-navbar">
+            <div class="container-xl">
+                <a class="navbar-brand d-flex align-items-center gap-3" href="/tecnico">
+                    <span class="technician-brand-mark">CSF</span>
+                    <span><strong>Clínica San Francisco</strong><small class="d-block">Técnico de laboratorio · Turnos</small></span>
+                </a>
+                <div class="navbar-nav flex-row ms-auto align-items-center gap-2">
+                    <a class="btn btn-outline-primary" href="/pacientes/perfil"><i data-lucide="settings-2"></i>Editar perfil</a>
+                    <a class="btn btn-ghost-secondary" href="/auth/logout"><i data-lucide="log-out"></i>Cerrar sesión</a>
+                </div>
+            </div>
+        </header>
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="page-pretitle">Panel del técnico</div>
+                    <h1 class="page-title">Turnos asignados</h1>
+                    <div class="text-secondary mt-1">Atiende los turnos que recepción confirmó y registra tus observaciones.</div>
+                </div>
+            </div>
+            <main class="page-body">
+                <div class="container-xl">
+                    <% if (mensaje) { %><div class="alert alert-success" role="status"><i data-lucide="circle-check"></i><%= mensaje %></div><% } %>
+                    <% if (error) { %><div class="alert alert-danger" role="alert"><i data-lucide="circle-alert"></i><%= error %></div><% } %>
+
+                    <section class="technician-kpis" aria-label="Resumen de turnos">
+                        <article class="technician-kpi is-assigned"><strong><%= kpis.asignados %></strong><span>Confirmados para atención</span></article>
+                        <article class="technician-kpi"><strong><%= kpis.pendientes %></strong><span>Pendientes</span></article>
+                        <article class="technician-kpi"><strong><%= kpis.atendidos %></strong><span>Atendidos</span></article>
+                        <article class="technician-kpi"><strong><%= kpis.cancelados %></strong><span>Cancelados</span></article>
+                    </section>
+
+                    <form class="technician-filters" method="get" action="/tecnico">
+                        <label><span>Buscar paciente o turno</span><input class="form-control" type="search" name="buscar" value="<%= buscar %>" placeholder="Nombre, cédula o código"></label>
+                        <label><span>Fecha de atención</span><input class="form-control" type="date" name="fecha" value="<%= fecha %>"></label>
+                        <button class="btn btn-primary" type="submit"><i data-lucide="search"></i>Filtrar</button>
+                    </form>
+                    <p class="technician-date"><%= fechaLegible %> · <%= turnos.length %> turno<%= turnos.length === 1 ? '' : 's' %></p>
+
+                    <section class="technician-turn-list" aria-label="Turnos asignados">
+                        <% if (!turnos.length) { %>
+                            <div class="technician-empty"><i data-lucide="calendar-check-2"></i><h2>No hay turnos para esta fecha</h2><p>Los turnos aparecerán aquí cuando recepción registre la llegada del paciente.</p></div>
+                        <% } %>
+                        <% turnos.forEach((turno) => { const estadoClase = turno.estadoCodigo === 'ATENDIDO' ? 'is-done' : turno.estadoCodigo === 'CANCELADO' ? 'is-cancelled' : turno.estadoCodigo === 'PENDIENTE' ? 'is-pending' : 'is-confirmed'; %>
+                            <article class="technician-card">
+                                <div class="technician-card-heading">
+                                    <div><h2><%= turno.paciente %></h2><p>Turno <strong><%= turno.codigo %></strong> · Cédula <%= turno.identificacion %> · <%= turno.hora %></p></div>
+                                    <span class="technician-status <%= estadoClase %>"><%= turno.estado %></span>
+                                </div>
+                                <div class="technician-service"><i data-lucide="test-tube-diagonal"></i><%= turno.servicio %></div>
+                                <% if (turno.puedeEditar) { %>
+                                    <form class="technician-attendance-form" method="post" action="/tecnico/turnos/<%= turno.id %>/estado">
+                                        <input type="hidden" name="fecha" value="<%= fecha %>">
+                                        <label for="observation-<%= turno.id %>"><i data-lucide="clipboard-check"></i>Observación de la atención</label>
+                                        <textarea class="form-control" id="observation-<%= turno.id %>" name="observacion" rows="3" maxlength="2000" placeholder="Ej. Muestra tomada sin complicaciones, paciente en ayunas."><%= turno.observacion %></textarea>
+                                        <div class="technician-form-actions">
+                                            <label class="technician-state-select" for="status-<%= turno.id %>"><span>Guardar como</span><select class="form-select" id="status-<%= turno.id %>" name="estado" required><option value="ATENDIDO" <%= turno.estadoCodigo === 'ATENDIDO' ? 'selected' : '' %>>Atendido</option><option value="PENDIENTE" <%= turno.estadoCodigo === 'PENDIENTE' ? 'selected' : '' %>>Pendiente</option><option value="CANCELADO" <%= turno.estadoCodigo === 'CANCELADO' ? 'selected' : '' %>>Cancelado</option></select></label>
+                                            <button class="btn btn-primary" type="submit"><i data-lucide="save"></i>Guardar atención</button>
+                                        </div>
+                                    </form>
+                                <% } %>
+                            </article>
+                        <% }); %>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+    <%- include('../partials/scripts') %>
+</body>
+</html>

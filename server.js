@@ -52,6 +52,7 @@ app.use("/turnos", require("./routes/turnoRoutes"));
 app.use("/admin", require("./routes/servicioRoutes"));
 app.use("/pacientes", require("./routes/pacienteRoutes"));
 app.use("/recepcion", require("./routes/recepcionRoutes"));
+app.use("/tecnico", require("./routes/tecnicoRoutes"));
 app.use("/admin", require("./routes/adminRoutes"));
 app.use("/reportes", require("./routes/reporteRoutes"));
 
