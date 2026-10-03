@@ -57,7 +57,7 @@
                             </div>
                             <div>
                                 <label class="form-label" for="identification">Cédula</label>
-                                <input id="identification" class="form-control <%= errores.identificacion ? 'is-invalid' : '' %>" type="text" name="identificacion" value="<%= datos.identificacion %>" placeholder="0912345678" inputmode="numeric" minlength="10" maxlength="10" pattern="\d{10}" autocomplete="off" required>
+                                <input id="identification" class="form-control <%= errores.identificacion ? 'is-invalid' : '' %>" type="text" name="identificacion" value="<%= datos.identificacion %>" placeholder="0912345678" inputmode="numeric" minlength="10" maxlength="10" pattern="[0-9]{10}" data-digits-only autocomplete="off" title="Ingresa 10 dígitos" required>
                                 <% if (errores.identificacion) { %><small class="field-error"><%= errores.identificacion %></small><% } %>
                             </div>
                             <div>
@@ -78,7 +78,7 @@
                             </div>
                             <div>
                                 <label class="form-label" for="phone">Celular / teléfono</label>
-                                <input id="phone" class="form-control <%= errores.telefono ? 'is-invalid' : '' %>" type="tel" name="telefono" value="<%= datos.telefono %>" placeholder="099 123 4567" autocomplete="tel" required>
+                                <input id="phone" class="form-control <%= errores.telefono ? 'is-invalid' : '' %>" type="tel" name="telefono" value="<%= datos.telefono %>" placeholder="0991234567" inputmode="numeric" minlength="7" maxlength="20" pattern="[0-9]{7,20}" data-digits-only autocomplete="tel" title="Ingresa entre 7 y 20 dígitos" required>
                                 <% if (errores.telefono) { %><small class="field-error"><%= errores.telefono %></small><% } %>
                             </div>
                         </div>

@@ -59,7 +59,7 @@ function validarPaciente(datos) {
   if (!validarCedulaEcuatoriana(datos.identificacion)) errores.identificacion = 'Ingresa una cédula ecuatoriana válida.';
   if (!/^\d+$/.test(datos.edad) || Number(datos.edad) < 1 || Number(datos.edad) > 120) errores.edad = 'Ingresa una edad entre 1 y 120 años.';
   if (!OPCIONES_SEXO.includes(datos.sexo)) errores.sexo = 'Selecciona una opción válida.';
-  if (!/^[\d\s()+-]{7,20}$/.test(datos.telefono)) errores.telefono = 'Ingresa un teléfono válido.';
+  if (!/^[0-9]{7,20}$/.test(datos.telefono)) errores.telefono = 'Ingresa un teléfono válido usando solo números.';
   if (!validarCorreoElectronico(datos.correo)) errores.correo = 'Ingresa un correo electrónico válido.';
   if (datos.direccion.length > 300) errores.direccion = 'La dirección no puede superar 300 caracteres.';
   return errores;

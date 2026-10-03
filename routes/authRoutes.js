@@ -43,7 +43,7 @@ function validarRegistro(datos, password) {
   }
   if (!/^\d+$/.test(datos.edad) || Number(datos.edad) < 1 || Number(datos.edad) > 120) errores.edad = 'Ingresa una edad valida.';
   if (!opcionesSexo.includes(datos.sexo)) errores.sexo = 'Selecciona una opcion.';
-  if (!/^[\d\s()+-]{7,20}$/.test(datos.telefono)) errores.telefono = 'Ingresa un telefono valido.';
+  if (!/^[0-9]{7,20}$/.test(datos.telefono)) errores.telefono = 'Ingresa un teléfono válido usando solo números.';
   if (!validarCorreoElectronico(datos.correo)) errores.correo = 'Ingresa un correo electrónico válido.';
   if (!password || password.length < 8) errores.password = 'Usa al menos 8 caracteres.';
 
