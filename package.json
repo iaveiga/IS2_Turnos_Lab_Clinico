@@ -9,6 +9,7 @@
     "seed": "node prisma/seed.js",
     "seed:patients": "node scripts/seed-demo-patients.js",
     "sync:reception-permissions": "node scripts/sync-reception-permissions.js",
+    "sync:patient-users": "node scripts/sync-patient-users.js",
     "check:ui": "node scripts/check-ui.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

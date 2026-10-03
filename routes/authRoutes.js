@@ -63,12 +63,12 @@ router.get('/login', (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-  const identificador = (req.body.identificador || req.body.correo || req.body.cedula || '').trim();
+  const identificador = (req.body.identificador || req.body.correo || req.body.cedula || '').trim().toLowerCase();
   const password = req.body.password || '';
 
   if (!identificador || !password) {
     return res.status(400).render('auth/login', {
-      error: 'Por favor ingresa tu correo o cédula y tu contraseña.',
+      error: 'Por favor ingresa tu correo o cédula de paciente y tu contraseña.',
       identificador,
       registrado: false,
       salida: false
@@ -76,13 +76,17 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    // Buscar usuario por correo, nombre_usuario o cédula del paciente asociado
+    // El personal ingresa por correo; los pacientes también pueden usar su cédula.
     const usuario = await prisma.usuario.findFirst({
       where: {
         OR: [
           { correo: { equals: identificador, mode: 'insensitive' } },
-          { identificacion: { equals: identificador, mode: 'insensitive' } },
-          { paciente: { identificacion: identificador } }
+          {
+            AND: [
+              { paciente: { identificacion: identificador } },
+              { usuario_rol: { some: { activo: true, rol: { nombre: 'PACIENTE', activo: true } } } }
+            ]
+          }
         ]
       },
       include: {
@@ -126,15 +130,17 @@ router.post('/login', async (req, res) => {
       .filter((asignacion) => asignacion.activo && asignacion.rol.activo)
       .flatMap((asignacion) => asignacion.rol.rol_permiso.map((relacion) => relacion.permiso.codigo)))];
     const esPaciente = roles.includes('PACIENTE');
-    const identificadorNormalizado = identificador.toLowerCase();
-    const accesoPermitido = esPaciente
-      ? usuario.correo.toLowerCase() === identificadorNormalizado
+    const esPersonal = roles.some((rol) => ['ADMINISTRADOR', 'TECNICO', 'RECEPCIONISTA'].includes(rol));
+    const accesoPermitido = esPaciente && !esPersonal
+      ? usuario.correo.toLowerCase() === identificador
         || usuario.paciente?.identificacion === identificador
-      : usuario.identificacion?.toLowerCase() === identificadorNormalizado;
+      : usuario.correo.toLowerCase() === identificador;
 
     if (!accesoPermitido) {
       return res.status(401).render('auth/login', {
-        error: 'Credenciales inválidas para el tipo de usuario.',
+        error: esPersonal
+          ? 'El personal del laboratorio debe ingresar con su correo electrónico.'
+          : 'Credenciales inválidas para el tipo de usuario.',
         identificador,
         registrado: false,
         salida: false
@@ -232,6 +238,9 @@ router.post('/registro', async (req, res) => {
       const usuario = await tx.usuario.create({
         data: {
           id_paciente: paciente.id_paciente,
+          identificacion: paciente.identificacion,
+          nombres: paciente.nombres,
+          apellidos: paciente.apellidos,
           nombre_usuario: datos.correo,
           correo: datos.correo,
           password_hash: passwordHash
