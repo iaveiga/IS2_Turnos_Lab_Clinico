@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const prisma = require('./config/prisma');
+const { sincronizarAutorizacion } = require('./middlewares/authMiddleware');
 
 const session = require('express-session');
 
@@ -14,7 +15,11 @@ app.set('view engine', 'ejs');
 // 2. Middlewares esenciales (¡Cruciales para formularios y archivos estáticos!)
 app.use(express.urlencoded({ extended: true })); // Permite leer los datos enviados desde formularios POST
 app.use(express.json());                         // Permite procesar peticiones JSON
-app.use(express.static(path.join(__dirname, 'public'))); // Sirve tu custom.css y recursos
+app.use(express.static(path.join(__dirname, 'public'))); // Sirve estilos, scripts e imágenes del portal
+app.use(
+  '/vendor/tabler',
+  express.static(path.join(__dirname, 'node_modules', '@tabler', 'core', 'dist'))
+);
 
 // 2.1. Configuración de sesiones de usuario
 app.use(session({
@@ -28,11 +33,8 @@ app.use(session({
   }
 }));
 
-// 2.2. Pasar información de la sesión a las vistas
-app.use((req, res, next) => {
-  res.locals.usuario = req.session?.user || null;
-  next();
-});
+// 2.2. Mantener roles y permisos sincronizados con la base de datos
+app.use(sincronizarAutorizacion);
 
 // Redirecciones directas de conveniencia
 app.get('/login', (req, res) => res.redirect('/auth/login'));
@@ -44,6 +46,8 @@ app.use('/auth', require('./routes/authRoutes'));
 app.use('/turnos', require('./routes/turnoRoutes'));
 app.use('/admin', require('./routes/servicioRoutes'));
 app.use('/pacientes', require('./routes/pacienteRoutes'));
+app.use('/recepcion', require('./routes/recepcionRoutes'));
+app.use('/admin', require('./routes/adminRoutes'));
 app.use('/reportes', require('./routes/reporteRoutes'));
 
 

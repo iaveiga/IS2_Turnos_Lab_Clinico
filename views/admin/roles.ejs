@@ -1,0 +1,133 @@
+<%- include('../partials/head', {
+    titulo: 'Roles y permisos',
+    descripcion: 'Administración de roles y permisos del sistema',
+    estilos: ['/css/admin-tabler.css']
+}) %>
+<body class="layout-fluid admin-tabler-page">
+    <div class="page">
+        <%- include('partials/sidebar', { seccionAdmin: 'roles' }) %>
+
+        <div class="page-wrapper">
+            <%- include('partials/topbar') %>
+
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <div class="page-pretitle">Seguridad y acceso</div>
+                            <h2 class="page-title">Roles y permisos</h2>
+                            <div class="text-secondary mt-1">Controla el acceso de cada rol a las funciones del sistema.</div>
+                        </div>
+                        <div class="col-auto ms-auto d-print-none">
+                            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#create-role-modal">
+                                <i data-lucide="shield-plus"></i><span>Nuevo rol</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <div class="container-xl">
+                    <%- include('partials/alerts') %>
+
+                    <section class="card admin-role-card" aria-labelledby="role-permissions-title">
+                        <div class="admin-role-toolbar">
+                            <div class="admin-role-selector">
+                                <label class="form-label" for="role-selector">Rol seleccionado</label>
+                                <select id="role-selector" class="form-select" data-role-selector>
+                                    <% roles.forEach((rol) => { %>
+                                        <option value="<%= rol.id %>" <%= rolSeleccionado && rol.id === rolSeleccionado.id ? 'selected' : '' %>><%= rol.nombre %><%= rol.activo ? '' : ' · Inactivo' %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                            <% if (rolSeleccionado) { %>
+                                <div class="admin-role-summary">
+                                    <div class="admin-role-summary-copy">
+                                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                                            <strong><%= rolSeleccionado.nombre %></strong>
+                                            <span class="badge <%= rolSeleccionado.activo ? 'bg-green-lt' : 'bg-red-lt' %>"><%= rolSeleccionado.activo ? 'Activo' : 'Inactivo' %></span>
+                                        </div>
+                                        <span><%= rolSeleccionado.descripcion %></span>
+                                    </div>
+                                    <div class="admin-role-metrics" aria-label="Resumen del rol">
+                                        <span><strong><%= rolSeleccionado.usuarios %></strong> usuarios</span>
+                                        <span><strong data-total-enabled><%= permisosAsignados.length %></strong> de <%= totalPermisos %> permisos</span>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+
+                        <% if (rolSeleccionado) { %>
+                            <form method="post" action="/admin/roles/<%= rolSeleccionado.id %>/permisos" data-permissions-form>
+                                <div class="admin-permission-heading">
+                                    <div>
+                                        <h3 id="role-permissions-title">Permisos del rol</h3>
+                                        <p class="text-secondary mb-0">Configuración efectiva para los usuarios que tienen asignado <strong><%= rolSeleccionado.nombre %></strong>.</p>
+                                    </div>
+                                    <button class="btn btn-primary" type="submit"><i data-lucide="save"></i>Guardar permisos</button>
+                                </div>
+
+                                <div class="admin-transfer-layout">
+                                    <section class="admin-permission-panel" aria-labelledby="available-permissions-title" data-permission-zone="available">
+                                        <header>
+                                            <div><h4 id="available-permissions-title">Sin habilitar</h4><span data-permission-count="available"><%= permisosDisponibles.length %></span></div>
+                                            <div class="input-icon">
+                                                <span class="input-icon-addon"><i data-lucide="search"></i></span>
+                                                <input class="form-control" type="search" placeholder="Buscar permiso" aria-label="Buscar permisos sin habilitar" data-permission-search="available">
+                                            </div>
+                                        </header>
+                                        <div class="admin-permission-list" data-permission-list="available">
+                                            <% permisosDisponibles.forEach((permiso) => { %>
+                                                <label class="admin-permission-item" draggable="true" data-permission-item data-id="<%= permiso.id %>" data-side="available">
+                                                    <input class="form-check-input" type="checkbox" data-permission-check>
+                                                    <span class="admin-permission-copy"><strong><%= permiso.nombre %></strong><small><%= permiso.descripcion %></small><code><%= permiso.codigo %></code></span>
+                                                    <i data-lucide="grip-vertical" aria-hidden="true"></i>
+                                                </label>
+                                            <% }); %>
+                                        </div>
+                                        <div class="admin-permission-empty" data-permission-empty="available"><i data-lucide="circle-check-big"></i><span>No hay permisos pendientes</span></div>
+                                    </section>
+
+                                    <div class="admin-transfer-actions" aria-label="Mover permisos">
+                                        <button class="btn btn-icon btn-outline-secondary" type="button" data-transfer="grant-all" title="Habilitar todos" aria-label="Habilitar todos"><i data-lucide="chevrons-right"></i></button>
+                                        <button class="btn btn-icon btn-primary" type="button" data-transfer="grant" title="Habilitar seleccionados" aria-label="Habilitar seleccionados"><i data-lucide="arrow-right"></i></button>
+                                        <button class="btn btn-icon btn-primary" type="button" data-transfer="revoke" title="Retirar seleccionados" aria-label="Retirar seleccionados"><i data-lucide="arrow-left"></i></button>
+                                        <button class="btn btn-icon btn-outline-secondary" type="button" data-transfer="revoke-all" title="Retirar todos" aria-label="Retirar todos"><i data-lucide="chevrons-left"></i></button>
+                                    </div>
+
+                                    <section class="admin-permission-panel admin-permission-panel-enabled" aria-labelledby="enabled-permissions-title" data-permission-zone="enabled">
+                                        <header>
+                                            <div><h4 id="enabled-permissions-title">Habilitados</h4><span data-permission-count="enabled"><%= permisosAsignados.length %></span></div>
+                                            <div class="input-icon">
+                                                <span class="input-icon-addon"><i data-lucide="search"></i></span>
+                                                <input class="form-control" type="search" placeholder="Buscar permiso" aria-label="Buscar permisos habilitados" data-permission-search="enabled">
+                                            </div>
+                                        </header>
+                                        <div class="admin-permission-list" data-permission-list="enabled">
+                                            <% permisosAsignados.forEach((permiso) => { %>
+                                                <label class="admin-permission-item <%= permiso.bloqueado ? 'is-locked' : '' %>" draggable="<%= permiso.bloqueado ? 'false' : 'true' %>" data-permission-item data-id="<%= permiso.id %>" data-side="enabled" <%= permiso.bloqueado ? 'data-locked="true"' : '' %>>
+                                                    <input class="form-check-input" type="checkbox" data-permission-check <%= permiso.bloqueado ? 'disabled' : '' %>>
+                                                    <span class="admin-permission-copy"><strong><%= permiso.nombre %></strong><small><%= permiso.descripcion %></small><code><%= permiso.codigo %></code></span>
+                                                    <i data-lucide="<%= permiso.bloqueado ? 'lock-keyhole' : 'grip-vertical' %>" aria-hidden="true"></i>
+                                                </label>
+                                            <% }); %>
+                                        </div>
+                                        <div class="admin-permission-empty" data-permission-empty="enabled"><i data-lucide="shield-off"></i><span>El rol no tiene permisos</span></div>
+                                    </section>
+                                </div>
+                                <div data-permission-inputs></div>
+                            </form>
+                        <% } else { %>
+                            <div class="empty py-5"><div class="empty-icon"><i data-lucide="shield-off"></i></div><p class="empty-title">No existen roles registrados</p></div>
+                        <% } %>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/role-modal') %>
+    <%- include('../partials/scripts', { scripts: ['/js/admin-roles.js'] }) %>
+</body>
+</html>

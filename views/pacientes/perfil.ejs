@@ -1,0 +1,47 @@
+<%- include('../partials/head', {
+    titulo: 'Mi perfil',
+    descripcion: 'Información del perfil del paciente.'
+}) %>
+<body class="profile-page">
+    <%- include('../partials/public-header', { seccion: 'perfil' }) %>
+
+    <main class="container-xl profile-main">
+        <header class="module-header">
+            <div>
+                <p class="app-eyebrow">Portal de pacientes</p>
+                <h1>Mi perfil</h1>
+                <p>Información registrada para la atención y asignación de turnos.</p>
+            </div>
+            <a class="btn btn-primary" href="/turnos"><i data-lucide="calendar-days"></i>Ver mis turnos</a>
+        </header>
+
+        <div class="profile-layout">
+            <section class="card">
+                <div class="card-body profile-summary">
+                    <span class="avatar profile-avatar"><%= (paciente.nombres[0] + paciente.apellidos[0]).toUpperCase() %></span>
+                    <h2><%= paciente.nombres %> <%= paciente.apellidos %></h2>
+                    <p>Paciente registrado</p>
+                    <span class="badge <%= paciente.activo ? 'bg-green-lt' : 'bg-red-lt' %>"><span class="status-dot <%= paciente.activo ? 'bg-green' : 'bg-red' %> me-1"></span><%= paciente.activo ? 'Activo' : 'Inactivo' %></span>
+                </div>
+            </section>
+
+            <section class="card" aria-labelledby="profile-data-title">
+                <div class="card-header"><h2 class="card-title" id="profile-data-title">Datos personales</h2></div>
+                <div class="card-body">
+                    <div class="profile-data-grid">
+                        <div class="profile-field"><small>Cédula</small><strong><%= paciente.identificacion %></strong></div>
+                        <div class="profile-field"><small>Edad</small><strong><%= paciente.edad || 'No registrada' %></strong></div>
+                        <div class="profile-field"><small>Sexo</small><strong><%= paciente.sexo ? paciente.sexo.replaceAll('_', ' ') : 'No registrado' %></strong></div>
+                        <div class="profile-field"><small>Teléfono</small><strong><%= paciente.telefono || 'No registrado' %></strong></div>
+                        <div class="profile-field"><small>Correo electrónico</small><strong><%= paciente.correo || locals.usuario.correo %></strong></div>
+                        <div class="profile-field"><small>Dirección</small><strong><%= paciente.direccion || 'No registrada' %></strong></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+    <%- include('../partials/scripts') %>
+</body>
+</html>

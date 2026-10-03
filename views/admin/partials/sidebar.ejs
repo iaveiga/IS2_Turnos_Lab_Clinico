@@ -1,0 +1,84 @@
+<%
+const seccionAdminActual = locals.seccionAdmin || '';
+const permisosAdmin = new Set(locals.permisosUsuario || locals.usuario?.permisos || []);
+const puedeAdmin = (codigo) => permisosAdmin.has(codigo);
+%>
+<aside class="navbar navbar-vertical navbar-expand-lg admin-navbar" data-bs-theme="dark">
+    <div class="container-fluid">
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#admin-sidebar-menu"
+            aria-controls="admin-sidebar-menu"
+            aria-expanded="false"
+            aria-label="Abrir navegación"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <h1 class="navbar-brand navbar-brand-autodark">
+            <a href="/admin" class="admin-brand-link">
+                <span class="admin-brand-mark">CSF</span>
+                <span class="admin-brand-copy">
+                    <strong>Clínica San Francisco</strong>
+                    <small>Administración</small>
+                </span>
+            </a>
+        </h1>
+
+        <div class="collapse navbar-collapse" id="admin-sidebar-menu">
+            <ul class="navbar-nav pt-lg-3">
+                <% if (puedeAdmin('GESTIONAR_TURNOS')) { %>
+                    <li class="nav-item <%= seccionAdminActual === 'turnos' ? 'active' : '' %>">
+                        <a class="nav-link" href="/admin/turnos"><span class="nav-link-icon"><i data-lucide="calendar-days"></i></span><span class="nav-link-title">Turnos</span></a>
+                    </li>
+                <% } %>
+                <% if (puedeAdmin('GESTIONAR_USUARIOS')) { %>
+                    <li class="nav-item <%= seccionAdminActual === 'pacientes' ? 'active' : '' %>">
+                        <a class="nav-link" href="/admin/pacientes"><span class="nav-link-icon"><i data-lucide="users-round"></i></span><span class="nav-link-title">Pacientes</span></a>
+                    </li>
+                <% } %>
+                <% if (puedeAdmin('GESTIONAR_SERVICIOS')) { %>
+                    <li class="nav-item <%= seccionAdminActual === 'servicios' ? 'active' : '' %>">
+                        <a class="nav-link" href="/admin/servicios"><span class="nav-link-icon"><i data-lucide="flask-conical"></i></span><span class="nav-link-title">Servicios</span></a>
+                    </li>
+                <% } %>
+                <% if (puedeAdmin('GESTIONAR_HORARIOS')) { %>
+                    <li class="nav-item <%= seccionAdminActual === 'horarios' ? 'active' : '' %>">
+                        <a class="nav-link" href="/admin/horarios"><span class="nav-link-icon"><i data-lucide="clock-3"></i></span><span class="nav-link-title">Horarios y capacidad</span></a>
+                    </li>
+                <% } %>
+                <% if (puedeAdmin('GESTIONAR_USUARIOS')) { %>
+                    <li class="nav-item <%= seccionAdminActual === 'usuarios' ? 'active' : '' %>">
+                        <a class="nav-link" href="/admin/usuarios"><span class="nav-link-icon"><i data-lucide="user-cog"></i></span><span class="nav-link-title">Usuarios administrativos</span></a>
+                    </li>
+                <% } %>
+                <% if (puedeAdmin('GESTIONAR_ROLES_PERMISOS')) { %>
+                    <li class="nav-item <%= seccionAdminActual === 'roles' ? 'active' : '' %>">
+                        <a class="nav-link" href="/admin/roles"><span class="nav-link-icon"><i data-lucide="shield-check"></i></span><span class="nav-link-title">Roles y permisos</span></a>
+                    </li>
+                <% } %>
+                <% if (puedeAdmin('VER_REPORTES')) { %>
+                    <li class="nav-item <%= seccionAdminActual === 'reportes' ? 'active' : '' %>">
+                        <a class="nav-link" href="/admin/reportes"><span class="nav-link-icon"><i data-lucide="chart-no-axes-combined"></i></span><span class="nav-link-title">Reportes</span></a>
+                    </li>
+                <% } %>
+                <% if (puedeAdmin('VER_AUDITORIA')) { %>
+                    <li class="nav-item <%= seccionAdminActual === 'auditoria' ? 'active' : '' %>">
+                        <a class="nav-link" href="/admin/auditoria"><span class="nav-link-icon"><i data-lucide="scroll-text"></i></span><span class="nav-link-title">Auditoría</span></a>
+                    </li>
+                <% } %>
+            </ul>
+
+            <div class="admin-sidebar-user mt-auto">
+                <span class="avatar avatar-sm admin-profile-avatar"><%= locals.usuario.nombre.split(' ').map((parte) => parte[0]).slice(0, 2).join('').toUpperCase() %></span>
+                <span class="admin-sidebar-user-copy">
+                    <strong><%= locals.usuario.nombre %></strong>
+                    <small><%= String(locals.usuario.rol || 'Usuario').replaceAll('_', ' ') %></small>
+                </span>
+                <a class="btn btn-icon btn-ghost-light btn-sm" href="/auth/logout" aria-label="Cerrar sesión" title="Cerrar sesión"><i data-lucide="log-out"></i></a>
+            </div>
+        </div>
+    </div>
+</aside>

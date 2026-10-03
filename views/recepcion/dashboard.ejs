@@ -1,0 +1,77 @@
+<%- include('../partials/head', {
+    titulo: 'Recepción',
+    descripcion: 'Control de llegada y atención diaria del Laboratorio Clínico San Francisco',
+    estilos: ['/css/admin-tabler.css', '/css/reception.css']
+}) %>
+<body class="layout-fluid admin-tabler-page reception-page">
+    <div class="page">
+        <%- include('partials/sidebar') %>
+        <div class="page-wrapper">
+            <%- include('partials/topbar') %>
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-3 align-items-center">
+                        <div class="col">
+                            <div class="page-pretitle">Recepción y admisión</div>
+                            <h2 class="page-title">Control de pacientes</h2>
+                            <div class="text-secondary mt-1"><%= fechaLegible %> · Agenda, llegadas y resultados.</div>
+                        </div>
+                        <% if (puedeRegistrarPaciente) { %>
+                            <div class="col-12 col-sm-auto"><button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#new-patient-modal"><i data-lucide="user-plus"></i><span>Nuevo paciente</span></button></div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <div class="container-xl">
+                    <% if (mensaje) { %><div class="alert alert-success alert-dismissible" role="alert"><div class="d-flex"><i data-lucide="circle-check"></i><div><%= mensaje %></div></div><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button></div><% } %>
+                    <% if (error) { %><div class="alert alert-danger alert-dismissible" role="alert"><div class="d-flex"><i data-lucide="circle-alert"></i><div><%= error %></div></div><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button></div><% } %>
+
+                    <section class="reception-kpi-grid" aria-label="Resumen de turnos">
+                        <article class="card reception-kpi"><div class="card-body"><span class="reception-kpi-icon bg-cyan-lt text-cyan"><i data-lucide="calendar-days"></i></span><div><span>Turnos del día</span><strong><%= kpis.total %></strong></div></div></article>
+                        <article class="card reception-kpi"><div class="card-body"><span class="reception-kpi-icon bg-yellow-lt text-yellow"><i data-lucide="clock-3"></i></span><div><span>En espera</span><strong><%= kpis.espera %></strong></div></div></article>
+                        <article class="card reception-kpi"><div class="card-body"><span class="reception-kpi-icon bg-red-lt text-red"><i data-lucide="calendar-x"></i></span><div><span>Cancelados</span><strong><%= kpis.cancelados %></strong></div></div></article>
+                        <article class="card reception-kpi"><div class="card-body"><span class="reception-kpi-icon bg-green-lt text-green"><i data-lucide="circle-check"></i></span><div><span>Atendidos</span><strong><%= kpis.atendidos %></strong></div></div></article>
+                    </section>
+
+                    <section id="turnos-dia" class="card reception-agenda-card" aria-labelledby="reception-agenda-title">
+                        <div class="card-header"><div><h3 id="reception-agenda-title" class="card-title">Agenda de atención</h3><div class="text-secondary reception-card-subtitle"><%= turnos.length %> turno<%= turnos.length === 1 ? '' : 's' %> en la selección actual</div></div></div>
+                        <form class="card-body border-bottom admin-filter-form" method="get" action="/recepcion" data-auto-submit-filters>
+                            <div class="row g-2 align-items-end">
+                                <div class="col-12 col-lg"><label class="form-label visually-hidden" for="reception-search">Buscar</label><div class="input-icon"><span class="input-icon-addon"><i data-lucide="search"></i></span><input id="reception-search" class="form-control" type="search" name="buscar" value="<%= filtros.buscar %>" placeholder="Paciente, cédula, código o examen"></div></div>
+                                <div class="col-7 col-sm-5 col-lg-3"><label class="form-label" for="reception-date">Fecha de atención</label><input id="reception-date" class="form-control" type="date" name="fecha" value="<%= filtros.fecha %>"></div>
+                                <div class="col-5 col-sm-4 col-lg-2"><label class="form-label" for="reception-status">Estado</label><select id="reception-status" class="form-select" name="estado"><option value="">Todos</option><% estados.forEach((item) => { %><option value="<%= item.codigo %>" <%= filtros.estado === item.codigo ? 'selected' : '' %>><%= item.nombre %></option><% }); %></select></div>
+                            </div>
+                        </form>
+                        <div class="table-responsive reception-table-wrap">
+                            <table class="table table-vcenter admin-users-table reception-table">
+                                <thead><tr><th>Hora</th><th>Paciente</th><th>Examen agendado</th><th>Estado</th><th>Resultado</th><th class="text-end">Acciones</th></tr></thead>
+                                <tbody>
+                                    <% if (!turnos.length) { %><tr><td colspan="6"><div class="empty py-5"><div class="empty-icon"><i data-lucide="calendar-search"></i></div><p class="empty-title">No hay turnos en esta selección</p><p class="empty-subtitle text-secondary">La agenda se actualizará al cambiar la fecha o los filtros.</p></div></td></tr><% } %>
+                                    <% turnos.forEach((turno) => { const estadoClase = turno.estadoCodigo === 'ATENDIDO' ? 'bg-green-lt' : turno.estadoCodigo === 'CANCELADO' ? 'bg-red-lt' : turno.estadoCodigo === 'AUSENTE' ? 'bg-orange-lt' : turno.estadoCodigo === 'CONFIRMADO' ? 'bg-azure-lt' : 'bg-yellow-lt'; %>
+                                        <tr>
+                                            <td><div class="reception-time"><strong><%= turno.horaInicio %></strong><small>hasta <%= turno.horaFin %></small></div></td>
+                                            <td><div class="d-flex align-items-center gap-3 reception-patient-cell"><span class="avatar avatar-sm bg-cyan-lt text-cyan"><%= turno.paciente.split(' ').map((parte) => parte[0]).slice(0, 2).join('').toUpperCase() %></span><div class="min-w-0"><div class="fw-semibold text-body text-truncate"><%= turno.paciente %></div><div class="small text-secondary text-truncate">CI <%= turno.identificacion %> · <%= turno.telefono %></div></div></div></td>
+                                            <td><div class="reception-service"><strong title="<%= turno.servicio %>"><%= turno.servicio %></strong><small><%= turno.codigo %></small></div></td>
+                                            <td><span class="badge <%= estadoClase %>"><%= turno.estado %></span></td>
+                                            <td><span class="reception-result-state <%= turno.tieneResultado ? 'is-ready' : '' %>"><i data-lucide="<%= turno.tieneResultado ? 'file-check-2' : 'file-clock' %>"></i><%= turno.tieneResultado ? 'Disponible' : 'Pendiente' %></span></td>
+                                            <td><div class="reception-actions">
+                                                <button class="btn btn-icon btn-ghost-secondary btn-sm" type="button" data-view-patient="<%= turno.idPaciente %>" aria-label="Ver paciente y exámenes" title="Ver paciente y exámenes"><i data-lucide="eye"></i></button>
+                                                <% if (puedeRegistrarLlegada && turno.puedeRegistrarLlegada) { %><button class="btn btn-primary btn-sm" type="button" data-register-arrival data-id="<%= turno.id %>" data-code="<%= turno.codigo %>" data-patient="<%= turno.paciente %>"><i data-lucide="log-in"></i><span>Registrar llegada</span></button><% } %>
+                                            </div></td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script id="reception-patient-data" type="application/json"><%- fichasPacientesJson %></script>
+    <%- include('partials/modals') %>
+    <%- include('../partials/scripts', { scripts: ['/js/reception.js'] }) %>
+</body>
+</html>

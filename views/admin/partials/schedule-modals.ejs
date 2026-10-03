@@ -1,0 +1,111 @@
+<div class="modal modal-blur fade" id="create-schedule-modal" tabindex="-1" aria-hidden="true" data-auto-open="<%= abrirCrearHorario ? 'true' : 'false' %>">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form method="post" action="/admin/horarios" class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="avatar bg-primary-lt text-primary"><i data-lucide="calendar-plus"></i></span>
+                    <div><div class="text-uppercase text-primary fw-bold admin-modal-eyebrow">Disponibilidad recurrente</div><h2 class="modal-title">Crear horario</h2></div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label" for="new-schedule-service">Servicio</label>
+                        <select id="new-schedule-service" class="form-select" name="id_servicio" required>
+                            <option value="">Selecciona un servicio</option>
+                            <% servicios.forEach((servicio) => { %>
+                                <option value="<%= servicio.id_servicio %>" <%= String(formularioHorario.id_servicio) === String(servicio.id_servicio) ? 'selected' : '' %>><%= servicio.nombre %><%= servicio.activo === false ? ' (inactivo)' : '' %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <fieldset class="col-12">
+                        <legend class="form-label">Días de atención</legend>
+                        <div class="admin-day-checks">
+                            <% diasSemana.forEach((dia) => { %>
+                                <label class="admin-day-check" for="new-day-<%= dia.codigo %>">
+                                    <input id="new-day-<%= dia.codigo %>" class="form-check-input" type="checkbox" name="dias_semana" value="<%= dia.codigo %>" <%= formularioHorario.dias_semana.includes(dia.codigo) ? 'checked' : '' %>>
+                                    <span><%= dia.nombre %></span>
+                                </label>
+                            <% }); %>
+                        </div>
+                    </fieldset>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label" for="new-schedule-start">Hora de inicio</label>
+                        <input id="new-schedule-start" class="form-control" type="time" name="hora_inicio" value="<%= formularioHorario.hora_inicio %>" required>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label" for="new-schedule-end">Hora de fin</label>
+                        <input id="new-schedule-end" class="form-control" type="time" name="hora_fin" value="<%= formularioHorario.hora_fin %>" required>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label" for="new-schedule-duration">Duración del turno</label>
+                        <div class="input-group"><input id="new-schedule-duration" class="form-control" type="number" name="duracion_turno_min" value="<%= formularioHorario.duracion_turno_min %>" min="5" max="240" step="5" required><span class="input-group-text">min</span></div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label" for="new-schedule-capacity">Cupos por bloque</label>
+                        <input id="new-schedule-capacity" class="form-control" type="number" name="capacidad" value="<%= formularioHorario.capacidad %>" min="1" max="100" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-check form-switch">
+                            <input type="hidden" name="activo" value="false">
+                            <input class="form-check-input" type="checkbox" name="activo" value="true" <%= formularioHorario.activo !== false ? 'checked' : '' %>>
+                            <span class="form-check-label">Habilitar horario al crear</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary"><i data-lucide="plus"></i>Crear horario</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="edit-schedule-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form method="post" action="/admin/horarios/editar-grupo" class="modal-content" id="edit-schedule-form">
+            <div class="modal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="avatar bg-primary-lt text-primary"><i data-lucide="calendar-cog"></i></span>
+                    <div><div class="text-uppercase text-primary fw-bold admin-modal-eyebrow">Disponibilidad recurrente</div><h2 class="modal-title">Editar horario</h2></div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12"><label class="form-label" for="edit-schedule-service">Servicio</label><select id="edit-schedule-service" class="form-select" disabled><% servicios.forEach((servicio) => { %><option value="<%= servicio.id_servicio %>"><%= servicio.nombre %><%= servicio.activo === false ? ' (inactivo)' : '' %></option><% }); %></select><input id="edit-schedule-service-value" type="hidden" name="id_servicio"><input id="edit-schedule-ids" type="hidden" name="ids_horarios"></div>
+                    <fieldset class="col-12">
+                        <legend class="form-label">Días de atención</legend>
+                        <div class="admin-day-checks">
+                            <% diasSemana.forEach((dia) => { %><label class="admin-day-check" for="edit-day-<%= dia.codigo %>"><input id="edit-day-<%= dia.codigo %>" class="form-check-input" type="checkbox" name="dias_semana" value="<%= dia.codigo %>"><span><%= dia.nombre %></span></label><% }); %>
+                        </div>
+                    </fieldset>
+                    <div class="col-6 col-md-3"><label class="form-label" for="edit-schedule-start">Hora de inicio</label><input id="edit-schedule-start" class="form-control" type="time" name="hora_inicio" required></div>
+                    <div class="col-6 col-md-3"><label class="form-label" for="edit-schedule-end">Hora de fin</label><input id="edit-schedule-end" class="form-control" type="time" name="hora_fin" required></div>
+                    <div class="col-6 col-md-3"><label class="form-label" for="edit-schedule-duration">Duración del turno</label><div class="input-group"><input id="edit-schedule-duration" class="form-control" type="number" name="duracion_turno_min" min="5" max="240" step="5" required><span class="input-group-text">min</span></div></div>
+                    <div class="col-6 col-md-3"><label class="form-label" for="edit-schedule-capacity">Cupos por bloque</label><input id="edit-schedule-capacity" class="form-control" type="number" name="capacidad" min="1" max="100" required></div>
+                    <div class="col-12"><label class="form-check form-switch"><input type="hidden" name="activo" value="false"><input id="edit-schedule-active" class="form-check-input" type="checkbox" name="activo" value="true"><span class="form-check-label">Horario activo</span></label></div>
+                </div>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-primary"><i data-lucide="save"></i>Guardar cambios</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="create-closed-day-modal" tabindex="-1" aria-hidden="true" data-auto-open="<%= abrirCrearDia ? 'true' : 'false' %>">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" action="/admin/horarios/dias-no-laborables" class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex align-items-center gap-3"><span class="avatar bg-red-lt text-red"><i data-lucide="calendar-off"></i></span><div><div class="text-uppercase text-red fw-bold admin-modal-eyebrow">Excepción de atención</div><h2 class="modal-title">Agregar día no laborable</h2></div></div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3"><label class="form-label" for="closed-day-date">Fecha</label><input id="closed-day-date" class="form-control" type="date" name="fecha" value="<%= formularioDia.fecha || '' %>" min="<%= fechaMinima %>" required></div>
+                <div><label class="form-label" for="closed-day-description">Motivo</label><textarea id="closed-day-description" class="form-control" name="descripcion" rows="3" minlength="3" maxlength="200" required><%= formularioDia.descripcion || '' %></textarea><div class="form-hint">Ejemplo: feriado nacional o mantenimiento del laboratorio.</div></div>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-primary"><i data-lucide="calendar-plus"></i>Registrar fecha</button></div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,145 @@
+<%- include('../partials/head', {
+    titulo: 'Auditoría',
+    descripcion: 'Registro de movimientos y transacciones del sistema',
+    estilos: ['/css/admin-tabler.css']
+}) %>
+<body class="layout-fluid admin-tabler-page">
+    <div class="page">
+        <%- include('partials/sidebar', { seccionAdmin: 'auditoria' }) %>
+
+        <div class="page-wrapper">
+            <%- include('partials/topbar') %>
+
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <div class="page-pretitle">Administración del sistema</div>
+                            <h2 class="page-title">Auditoría</h2>
+                            <div class="text-secondary mt-1">Consulta los movimientos y transacciones registrados dentro del sistema.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <div class="container-xl">
+                    <section class="card admin-users-card admin-audit-card" aria-labelledby="audit-table-title">
+                        <form class="card-body border-bottom admin-filter-form" method="get" action="/admin/auditoria" data-auto-submit-filters>
+                            <div class="row g-2 align-items-end">
+                                <div class="col-12 col-xl-3">
+                                    <label class="form-label" for="audit-search">Buscar</label>
+                                    <div class="input-icon">
+                                        <span class="input-icon-addon"><i data-lucide="search"></i></span>
+                                        <input id="audit-search" class="form-control" type="search" name="buscar" value="<%= filtros.buscar %>" placeholder="Actor, detalle, IP o registro">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3 col-xl-2">
+                                    <label class="form-label" for="audit-action-filter">Acción</label>
+                                    <select id="audit-action-filter" class="form-select" name="accion">
+                                        <option value="">Todas</option>
+                                        <% acciones.forEach((item) => { %><option value="<%= item.value %>" <%= filtros.accion === item.value ? 'selected' : '' %>><%= item.label %></option><% }); %>
+                                    </select>
+                                </div>
+                                <div class="col-6 col-md-3 col-xl-2">
+                                    <label class="form-label" for="audit-entity-filter">Entidad</label>
+                                    <select id="audit-entity-filter" class="form-select" name="entidad">
+                                        <option value="">Todas</option>
+                                        <% entidades.forEach((item) => { %><option value="<%= item.value %>" <%= filtros.entidad === item.value ? 'selected' : '' %>><%= item.label %></option><% }); %>
+                                    </select>
+                                </div>
+                                <div class="col-6 col-md-3 col-xl-2">
+                                    <label class="form-label" for="audit-date-from">Desde</label>
+                                    <input id="audit-date-from" class="form-control" type="date" name="desde" value="<%= filtros.desde %>">
+                                </div>
+                                <div class="col-6 col-md-3 col-xl-2">
+                                    <label class="form-label" for="audit-date-to">Hasta</label>
+                                    <input id="audit-date-to" class="form-control" type="date" name="hasta" value="<%= filtros.hasta %>">
+                                </div>
+                                <div class="col-8 col-md-auto">
+                                    <button class="btn btn-outline-secondary w-100" type="submit"><i data-lucide="list-filter"></i>Filtrar</button>
+                                </div>
+                                <% if (filtros.buscar || filtros.accion || filtros.entidad || filtros.desde || filtros.hasta) { %>
+                                    <div class="col-4 col-md-auto">
+                                        <a class="btn btn-icon btn-outline-secondary w-100" href="/admin/auditoria" title="Limpiar filtros" aria-label="Limpiar filtros"><i data-lucide="filter-x"></i></a>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </form>
+
+                        <div class="table-responsive">
+                            <table class="table table-vcenter table-hover card-table admin-users-table admin-audit-table <%= registros.length === 0 ? 'admin-empty-table' : '' %>">
+                                <thead>
+                                    <tr>
+                                        <th id="audit-table-title">Fecha y hora</th>
+                                        <th>Actor</th>
+                                        <th>Movimiento</th>
+                                        <th>Entidad</th>
+                                        <th>Detalle</th>
+                                        <th>Origen</th>
+                                        <th class="w-1"><span class="visually-hidden">Acciones</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (registros.length === 0) { %>
+                                        <tr><td colspan="7"><div class="empty py-5"><div class="empty-icon"><i data-lucide="file-search"></i></div><p class="empty-title">No se encontraron movimientos</p><p class="empty-subtitle text-secondary">Revisa los filtros aplicados al registro de auditoría.</p></div></td></tr>
+                                    <% } %>
+                                    <% registros.forEach((registro) => { %>
+                                        <tr>
+                                            <td><div class="admin-audit-date"><strong><%= registro.fecha %></strong><small>Evento #<%= registro.id %></small></div></td>
+                                            <td><div class="admin-audit-actor"><strong title="<%= registro.actor %>"><%= registro.actor %></strong><small title="<%= registro.actorEmail %>"><%= registro.actorEmail %></small></div></td>
+                                            <td><span class="badge bg-<%= registro.accionColor %>-lt"><i data-lucide="<%= registro.accionIcon %>"></i><%= registro.accionLabel %></span></td>
+                                            <td><div class="admin-audit-entity"><strong><%= registro.entidadLabel %></strong><small>Registro #<%= registro.idRegistro %></small></div></td>
+                                            <td><span class="admin-audit-description" title="<%= registro.detalle %>"><%= registro.detalle %></span></td>
+                                            <td><span class="admin-audit-ip"><i data-lucide="network"></i><%= registro.ip %></span></td>
+                                            <td>
+                                                <button
+                                                    class="btn btn-icon btn-ghost-secondary btn-sm"
+                                                    type="button"
+                                                    data-view-audit
+                                                    data-id="<%= registro.id %>"
+                                                    data-date="<%= registro.fecha %>"
+                                                    data-actor="<%= registro.actor %>"
+                                                    data-email="<%= registro.actorEmail %>"
+                                                    data-identification="<%= registro.actorIdentification %>"
+                                                    data-role="<%= registro.actorRole %>"
+                                                    data-action="<%= registro.accionLabel %>"
+                                                    data-entity="<%= registro.entidadLabel %>"
+                                                    data-record="<%= registro.idRegistro %>"
+                                                    data-detail="<%= registro.detalle %>"
+                                                    data-ip="<%= registro.ip %>"
+                                                    aria-label="Ver detalle del evento <%= registro.id %>"
+                                                    title="Ver detalle"
+                                                ><i data-lucide="eye"></i></button>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="card-footer d-flex align-items-center admin-table-footer">
+                            <p class="m-0 text-secondary">Mostrando <%= paginacion.desde %>–<%= paginacion.hasta %> de <%= paginacion.total %> movimientos</p>
+                            <ul class="pagination m-0 ms-auto">
+                                <% const queryBase = 'buscar=' + encodeURIComponent(filtros.buscar) + '&accion=' + encodeURIComponent(filtros.accion) + '&entidad=' + encodeURIComponent(filtros.entidad) + '&desde=' + encodeURIComponent(filtros.desde) + '&hasta=' + encodeURIComponent(filtros.hasta); %>
+                                <% const paginaInicial = Math.max(1, paginacion.pagina - 2); %>
+                                <% const paginaFinal = Math.min(paginacion.totalPaginas, paginacion.pagina + 2); %>
+                                <li class="page-item <%= paginacion.pagina === 1 ? 'disabled' : '' %>"><a class="page-link" href="/admin/auditoria?<%= queryBase %>&pagina=<%= Math.max(paginacion.pagina - 1, 1) %>" aria-label="Página anterior"><i data-lucide="chevron-left"></i></a></li>
+                                <% if (paginaInicial > 1) { %><li class="page-item"><a class="page-link" href="/admin/auditoria?<%= queryBase %>&pagina=1">1</a></li><% } %>
+                                <% if (paginaInicial > 2) { %><li class="page-item disabled"><span class="page-link">…</span></li><% } %>
+                                <% for (let numero = paginaInicial; numero <= paginaFinal; numero += 1) { %><li class="page-item <%= numero === paginacion.pagina ? 'active' : '' %>"><a class="page-link" href="/admin/auditoria?<%= queryBase %>&pagina=<%= numero %>"><%= numero %></a></li><% } %>
+                                <% if (paginaFinal < paginacion.totalPaginas - 1) { %><li class="page-item disabled"><span class="page-link">…</span></li><% } %>
+                                <% if (paginaFinal < paginacion.totalPaginas) { %><li class="page-item"><a class="page-link" href="/admin/auditoria?<%= queryBase %>&pagina=<%= paginacion.totalPaginas %>"><%= paginacion.totalPaginas %></a></li><% } %>
+                                <li class="page-item <%= paginacion.pagina === paginacion.totalPaginas ? 'disabled' : '' %>"><a class="page-link" href="/admin/auditoria?<%= queryBase %>&pagina=<%= Math.min(paginacion.pagina + 1, paginacion.totalPaginas) %>" aria-label="Página siguiente"><i data-lucide="chevron-right"></i></a></li>
+                            </ul>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/audit-modal') %>
+    <%- include('../partials/scripts', { scripts: ['/js/admin-audit.js'] }) %>
+</body>
+</html>

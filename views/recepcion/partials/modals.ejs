@@ -1,0 +1,64 @@
+<div class="modal modal-blur fade" id="patient-detail-modal" tabindex="-1" aria-hidden="true" data-can-view-results="<%= puedeVerResultados ? 'true' : 'false' %>">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header"><div><div class="page-pretitle">Ficha del paciente</div><h2 class="modal-title" data-patient-name>Paciente</h2></div><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div>
+            <div class="modal-body">
+                <section class="reception-detail-section" aria-labelledby="patient-data-title">
+                    <h3 id="patient-data-title"><i data-lucide="contact"></i>Información del paciente</h3>
+                    <dl class="reception-detail-grid">
+                        <div><dt>Cédula</dt><dd data-patient-field="identificacion"></dd></div>
+                        <div><dt>Edad</dt><dd data-patient-field="edad"></dd></div>
+                        <div><dt>Sexo</dt><dd data-patient-field="sexo"></dd></div>
+                        <div><dt>Teléfono</dt><dd data-patient-field="telefono"></dd></div>
+                        <div><dt>Correo</dt><dd data-patient-field="correo"></dd></div>
+                        <div><dt>Dirección</dt><dd data-patient-field="direccion"></dd></div>
+                    </dl>
+                </section>
+                <section class="reception-detail-section" aria-labelledby="scheduled-exams-title">
+                    <div class="reception-section-heading"><h3 id="scheduled-exams-title"><i data-lucide="flask-conical"></i>Exámenes agendados</h3><span class="badge bg-cyan-lt" data-exam-count>0</span></div>
+                    <div class="reception-exam-list" data-exam-list></div>
+                </section>
+                <section class="reception-detail-section" aria-labelledby="exam-results-title">
+                    <h3 id="exam-results-title"><i data-lucide="file-check-2"></i>Resultados publicados</h3>
+                    <div class="reception-result-list" data-result-list></div>
+                </section>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="arrival-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h2 class="modal-title">Registrar llegada</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div>
+            <form method="post" data-arrival-form>
+                <div class="modal-body"><div class="reception-confirm-icon"><i data-lucide="log-in"></i></div><p class="mb-1 fw-bold text-center" data-arrival-patient></p><p class="mb-0 text-secondary text-center">El turno <strong data-arrival-code></strong> pasará a sala de espera.</p></div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-primary"><i data-lucide="circle-check"></i>Confirmar llegada</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<% if (puedeRegistrarPaciente) { %>
+<div class="modal modal-blur fade" id="new-patient-modal" tabindex="-1" aria-hidden="true" data-auto-open="<%= abrirPaciente ? 'true' : 'false' %>">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <form class="modal-content" method="post" action="/recepcion/pacientes" novalidate>
+            <div class="modal-header"><div><div class="page-pretitle">Admisión</div><h2 class="modal-title">Registrar paciente</h2></div><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6"><label class="form-label" for="patient-first-name">Nombres</label><input id="patient-first-name" class="form-control <%= erroresPaciente.nombres ? 'is-invalid' : '' %>" name="nombres" value="<%= formularioPaciente.nombres || '' %>" maxlength="100" required><% if (erroresPaciente.nombres) { %><div class="invalid-feedback"><%= erroresPaciente.nombres %></div><% } %></div>
+                    <div class="col-12 col-md-6"><label class="form-label" for="patient-last-name">Apellidos</label><input id="patient-last-name" class="form-control <%= erroresPaciente.apellidos ? 'is-invalid' : '' %>" name="apellidos" value="<%= formularioPaciente.apellidos || '' %>" maxlength="100" required><% if (erroresPaciente.apellidos) { %><div class="invalid-feedback"><%= erroresPaciente.apellidos %></div><% } %></div>
+                    <div class="col-12 col-md-6"><label class="form-label" for="patient-identification">Cédula</label><input id="patient-identification" class="form-control <%= erroresPaciente.identificacion ? 'is-invalid' : '' %>" name="identificacion" value="<%= formularioPaciente.identificacion || '' %>" inputmode="numeric" maxlength="10" required><% if (erroresPaciente.identificacion) { %><div class="invalid-feedback"><%= erroresPaciente.identificacion %></div><% } %></div>
+                    <div class="col-6 col-md-3"><label class="form-label" for="patient-age">Edad</label><input id="patient-age" class="form-control <%= erroresPaciente.edad ? 'is-invalid' : '' %>" type="number" name="edad" value="<%= formularioPaciente.edad || '' %>" min="1" max="120" required><% if (erroresPaciente.edad) { %><div class="invalid-feedback"><%= erroresPaciente.edad %></div><% } %></div>
+                    <div class="col-6 col-md-3"><label class="form-label" for="patient-sex">Sexo</label><select id="patient-sex" class="form-select <%= erroresPaciente.sexo ? 'is-invalid' : '' %>" name="sexo" required><option value="">Seleccionar</option><option value="FEMENINO" <%= formularioPaciente.sexo === 'FEMENINO' ? 'selected' : '' %>>Femenino</option><option value="MASCULINO" <%= formularioPaciente.sexo === 'MASCULINO' ? 'selected' : '' %>>Masculino</option><option value="OTRO" <%= formularioPaciente.sexo === 'OTRO' ? 'selected' : '' %>>Otro</option><option value="PREFIERO_NO_DECIR" <%= formularioPaciente.sexo === 'PREFIERO_NO_DECIR' ? 'selected' : '' %>>Prefiero no decir</option></select><% if (erroresPaciente.sexo) { %><div class="invalid-feedback"><%= erroresPaciente.sexo %></div><% } %></div>
+                    <div class="col-12 col-md-6"><label class="form-label" for="patient-phone">Teléfono</label><input id="patient-phone" class="form-control <%= erroresPaciente.telefono ? 'is-invalid' : '' %>" name="telefono" value="<%= formularioPaciente.telefono || '' %>" inputmode="tel" maxlength="20" required><% if (erroresPaciente.telefono) { %><div class="invalid-feedback"><%= erroresPaciente.telefono %></div><% } %></div>
+                    <div class="col-12 col-md-6"><label class="form-label" for="patient-email">Correo electrónico</label><input id="patient-email" class="form-control <%= erroresPaciente.correo ? 'is-invalid' : '' %>" type="email" name="correo" value="<%= formularioPaciente.correo || '' %>" maxlength="254" required><% if (erroresPaciente.correo) { %><div class="invalid-feedback"><%= erroresPaciente.correo %></div><% } %></div>
+                    <div class="col-12"><label class="form-label" for="patient-address">Dirección <span class="text-secondary fw-normal">(opcional)</span></label><textarea id="patient-address" class="form-control <%= erroresPaciente.direccion ? 'is-invalid' : '' %>" name="direccion" rows="2" maxlength="300"><%= formularioPaciente.direccion || '' %></textarea><% if (erroresPaciente.direccion) { %><div class="invalid-feedback"><%= erroresPaciente.direccion %></div><% } %></div>
+                </div>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-primary"><i data-lucide="user-plus"></i>Registrar paciente</button></div>
+        </form>
+    </div>
+</div>
+<% } %>

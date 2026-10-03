@@ -1,0 +1,169 @@
+<%- include('../partials/head', {
+    titulo: 'Servicios',
+    descripcion: 'Administración de servicios del Laboratorio Clínico San Francisco',
+    estilos: ['/css/admin-tabler.css']
+}) %>
+<body class="layout-fluid admin-tabler-page">
+    <div class="page">
+        <%- include('partials/sidebar', { seccionAdmin: 'servicios' }) %>
+
+        <div class="page-wrapper">
+            <%- include('partials/topbar') %>
+
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <div class="page-pretitle">Administración del sistema</div>
+                            <h2 class="page-title">Servicios</h2>
+                            <div class="text-secondary mt-1">Administra los tipos de examen ofrecidos por el laboratorio.</div>
+                        </div>
+                        <div class="col-auto ms-auto d-print-none">
+                            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#create-service-modal">
+                                <i data-lucide="plus"></i><span>Nuevo servicio</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <div class="container-xl">
+                    <%- include('partials/alerts') %>
+
+                    <section class="card admin-users-card" aria-labelledby="services-table-title">
+                        <form class="card-body border-bottom admin-filter-form" method="get" action="/admin/servicios" data-auto-submit-filters>
+                            <div class="row g-2 align-items-end">
+                                <div class="col-12 col-lg">
+                                    <label class="form-label visually-hidden" for="service-search">Buscar servicios</label>
+                                    <div class="input-icon">
+                                        <span class="input-icon-addon"><i data-lucide="search"></i></span>
+                                        <input id="service-search" class="form-control" type="search" name="buscar" value="<%= filtros.buscar %>" placeholder="Buscar nombre o descripción">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <label class="form-label" for="service-status-filter">Estado</label>
+                                    <select id="service-status-filter" class="form-select" name="estado">
+                                        <option value="">Todos</option>
+                                        <option value="activo" <%= filtros.estado === 'activo' ? 'selected' : '' %>>Activo</option>
+                                        <option value="inactivo" <%= filtros.estado === 'inactivo' ? 'selected' : '' %>>Inactivo</option>
+                                    </select>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <label class="form-label" for="availability-filter">Horarios</label>
+                                    <select id="availability-filter" class="form-select" name="disponibilidad">
+                                        <option value="">Todos</option>
+                                        <option value="con_horarios" <%= filtros.disponibilidad === 'con_horarios' ? 'selected' : '' %>>Con horarios</option>
+                                        <option value="sin_horarios" <%= filtros.disponibilidad === 'sin_horarios' ? 'selected' : '' %>>Sin horarios</option>
+                                    </select>
+                                </div>
+                                <div class="col-8 col-md-auto">
+                                    <button class="btn btn-outline-secondary w-100" type="submit"><i data-lucide="list-filter"></i>Filtrar</button>
+                                </div>
+                                <% if (filtros.buscar || filtros.estado || filtros.disponibilidad) { %>
+                                    <div class="col-4 col-md-auto">
+                                        <a class="btn btn-icon btn-outline-secondary w-100" href="/admin/servicios" title="Limpiar filtros" aria-label="Limpiar filtros"><i data-lucide="filter-x"></i></a>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </form>
+
+                        <div class="table-responsive">
+                            <table class="table table-vcenter table-hover card-table admin-users-table admin-services-table">
+                                <thead>
+                                    <tr>
+                                        <th id="services-table-title">Servicio</th>
+                                        <th>Descripción</th>
+                                        <th>Horarios activos</th>
+                                        <th>Turnos</th>
+                                        <th>Disponibilidad</th>
+                                        <th>Estado</th>
+                                        <th class="w-1"><span class="visually-hidden">Acciones</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (servicios.length === 0) { %>
+                                        <tr>
+                                            <td colspan="7">
+                                                <div class="empty py-5">
+                                                    <div class="empty-icon"><i data-lucide="flask-conical-off"></i></div>
+                                                    <p class="empty-title">No se encontraron servicios</p>
+                                                    <p class="empty-subtitle text-secondary">Revisa los filtros o registra un nuevo tipo de examen.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                    <% servicios.forEach((servicio) => { %>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-3 admin-service-cell">
+                                                    <span class="avatar avatar-sm bg-cyan-lt text-cyan"><i data-lucide="flask-conical"></i></span>
+                                                    <div class="min-w-0 fw-semibold text-body text-truncate" title="<%= servicio.nombre %>"><%= servicio.nombre %></div>
+                                                </div>
+                                            </td>
+                                            <td><span class="admin-service-description"><%= servicio.descripcion || 'Sin descripción registrada' %></span></td>
+                                            <td><span class="badge bg-azure-lt"><i data-lucide="clock-3"></i><%= servicio.horariosActivos %></span></td>
+                                            <td><span class="badge bg-purple-lt"><i data-lucide="calendar-days"></i><%= servicio.turnos %></span></td>
+                                            <td>
+                                                <span class="badge <%= servicio.disponible ? 'bg-green-lt' : 'bg-secondary-lt' %>">
+                                                    <i data-lucide="<%= servicio.disponible ? 'circle-check' : 'circle-slash-2' %>"></i>
+                                                    <%= servicio.disponible ? 'Disponible' : 'No disponible' %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge <%= servicio.activo ? 'bg-green-lt' : 'bg-red-lt' %>">
+                                                    <span class="status-dot <%= servicio.activo ? 'status-dot-animated bg-green' : 'bg-red' %> me-1"></span>
+                                                    <%= servicio.activo ? 'Activo' : 'Inactivo' %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-icon btn-ghost-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Acciones de <%= servicio.nombre %>"><i data-lucide="ellipsis-vertical"></i></button>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        <a class="dropdown-item" href="/admin/horarios?servicio=<%= servicio.id %>">
+                                                            <i data-lucide="calendar-clock"></i><span>Administrar horarios</span>
+                                                        </a>
+                                                        <button class="dropdown-item" type="button" data-edit-service data-id="<%= servicio.id %>" data-name="<%= servicio.nombre %>" data-description="<%= servicio.descripcion %>">
+                                                            <i data-lucide="pencil"></i><span>Editar</span>
+                                                        </button>
+                                                        <form method="post" action="/admin/servicios/<%= servicio.id %>/estado">
+                                                            <input type="hidden" name="activo" value="<%= servicio.activo ? 'false' : 'true' %>">
+                                                            <button type="submit" class="dropdown-item <%= servicio.activo ? 'text-danger' : 'text-success' %>">
+                                                                <i data-lucide="<%= servicio.activo ? 'circle-off' : 'circle-check' %>"></i>
+                                                                <span><%= servicio.activo ? 'Desactivar' : 'Activar' %></span>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="card-footer d-flex align-items-center admin-table-footer">
+                            <p class="m-0 text-secondary">Mostrando <%= paginacion.desde %>–<%= paginacion.hasta %> de <%= paginacion.total %> servicios</p>
+                            <ul class="pagination m-0 ms-auto">
+                                <% const queryBase = 'buscar=' + encodeURIComponent(filtros.buscar) + '&estado=' + encodeURIComponent(filtros.estado) + '&disponibilidad=' + encodeURIComponent(filtros.disponibilidad); %>
+                                <li class="page-item <%= paginacion.pagina === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link" href="/admin/servicios?<%= queryBase %>&pagina=<%= Math.max(paginacion.pagina - 1, 1) %>" aria-label="Página anterior"><i data-lucide="chevron-left"></i></a>
+                                </li>
+                                <% for (let numero = 1; numero <= paginacion.totalPaginas; numero += 1) { %>
+                                    <li class="page-item <%= numero === paginacion.pagina ? 'active' : '' %>"><a class="page-link" href="/admin/servicios?<%= queryBase %>&pagina=<%= numero %>"><%= numero %></a></li>
+                                <% } %>
+                                <li class="page-item <%= paginacion.pagina === paginacion.totalPaginas ? 'disabled' : '' %>">
+                                    <a class="page-link" href="/admin/servicios?<%= queryBase %>&pagina=<%= Math.min(paginacion.pagina + 1, paginacion.totalPaginas) %>" aria-label="Página siguiente"><i data-lucide="chevron-right"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/service-modals') %>
+    <%- include('../partials/scripts', { scripts: ['/js/admin-services.js'] }) %>
+</body>
+</html>
