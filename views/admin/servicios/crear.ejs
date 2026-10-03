@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo Servicio - LabSys</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+</head>
+<body>
+    <main class="container" style="max-width: 600px;">
+        <header><h2>➕ Registrar Nuevo Examen</h2></header>
+        <% if (error) { %>
+            <article style="background-color: #ffebee; color: #c62828; padding: 0.8rem;"><%= error %></article>
+        <% } %>
+        <form action="/admin/servicios/nuevo" method="POST">
+            <label for="nombre">Nombre del Examen (Ej. Hemograma Completo, Inmunología):</label>
+            <input type="text" id="nombre" name="nombre" required placeholder="Ej. Hormonas">
+
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" name="descripcion" placeholder="Detalle clínico del examen..."></textarea>
+
+            <button type="submit">Guardar Examen</button>
+            <a href="/admin/servicios" class="secondary outline" role="button" style="width: 100%; text-align: center; display: block; margin-top: 10px;">Cancelar</a>
+        </form>
+    </main>
+</body>
+</html>

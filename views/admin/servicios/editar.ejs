@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Servicio - LabSys</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+</head>
+<body>
+    <main class="container" style="max-width: 600px;">
+        <header><h2>✏️ Editar Examen de Laboratorio</h2></header>
+        <form action="/admin/servicios/editar/<%= servicio.id_servicio %>" method="POST">
+            <label for="nombre">Nombre del Examen:</label>
+            <input type="text" id="nombre" name="nombre" value="<%= servicio.nombre %>" required>
+
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" name="descripcion"><%= servicio.descripcion %></textarea>
+
+            <label for="activo">
+                <input type="checkbox" id="activo" name="activo" <%= servicio.activo ? 'checked' : '' %>>
+                Examen Activo (Visible para agendar turnos)
+            </label>
+
+            <button type="submit">Actualizar Examen</button>
+            <a href="/admin/servicios" class="secondary outline" role="button" style="width: 100%; text-align: center; display: block; margin-top: 10px;">Cancelar</a>
+        </form>
+    </main>
+</body>
+</html>
