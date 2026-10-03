@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Exámenes y Servicios - LabSys</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+</head>
+<body>
+    <main class="container">
+        <header>
+            <nav>
+                <ul><li><h2>🧪 Catálogo de Exámenes de Laboratorio</h2></li></ul>
+                <ul>
+                    <li><a href="/admin/servicios/nuevo" role="button">+ Nuevo Examen</a></li>
+                    <li><a href="/admin/console" class="secondary outline">Volver a Consola</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section>
+            <table role="striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre del Examen</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% servicios.forEach(s => { %>
+                        <tr>
+                            <td><%= s.id_servicio %></td>
+                            <td><strong><%= s.nombre %></strong></td>
+                            <td><%= s.descripcion || 'Sin descripción' %></td>
+                            <td>
+                                <% if (s.activo) { %>
+                                    <mark style="background-color: #27ae60; color: white;">Activo</mark>
+                                <% } else { %>
+                                    <mark style="background-color: #c0392b; color: white;">Inactivo</mark>
+                                <% } %>
+                            </td>
+                            <td>
+                                <a href="/admin/servicios/editar/<%= s.id_servicio %>" class="outline" style="padding: 4px 8px; font-size: 0.8rem;">Editar</a>
+                                <form action="/admin/servicios/eliminar/<%= s.id_servicio %>" method="POST" style="display:inline; margin:0;">
+                                    <button type="submit" class="secondary outline" style="padding: 4px 8px; font-size: 0.8rem; color: #c0392b; border-color: #c0392b;">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+</html>

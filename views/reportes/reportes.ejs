@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes y Control de Personal - LabSys</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body>
+    <main class="container">
+        <header>
+            <nav>
+                <ul>
+                    <li><h2>Panel de Control y Reportes</h2></li>
+                </ul>
+                <ul>
+                    <li><a href="/admin/console" class="secondary outline">Volver a Consola</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- KPIs Generales -->
+        <section>
+            <div class="grid">
+                <article>
+                    <header><strong>Total Turnos</strong></header>
+                    <h3><%= metricas.totalTurnos %></h3>
+                </article>
+                <article>
+                    <header><strong>Pacientes Registrados</strong></header>
+                    <h3><%= metricas.totalPacientes %></h3>
+                </article>
+                <article>
+                    <header><strong>Personal Activo</strong></header>
+                    <h3><%= metricas.totalPersonal %></h3>
+                </article>
+            </div>
+        </section>
+
+        <!-- Sección de Estadísticas -->
+        <div class="grid">
+            <article>
+                <header><h3>Estado Actual de Turnos</h3></header>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Estado</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% turnosPorEstado.forEach(item => { %>
+                            <tr>
+                                <td><mark><%= item.estado %></mark></td>
+                                <td><strong><%= item._count.id_turno %></strong></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </article>
+
+            <article>
+                <header><h3>Top Servicios Solicitados</h3></header>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Servicio / Análisis</th>
+                            <th>Solicitudes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% serviciosPopulares.forEach(servicio => { %>
+                            <tr>
+                                <td><%= servicio.nombre %></td>
+                                <td><strong><%= servicio._count.turno %></strong></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </article>
+        </div>
+
+        <!-- Sección de Reporte de Personal -->
+        <section>
+            <article>
+                <header><h3>👥 Auditoría y Roles del Personal de Laboratorio</h3></header>
+                <table role="striped">
+                    <thead>
+                        <tr>
+                            <th>Nombre Completo</th>
+                            <th>Correo Electrónico</th>
+                            <th>Rol(es) Asignado(s)</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% personalActivo.forEach(persona => { %>
+                            <tr>
+                                <td><strong><%= persona.nombre %></strong></td>
+                                <td><%= persona.email %></td>
+                                <td>
+                                    <% persona.usuario_rol.forEach(ur => { %>
+                                        <span class="badge"><%= ur.rol.nombre %></span>
+                                    <% }) %>
+                                </td>
+                                <td><mark style="background-color: #27ae60; color: white;">Activo</mark></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </article>
+        </section>
+    </main>
+</body>
+</html>
