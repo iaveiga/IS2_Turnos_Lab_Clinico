@@ -1,0 +1,355 @@
+.reception-page {
+  --reception-accent: #0b8793;
+  --reception-ink: #193d50;
+}
+
+.reception-navbar {
+  background: #123f4d;
+}
+
+.reception-profile-avatar {
+  border: 0;
+  background: #2d6f61;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.reception-page .alert .d-flex {
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.reception-page .alert svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+.reception-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.reception-kpi .card-body {
+  display: flex;
+  min-height: 104px;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem;
+}
+
+.reception-kpi-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  border-radius: 7px;
+}
+
+.reception-kpi-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.reception-kpi span:not(.reception-kpi-icon),
+.reception-kpi strong {
+  display: block;
+}
+
+.reception-kpi span:not(.reception-kpi-icon) {
+  color: #6d818d;
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+
+.reception-kpi strong {
+  margin-top: 0.12rem;
+  color: var(--reception-ink);
+  font-size: 1.45rem;
+  line-height: 1.15;
+}
+
+.reception-agenda-card .card-header {
+  min-height: 68px;
+}
+
+.reception-card-subtitle {
+  margin-top: 0.18rem;
+  font-size: 0.62rem;
+}
+
+.reception-table-wrap {
+  min-height: 320px;
+}
+
+.reception-table {
+  min-width: 1040px;
+}
+
+.reception-table tbody td {
+  height: 74px;
+}
+
+.reception-time,
+.reception-service {
+  display: grid;
+  min-width: 0;
+}
+
+.reception-time strong,
+.reception-service strong {
+  color: #294c5e;
+  font-size: 0.68rem;
+}
+
+.reception-time small,
+.reception-service small {
+  margin-top: 0.12rem;
+  color: #718692;
+  font-size: 0.58rem;
+}
+
+.reception-service {
+  width: 215px;
+}
+
+.reception-service strong,
+.reception-service small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reception-patient-cell {
+  width: 245px;
+}
+
+.reception-result-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #7a8e98;
+  font-size: 0.61rem;
+  font-weight: 700;
+}
+
+.reception-result-state.is-ready {
+  color: #17805c;
+}
+
+.reception-result-state svg {
+  width: 15px;
+  height: 15px;
+}
+
+.reception-actions {
+  display: flex;
+  min-width: 190px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.reception-detail-section + .reception-detail-section {
+  margin-top: 1.35rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid #dfe8ec;
+}
+
+.reception-detail-section h3,
+.reception-section-heading h3 {
+  display: flex;
+  margin: 0 0 0.8rem;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--reception-ink);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.reception-detail-section h3 svg {
+  width: 17px;
+  height: 17px;
+  color: var(--reception-accent);
+}
+
+.reception-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reception-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border: 1px solid #e0e9ed;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.reception-detail-grid > div {
+  min-width: 0;
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid #e7eef1;
+}
+
+.reception-detail-grid > div:nth-child(odd) {
+  border-right: 1px solid #e7eef1;
+}
+
+.reception-detail-grid > div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.reception-detail-grid dt,
+.reception-detail-grid dd {
+  margin: 0;
+}
+
+.reception-detail-grid dt {
+  color: #748994;
+  font-size: 0.56rem;
+  font-weight: 700;
+}
+
+.reception-detail-grid dd {
+  margin-top: 0.18rem;
+  overflow-wrap: anywhere;
+  color: #294c5e;
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.reception-exam-list,
+.reception-result-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.reception-exam-row,
+.reception-result-row {
+  border: 1px solid #e0e9ed;
+  border-radius: 7px;
+  background: #fbfcfd;
+}
+
+.reception-exam-row {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0.75rem;
+}
+
+.reception-exam-main,
+.reception-result-heading > div {
+  display: grid;
+  min-width: 0;
+}
+
+.reception-exam-main strong,
+.reception-result-heading strong {
+  color: #294c5e;
+  font-size: 0.65rem;
+}
+
+.reception-exam-main small,
+.reception-result-heading small {
+  margin-top: 0.18rem;
+  color: #718692;
+  font-size: 0.56rem;
+}
+
+.reception-result-row {
+  padding: 0.8rem;
+}
+
+.reception-result-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.reception-result-content,
+.reception-result-notes {
+  margin: 0.7rem 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #385866;
+  font-size: 0.64rem;
+}
+
+.reception-result-notes {
+  padding-top: 0.55rem;
+  border-top: 1px solid #e6edef;
+  color: #677f8b;
+}
+
+.reception-result-row > small {
+  display: block;
+  margin-top: 0.55rem;
+  font-size: 0.55rem;
+}
+
+.reception-inline-empty {
+  min-height: 64px;
+  padding: 1.2rem;
+  border: 1px dashed #cbdbe1;
+  border-radius: 7px;
+  color: #718692;
+  font-size: 0.63rem;
+  text-align: center;
+}
+
+.reception-confirm-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 0.85rem;
+  place-items: center;
+  border-radius: 7px;
+  background: #e5f5f6;
+  color: var(--reception-accent);
+}
+
+.reception-confirm-icon svg {
+  width: 23px;
+  height: 23px;
+}
+
+@media (max-width: 991.98px) {
+  .reception-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .reception-kpi-grid,
+  .reception-detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .reception-detail-grid > div,
+  .reception-detail-grid > div:nth-child(odd),
+  .reception-detail-grid > div:nth-last-child(2) {
+    border-right: 0;
+    border-bottom: 1px solid #e7eef1;
+  }
+
+  .reception-detail-grid > div:last-child {
+    border-bottom: 0;
+  }
+
+  .reception-exam-row,
+  .reception-result-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

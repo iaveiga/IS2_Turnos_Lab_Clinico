@@ -1,0 +1,55 @@
+<%- include('../partials/head', {
+    titulo: 'Servicios',
+    descripcion: 'Catálogo de exámenes del Laboratorio Clínico San Francisco.'
+}) %>
+<body class="catalog-page">
+    <%- include('../partials/public-header', { seccion: 'servicios' }) %>
+
+    <main class="container-xl catalog-main">
+        <header class="module-header">
+            <div>
+                <p class="app-eyebrow">Catálogo del laboratorio</p>
+                <h1>Tipos de examen</h1>
+                <p>Consulta los servicios registrados y su disponibilidad actual para agendamiento.</p>
+            </div>
+            <% if (locals.usuario && ((locals.usuario.roles || []).includes('PACIENTE') || locals.usuario.rol === 'PACIENTE')) { %>
+                <a class="btn btn-primary" href="/turnos/nuevo"><i data-lucide="calendar-plus"></i>Agendar turno</a>
+            <% } else if (!locals.usuario) { %>
+                <a class="btn btn-primary" href="/auth/registro"><i data-lucide="user-plus"></i>Crear cuenta</a>
+            <% } %>
+        </header>
+
+        <% if (servicios.length === 0) { %>
+            <section class="card">
+                <div class="appointments-empty">
+                    <span class="avatar bg-azure-lt text-azure"><i data-lucide="flask-conical-off"></i></span>
+                    <h3>No hay servicios registrados</h3>
+                    <p>El catálogo se mostrará cuando existan tipos de examen en la base de datos.</p>
+                </div>
+            </section>
+        <% } else { %>
+            <section class="catalog-grid" aria-label="Servicios de laboratorio">
+                <% servicios.forEach((servicio) => { %>
+                    <article class="card catalog-service-card <%= servicio.disponible ? '' : 'opacity-75' %>">
+                        <div class="card-body">
+                            <span class="catalog-service-icon"><i data-lucide="<%= servicio.icono %>"></i></span>
+                            <h2><%= servicio.nombre %></h2>
+                            <p><%= servicio.descripcion || 'Examen de laboratorio clínico.' %></p>
+                            <div class="catalog-service-state">
+                                <% if (servicio.disponible) { %>
+                                    <span class="badge bg-green-lt"><span class="status-dot status-dot-animated bg-green me-1"></span>Disponible</span>
+                                <% } else { %>
+                                    <span class="badge bg-secondary-lt"><span class="status-dot bg-secondary me-1"></span>No disponible</span>
+                                <% } %>
+                            </div>
+                        </div>
+                    </article>
+                <% }); %>
+            </section>
+        <% } %>
+    </main>
+
+    <%- include('../partials/footer') %>
+    <%- include('../partials/scripts') %>
+</body>
+</html>

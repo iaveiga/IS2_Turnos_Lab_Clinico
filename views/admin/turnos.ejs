@@ -1,0 +1,188 @@
+<%- include('../partials/head', {
+    titulo: 'Gestión de turnos',
+    descripcion: 'Administración de turnos del Laboratorio Clínico San Francisco',
+    estilos: ['/css/admin-tabler.css']
+}) %>
+<body class="layout-fluid admin-tabler-page">
+    <div class="page">
+        <%- include('partials/sidebar', { seccionAdmin: 'turnos' }) %>
+
+        <div class="page-wrapper">
+            <%- include('partials/topbar') %>
+
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <div class="page-pretitle">Administración del sistema</div>
+                            <h2 class="page-title">Gestión de turnos</h2>
+                            <div class="text-secondary mt-1">Consulta el paciente y servicio asignados, y administra el estado de cada atención.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <div class="container-xl">
+                    <%- include('partials/alerts') %>
+
+                    <section class="card admin-users-card" aria-labelledby="appointments-table-title">
+                        <form class="card-body border-bottom admin-filter-form" method="get" action="/admin/turnos" data-auto-submit-filters>
+                            <div class="row g-2 align-items-end">
+                                <div class="col-12 col-xl">
+                                    <label class="form-label visually-hidden" for="appointment-search">Buscar turnos</label>
+                                    <div class="input-icon">
+                                        <span class="input-icon-addon"><i data-lucide="search"></i></span>
+                                        <input id="appointment-search" class="form-control" type="search" name="buscar" value="<%= filtros.buscar %>" placeholder="Código, paciente, cédula o servicio">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3 col-xl-2">
+                                    <label class="form-label" for="appointment-status-filter">Estado</label>
+                                    <select id="appointment-status-filter" class="form-select" name="estado">
+                                        <option value="">Todos</option>
+                                        <% estados.forEach((estado) => { %>
+                                            <option value="<%= estado.id_estado %>" <%= String(filtros.estado) === String(estado.id_estado) ? 'selected' : '' %>><%= estado.nombre %></option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                                <div class="col-6 col-md-4 col-xl-2">
+                                    <label class="form-label" for="appointment-service-filter">Servicio</label>
+                                    <select id="appointment-service-filter" class="form-select" name="servicio">
+                                        <option value="">Todos</option>
+                                        <% servicios.forEach((servicio) => { %>
+                                            <option value="<%= servicio.id_servicio %>" <%= String(filtros.servicio) === String(servicio.id_servicio) ? 'selected' : '' %>><%= servicio.nombre %></option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                                <div class="col-8 col-md-3 col-xl-2">
+                                    <label class="form-label" for="appointment-date-filter">Fecha</label>
+                                    <input id="appointment-date-filter" class="form-control" type="date" name="fecha" value="<%= filtros.fecha %>">
+                                </div>
+                                <div class="col-8 col-md-auto">
+                                    <button class="btn btn-outline-secondary w-100" type="submit"><i data-lucide="list-filter"></i>Filtrar</button>
+                                </div>
+                                <% if (filtros.buscar || filtros.estado || filtros.servicio || filtros.fecha) { %>
+                                    <div class="col-4 col-md-auto">
+                                        <a class="btn btn-icon btn-outline-secondary w-100" href="/admin/turnos" title="Limpiar filtros" aria-label="Limpiar filtros"><i data-lucide="filter-x"></i></a>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </form>
+
+                        <div class="table-responsive">
+                            <table class="table table-vcenter table-hover card-table admin-users-table admin-appointments-table">
+                                <thead>
+                                    <tr>
+                                        <th id="appointments-table-title">Turno</th>
+                                        <th>Fecha y hora</th>
+                                        <th>Paciente asignado</th>
+                                        <th>Servicio</th>
+                                        <th>Estado</th>
+                                        <th class="w-1"><span class="visually-hidden">Acciones</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (turnos.length === 0) { %>
+                                        <tr>
+                                            <td colspan="6">
+                                                <div class="empty py-5">
+                                                    <div class="empty-icon"><i data-lucide="calendar-search"></i></div>
+                                                    <p class="empty-title">No se encontraron turnos</p>
+                                                    <p class="empty-subtitle text-secondary">Revisa los filtros seleccionados o espera nuevos agendamientos.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                    <% turnos.forEach((turno) => { %>
+                                        <% const estadoClase = turno.estadoCodigo === 'ATENDIDO' ? 'bg-green-lt' : turno.estadoCodigo === 'CANCELADO' ? 'bg-red-lt' : turno.estadoCodigo === 'AUSENTE' ? 'bg-orange-lt' : turno.estadoCodigo === 'CONFIRMADO' ? 'bg-azure-lt' : 'bg-yellow-lt'; %>
+                                        <tr>
+                                            <td>
+                                                <div class="admin-appointment-code">
+                                                    <strong><%= turno.codigo %></strong>
+                                                    <small>Creado: <%= turno.fechaCreacion %></small>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="admin-appointment-date"><strong><%= turno.fecha %></strong><small><%= turno.horaInicio %>–<%= turno.horaFin %></small></div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-3 admin-patient-cell">
+                                                    <span class="avatar avatar-sm bg-cyan-lt text-cyan"><%= turno.paciente.split(' ').map((parte) => parte[0]).slice(0, 2).join('').toUpperCase() %></span>
+                                                    <div class="min-w-0">
+                                                        <div class="fw-semibold text-body text-truncate"><%= turno.paciente %></div>
+                                                        <div class="small text-secondary text-truncate">CI <%= turno.pacienteIdentificacion %></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="admin-appointment-service"><strong title="<%= turno.servicio %>"><%= turno.servicio %></strong><small><%= turno.servicioDescripcion %></small></div>
+                                            </td>
+                                            <td><span class="badge <%= estadoClase %>"><%= turno.estado %></span></td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-icon btn-ghost-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Acciones del turno <%= turno.codigo %>"><i data-lucide="ellipsis-vertical"></i></button>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        <button
+                                                            class="dropdown-item"
+                                                            type="button"
+                                                            data-view-appointment
+                                                            data-code="<%= turno.codigo %>"
+                                                            data-date="<%= turno.fecha %>"
+                                                            data-time="<%= turno.horaInicio %>–<%= turno.horaFin %>"
+                                                            data-status="<%= turno.estado %>"
+                                                            data-created="<%= turno.fechaCreacion %>"
+                                                            data-patient="<%= turno.paciente %>"
+                                                            data-identification="<%= turno.pacienteIdentificacion %>"
+                                                            data-phone="<%= turno.pacienteTelefono %>"
+                                                            data-email="<%= turno.pacienteCorreo %>"
+                                                            data-service="<%= turno.servicio %>"
+                                                            data-service-description="<%= turno.servicioDescripcion %>"
+                                                            data-notes="<%= turno.observacion %>"
+                                                            data-last-reason="<%= turno.ultimoMotivo %>"
+                                                        ><i data-lucide="eye"></i><span>Ver detalle</span></button>
+                                                        <% if (turno.transiciones.length > 0) { %>
+                                                            <button
+                                                                class="dropdown-item"
+                                                                type="button"
+                                                                data-change-appointment-status
+                                                                data-id="<%= turno.id %>"
+                                                                data-code="<%= turno.codigo %>"
+                                                                data-patient="<%= turno.paciente %>"
+                                                                data-service="<%= turno.servicio %>"
+                                                                data-transitions="<%= turno.transiciones.join(',') %>"
+                                                            ><i data-lucide="refresh-cw"></i><span>Cambiar estado</span></button>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="card-footer d-flex align-items-center admin-table-footer">
+                            <p class="m-0 text-secondary">Mostrando <%= paginacion.desde %>–<%= paginacion.hasta %> de <%= paginacion.total %> turnos</p>
+                            <ul class="pagination m-0 ms-auto">
+                                <% const queryBase = 'buscar=' + encodeURIComponent(filtros.buscar) + '&estado=' + encodeURIComponent(filtros.estado) + '&servicio=' + encodeURIComponent(filtros.servicio) + '&fecha=' + encodeURIComponent(filtros.fecha); %>
+                                <li class="page-item <%= paginacion.pagina === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link" href="/admin/turnos?<%= queryBase %>&pagina=<%= Math.max(paginacion.pagina - 1, 1) %>" aria-label="Página anterior"><i data-lucide="chevron-left"></i></a>
+                                </li>
+                                <% for (let numero = 1; numero <= paginacion.totalPaginas; numero += 1) { %>
+                                    <li class="page-item <%= numero === paginacion.pagina ? 'active' : '' %>"><a class="page-link" href="/admin/turnos?<%= queryBase %>&pagina=<%= numero %>"><%= numero %></a></li>
+                                <% } %>
+                                <li class="page-item <%= paginacion.pagina === paginacion.totalPaginas ? 'disabled' : '' %>">
+                                    <a class="page-link" href="/admin/turnos?<%= queryBase %>&pagina=<%= Math.min(paginacion.pagina + 1, paginacion.totalPaginas) %>" aria-label="Página siguiente"><i data-lucide="chevron-right"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/turno-modals') %>
+    <%- include('../partials/scripts', { scripts: ['/js/admin-turnos.js'] }) %>
+</body>
+</html>

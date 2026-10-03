@@ -1,0 +1,68 @@
+<div class="modal modal-blur fade" id="create-service-modal" tabindex="-1" aria-hidden="true" data-auto-open="<%= abrirCrear ? 'true' : 'false' %>">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" action="/admin/servicios" class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="avatar bg-primary-lt text-primary"><i data-lucide="flask-conical"></i></span>
+                    <div>
+                        <div class="text-uppercase text-primary fw-bold admin-modal-eyebrow">Catálogo de exámenes</div>
+                        <h2 class="modal-title">Crear servicio</h2>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label" for="new-service-name">Nombre del servicio</label>
+                    <input id="new-service-name" class="form-control" name="nombre" value="<%= formulario.nombre || '' %>" maxlength="120" autocomplete="off" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="new-service-description">Descripción</label>
+                    <textarea id="new-service-description" class="form-control" name="descripcion" rows="4" maxlength="500" placeholder="Describe los análisis incluidos y cualquier información relevante"><%= formulario.descripcion || '' %></textarea>
+                    <div class="form-hint">Máximo 500 caracteres.</div>
+                </div>
+                <label class="form-check form-switch">
+                    <input type="hidden" name="activo" value="false">
+                    <input class="form-check-input" type="checkbox" name="activo" value="true" <%= formulario.activo !== false ? 'checked' : '' %>>
+                    <span class="form-check-label">Habilitar servicio al crear</span>
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary"><i data-lucide="plus"></i>Crear servicio</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="edit-service-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" class="modal-content" id="edit-service-form">
+            <div class="modal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="avatar bg-primary-lt text-primary"><i data-lucide="pencil"></i></span>
+                    <div>
+                        <div class="text-uppercase text-primary fw-bold admin-modal-eyebrow">Catálogo de exámenes</div>
+                        <h2 class="modal-title">Editar servicio</h2>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label" for="edit-service-name">Nombre del servicio</label>
+                    <input id="edit-service-name" class="form-control" name="nombre" maxlength="120" autocomplete="off" required>
+                </div>
+                <div>
+                    <label class="form-label" for="edit-service-description">Descripción</label>
+                    <textarea id="edit-service-description" class="form-control" name="descripcion" rows="4" maxlength="500"></textarea>
+                    <div class="form-hint">Los horarios se administran desde su módulo independiente.</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary"><i data-lucide="save"></i>Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+</div>

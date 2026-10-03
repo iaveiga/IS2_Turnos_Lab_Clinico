@@ -1,0 +1,36 @@
+<div class="modal modal-blur fade" id="create-role-modal" tabindex="-1" aria-hidden="true" data-auto-open="<%= abrirCrear ? 'true' : 'false' %>">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" action="/admin/roles" class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="avatar bg-primary-lt text-primary"><i data-lucide="shield-plus"></i></span>
+                    <div><div class="text-uppercase text-primary fw-bold admin-modal-eyebrow">Seguridad</div><h2 class="modal-title">Crear rol personalizado</h2></div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label" for="new-role-name">Nombre del rol</label>
+                        <input id="new-role-name" class="form-control text-uppercase" name="nombre" value="<%= formulario.nombre || '' %>" maxlength="50" autocomplete="off" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="new-role-description">Descripción</label>
+                        <textarea id="new-role-description" class="form-control" name="descripcion" rows="3" maxlength="240" placeholder="Responsabilidad principal del rol"><%= formulario.descripcion || '' %></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="base-role">Configuración inicial</label>
+                        <select id="base-role" class="form-select" name="id_rol_base">
+                            <option value="">Sin permisos asignados</option>
+                            <% roles.forEach((rol) => { %><option value="<%= rol.id %>" <%= String(formulario.id_rol_base || '') === String(rol.id) ? 'selected' : '' %>>Copiar permisos de <%= rol.nombre %></option><% }); %>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary"><i data-lucide="shield-plus"></i>Crear rol</button>
+            </div>
+        </form>
+    </div>
+</div>

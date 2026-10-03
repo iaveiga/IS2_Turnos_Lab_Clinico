@@ -1,0 +1,219 @@
+<%- include('../partials/head', {
+    titulo: 'Horarios y capacidad',
+    descripcion: 'Administración de horarios, cupos y días no laborables',
+    estilos: ['/css/admin-tabler.css']
+}) %>
+<body class="layout-fluid admin-tabler-page">
+    <div class="page">
+        <%- include('partials/sidebar', { seccionAdmin: 'horarios' }) %>
+
+        <div class="page-wrapper">
+            <%- include('partials/topbar') %>
+
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <div class="page-pretitle">Administración del sistema</div>
+                            <h2 class="page-title">Horarios y capacidad</h2>
+                            <div class="text-secondary mt-1">Configura las jornadas, duración de turnos y cupos disponibles por servicio.</div>
+                        </div>
+                        <div class="col-auto ms-auto d-print-none">
+                            <% if (vista === 'horarios') { %>
+                                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#create-schedule-modal">
+                                    <i data-lucide="plus"></i><span>Nuevo horario</span>
+                                </button>
+                            <% } else { %>
+                                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#create-closed-day-modal">
+                                    <i data-lucide="calendar-plus"></i><span>Agregar fecha</span>
+                                </button>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <div class="container-xl">
+                    <%- include('partials/alerts') %>
+
+                    <nav class="admin-section-tabs" aria-label="Secciones de horarios">
+                        <a class="admin-section-tab <%= vista === 'horarios' ? 'active' : '' %>" href="/admin/horarios">
+                            <i data-lucide="calendar-clock"></i><span>Horarios por servicio</span>
+                        </a>
+                        <a class="admin-section-tab <%= vista === 'dias' ? 'active' : '' %>" href="/admin/horarios?vista=dias">
+                            <i data-lucide="calendar-off"></i><span>Días no laborables</span>
+                        </a>
+                    </nav>
+
+                    <% if (vista === 'horarios') { %>
+                        <section class="card admin-users-card" aria-labelledby="schedules-table-title">
+                            <form class="card-body border-bottom admin-filter-form" method="get" action="/admin/horarios" data-auto-submit-filters>
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-12 col-md-5 col-xl">
+                                        <label class="form-label" for="schedule-service-filter">Servicio</label>
+                                        <select id="schedule-service-filter" class="form-select" name="servicio">
+                                            <option value="">Todos los servicios</option>
+                                            <% servicios.forEach((servicio) => { %>
+                                                <option value="<%= servicio.id_servicio %>" <%= String(filtros.servicio) === String(servicio.id_servicio) ? 'selected' : '' %>><%= servicio.nombre %></option>
+                                            <% }); %>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 col-md-3 col-xl-2">
+                                        <label class="form-label" for="schedule-day-filter">Día</label>
+                                        <select id="schedule-day-filter" class="form-select" name="dia">
+                                            <option value="">Todos</option>
+                                            <% diasSemana.forEach((dia) => { %>
+                                                <option value="<%= dia.codigo %>" <%= filtros.dia === dia.codigo ? 'selected' : '' %>><%= dia.nombre %></option>
+                                            <% }); %>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 col-md-3 col-xl-2">
+                                        <label class="form-label" for="schedule-status-filter">Estado</label>
+                                        <select id="schedule-status-filter" class="form-select" name="estado">
+                                            <option value="">Todos</option>
+                                            <option value="activo" <%= filtros.estado === 'activo' ? 'selected' : '' %>>Activo</option>
+                                            <option value="inactivo" <%= filtros.estado === 'inactivo' ? 'selected' : '' %>>Inactivo</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-8 col-md-auto">
+                                        <button class="btn btn-outline-secondary w-100" type="submit"><i data-lucide="list-filter"></i>Filtrar</button>
+                                    </div>
+                                    <% if (filtros.servicio || filtros.dia || filtros.estado) { %>
+                                        <div class="col-4 col-md-auto">
+                                            <a class="btn btn-icon btn-outline-secondary w-100" href="/admin/horarios" title="Limpiar filtros" aria-label="Limpiar filtros"><i data-lucide="filter-x"></i></a>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </form>
+
+                            <div class="table-responsive">
+                                <table class="table table-vcenter table-hover card-table admin-users-table admin-schedules-table <%= horarios.length === 0 ? 'admin-empty-table' : '' %>">
+                                    <thead>
+                                        <tr>
+                                            <th id="schedules-table-title">Servicio</th>
+                                            <th>Días programados</th>
+                                            <th>Jornada</th>
+                                            <th>Duración por turno</th>
+                                            <th>Capacidad</th>
+                                            <th class="w-1"><span class="visually-hidden">Acciones</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (horarios.length === 0) { %>
+                                            <tr>
+                                                <td colspan="6">
+                                                    <div class="empty py-5">
+                                                        <div class="empty-icon"><i data-lucide="calendar-clock"></i></div>
+                                                        <p class="empty-title">No se encontraron horarios</p>
+                                                        <p class="empty-subtitle text-secondary">Registra una jornada para habilitar la disponibilidad del servicio.</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                        <% horarios.forEach((horario) => { %>
+                                            <tr>
+                                                <td>
+                                                    <div class="admin-schedule-service">
+                                                        <strong title="<%= horario.servicio %>"><%= horario.servicio %></strong>
+                                                        <% if (!horario.servicioActivo) { %><small>Servicio inactivo</small><% } else if (!horario.activo) { %><small>Horario inactivo</small><% } %>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="admin-schedule-days">
+                                                        <% horario.dias.forEach((dia) => { %><span class="badge bg-cyan-lt"><%= dia %></span><% }); %>
+                                                    </div>
+                                                </td>
+                                                <td><div class="admin-schedule-time"><strong><%= horario.horaInicio %> - <%= horario.horaFin %></strong></div></td>
+                                                <td><span><%= horario.duracion %> min</span></td>
+                                                <td><div class="admin-schedule-capacity"><strong><%= horario.capacidad %> cupos por bloque</strong></div></td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-icon btn-ghost-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Acciones del horario"><i data-lucide="ellipsis-vertical"></i></button>
+                                                        <div class="dropdown-menu dropdown-menu-end">
+                                                            <button
+                                                                class="dropdown-item"
+                                                                type="button"
+                                                                data-edit-schedule
+                                                                data-ids="<%= horario.ids.join(',') %>"
+                                                                data-service="<%= horario.idServicio %>"
+                                                                data-days="<%= horario.diasCodigos.join(',') %>"
+                                                                data-start="<%= horario.horaInicio %>"
+                                                                data-end="<%= horario.horaFin %>"
+                                                                data-duration="<%= horario.duracion %>"
+                                                                data-capacity="<%= horario.capacidad %>"
+                                                                data-active="<%= horario.activo %>"
+                                                            >
+                                                                <i data-lucide="pencil"></i><span>Editar</span>
+                                                            </button>
+                                                            <form method="post" action="/admin/horarios/estado-grupo">
+                                                                <input type="hidden" name="ids_horarios" value="<%= horario.ids.join(',') %>">
+                                                                <input type="hidden" name="activo" value="<%= horario.activo ? 'false' : 'true' %>">
+                                                                <button class="dropdown-item <%= horario.activo ? 'text-danger' : 'text-success' %>" type="submit">
+                                                                    <i data-lucide="<%= horario.activo ? 'circle-off' : 'circle-check' %>"></i>
+                                                                    <span><%= horario.activo ? 'Desactivar' : 'Activar' %></span>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="card-footer d-flex align-items-center admin-table-footer">
+                                <p class="m-0 text-secondary">Mostrando <%= paginacion.desde %>–<%= paginacion.hasta %> de <%= paginacion.total %> configuraciones</p>
+                                <ul class="pagination m-0 ms-auto">
+                                    <% const queryBase = 'servicio=' + encodeURIComponent(filtros.servicio) + '&dia=' + encodeURIComponent(filtros.dia) + '&estado=' + encodeURIComponent(filtros.estado); %>
+                                    <li class="page-item <%= paginacion.pagina === 1 ? 'disabled' : '' %>">
+                                        <a class="page-link" href="/admin/horarios?<%= queryBase %>&pagina=<%= Math.max(paginacion.pagina - 1, 1) %>" aria-label="Página anterior"><i data-lucide="chevron-left"></i></a>
+                                    </li>
+                                    <% for (let numero = 1; numero <= paginacion.totalPaginas; numero += 1) { %>
+                                        <li class="page-item <%= numero === paginacion.pagina ? 'active' : '' %>"><a class="page-link" href="/admin/horarios?<%= queryBase %>&pagina=<%= numero %>"><%= numero %></a></li>
+                                    <% } %>
+                                    <li class="page-item <%= paginacion.pagina === paginacion.totalPaginas ? 'disabled' : '' %>">
+                                        <a class="page-link" href="/admin/horarios?<%= queryBase %>&pagina=<%= Math.min(paginacion.pagina + 1, paginacion.totalPaginas) %>" aria-label="Página siguiente"><i data-lucide="chevron-right"></i></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </section>
+                    <% } else { %>
+                        <section class="card admin-users-card" aria-labelledby="closed-days-table-title">
+                            <div class="table-responsive">
+                                <table class="table table-vcenter table-hover card-table admin-users-table admin-closed-days-table <%= diasNoLaborables.length === 0 ? 'admin-empty-table' : '' %>">
+                                    <thead><tr><th id="closed-days-table-title">Fecha</th><th>Motivo</th><th>Vigencia</th><th>Estado</th><th class="w-1"><span class="visually-hidden">Acciones</span></th></tr></thead>
+                                    <tbody>
+                                        <% if (diasNoLaborables.length === 0) { %>
+                                            <tr><td colspan="5"><div class="empty py-5"><div class="empty-icon"><i data-lucide="calendar-check"></i></div><p class="empty-title">No hay días no laborables registrados</p><p class="empty-subtitle text-secondary">La atención seguirá los horarios semanales configurados.</p></div></td></tr>
+                                        <% } %>
+                                        <% diasNoLaborables.forEach((dia) => { %>
+                                            <tr>
+                                                <td><div class="admin-closed-day-date"><strong><%= dia.fecha %></strong><small><%= dia.fechaISO %></small></div></td>
+                                                <td><span class="admin-closed-day-description"><%= dia.descripcion %></span></td>
+                                                <td><span class="badge <%= dia.pasado ? 'bg-secondary-lt' : 'bg-azure-lt' %>"><%= dia.pasado ? 'Fecha pasada' : 'Próxima fecha' %></span></td>
+                                                <td><span class="badge <%= dia.activo ? 'bg-red-lt' : 'bg-secondary-lt' %>"><span class="status-dot <%= dia.activo ? 'bg-red' : 'bg-secondary' %> me-1"></span><%= dia.activo ? 'Sin atención' : 'Deshabilitado' %></span></td>
+                                                <td>
+                                                    <form method="post" action="/admin/horarios/dias-no-laborables/<%= dia.id %>/estado">
+                                                        <input type="hidden" name="activo" value="<%= dia.activo ? 'false' : 'true' %>">
+                                                        <button class="btn btn-icon btn-ghost-secondary btn-sm" type="submit" title="<%= dia.activo ? 'Habilitar atención' : 'Marcar sin atención' %>" aria-label="<%= dia.activo ? 'Habilitar atención' : 'Marcar sin atención' %>"><i data-lucide="<%= dia.activo ? 'calendar-check' : 'calendar-off' %>"></i></button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="card-footer admin-table-footer d-flex align-items-center"><p class="m-0 text-secondary"><%= diasNoLaborables.length %> fechas registradas</p></div>
+                        </section>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/schedule-modals') %>
+    <%- include('../partials/scripts', { scripts: ['/js/admin-schedules.js'] }) %>
+</body>
+</html>
