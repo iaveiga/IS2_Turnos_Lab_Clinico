@@ -190,6 +190,9 @@ router.post('/login', async (req, res) => {
     if (permisos.includes('ACCEDER_RECEPCION')) {
       return res.redirect('/recepcion');
     }
+    if (permisos.includes('ACCEDER_LABORATORIO')) {
+      return res.redirect('/laboratorio');
+    }
     return res.redirect('/turnos');
 
   } catch (error) {

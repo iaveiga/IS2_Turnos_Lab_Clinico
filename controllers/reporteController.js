@@ -1,6 +1,4 @@
-const path = require('path');
-const { PrismaClient } = require(path.join(__dirname, '../generated/prisma/client'));
-const prisma = new PrismaClient();
+const prisma = require('../config/prisma');
 
 exports.obtenerReportesCompletos = async (req, res) => {
     try {

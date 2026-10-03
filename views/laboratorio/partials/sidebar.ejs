@@ -1,0 +1,28 @@
+<aside class="navbar navbar-vertical navbar-expand-lg admin-navbar laboratory-navbar" data-bs-theme="dark">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#laboratory-sidebar-menu" aria-controls="laboratory-sidebar-menu" aria-expanded="false" aria-label="Abrir navegación">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <h1 class="navbar-brand navbar-brand-autodark">
+            <a href="/laboratorio" class="admin-brand-link">
+                <span class="admin-brand-mark">CSF</span>
+                <span class="admin-brand-copy"><strong>Clínica San Francisco</strong><small>Laboratorio</small></span>
+            </a>
+        </h1>
+        <div class="collapse navbar-collapse" id="laboratory-sidebar-menu">
+            <ul class="navbar-nav pt-lg-3">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/laboratorio"><span class="nav-link-icon"><i data-lucide="microscope"></i></span><span class="nav-link-title">Control de laboratorio</span></a>
+                </li>
+                <% if ((locals.permisosUsuario || []).includes('ACCEDER_CONSOLA')) { %>
+                    <li class="nav-item mt-lg-3"><a class="nav-link" href="/admin"><span class="nav-link-icon"><i data-lucide="shield-check"></i></span><span class="nav-link-title">Administración</span></a></li>
+                <% } %>
+            </ul>
+            <div class="admin-sidebar-user mt-auto">
+                <span class="avatar avatar-sm laboratory-profile-avatar"><%= locals.usuario.nombre.split(' ').map((parte) => parte[0]).slice(0, 2).join('').toUpperCase() %></span>
+                <span class="admin-sidebar-user-copy"><strong><%= locals.usuario.nombre %></strong><small><%= String(locals.usuario.rol || 'Técnico').replaceAll('_', ' ') %></small></span>
+                <a class="btn btn-icon btn-ghost-light btn-sm" href="/auth/logout" aria-label="Cerrar sesión" title="Cerrar sesión"><i data-lucide="log-out"></i></a>
+            </div>
+        </div>
+    </div>
+</aside>

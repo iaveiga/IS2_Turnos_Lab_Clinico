@@ -43,8 +43,11 @@ const permisosNavegacion = new Set(locals.permisosUsuario || locals.usuario?.per
                             <% if (permisosNavegacion.has('ACCEDER_CONSOLA')) { %>
                                 <a class="dropdown-item" href="/admin"><i data-lucide="shield-check"></i>Administración</a>
                                 <% if (permisosNavegacion.has('ACCEDER_RECEPCION')) { %><a class="dropdown-item" href="/recepcion"><i data-lucide="clipboard-check"></i>Recepción</a><% } %>
+                                <% if (permisosNavegacion.has('ACCEDER_LABORATORIO')) { %><a class="dropdown-item" href="/laboratorio"><i data-lucide="microscope"></i>Laboratorio</a><% } %>
                             <% } else if (permisosNavegacion.has('ACCEDER_RECEPCION')) { %>
                                 <a class="dropdown-item" href="/recepcion"><i data-lucide="clipboard-check"></i>Recepción</a>
+                            <% } else if (permisosNavegacion.has('ACCEDER_LABORATORIO')) { %>
+                                <a class="dropdown-item" href="/laboratorio"><i data-lucide="microscope"></i>Laboratorio</a>
                             <% } else if (esPaciente) { %>
                                 <% if (permisosNavegacion.has('VER_TURNOS')) { %><a class="dropdown-item" href="/turnos"><i data-lucide="calendar-days"></i>Mis turnos</a><% } %>
                                 <% if (permisosNavegacion.has('VER_PERFIL')) { %><a class="dropdown-item" href="/pacientes/perfil"><i data-lucide="user-round"></i>Mi perfil</a><% } %>

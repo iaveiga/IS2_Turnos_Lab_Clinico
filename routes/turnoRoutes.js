@@ -89,6 +89,29 @@ function horaLegible(fecha) {
   }).format(fecha);
 }
 
+function fechaHoraLegible(fecha) {
+  if (!fecha) return '';
+  return new Intl.DateTimeFormat('es-EC', {
+    timeZone: 'America/Guayaquil',
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  }).format(fecha);
+}
+
+function nombreUsuario(usuario) {
+  if (!usuario) return 'Laboratorio Clinico San Francisco';
+  return [usuario.nombres, usuario.apellidos].filter(Boolean).join(' ') || usuario.nombre_usuario;
+}
+
+function sexoPacienteLegible(valor) {
+  const sexo = String(valor || '').trim().toUpperCase();
+  if (sexo === 'MASCULINO') return 'Masculino';
+  if (sexo === 'FEMENINO') return 'Femenino';
+  if (sexo === 'OTRO') return 'Otro';
+  if (sexo === 'PREFIERO_NO_DECIR') return 'Prefiere no indicar';
+  return 'No registrado';
+}
+
 function iconoServicio(nombre) {
   const texto = nombre.toLowerCase();
   if (texto.includes('orina') || texto.includes('copro')) return 'test-tube-diagonal';
@@ -221,13 +244,56 @@ router.get('/', verificarPermiso('VER_TURNOS'), async (req, res, next) => {
     }));
     const hayServiciosDisponibles = servicios.some((servicio) => servicio.disponible);
 
-    const turnos = paciente
+    const turnosPaciente = paciente
       ? await prisma.turno.findMany({
         where: { id_paciente: paciente.id_paciente },
-        include: { servicio: true, estado_turno: true },
+        include: {
+          servicio: true,
+          estado_turno: true,
+          resultado_examen: { include: { tecnico: true } }
+        },
         orderBy: [{ fecha_turno: 'asc' }, { hora_inicio: 'asc' }]
       })
       : [];
+
+    const serializarTurno = (turno) => ({
+      id: turno.id_turno,
+      codigo: turno.codigo_turno,
+      servicio: turno.servicio?.nombre || 'Servicio no disponible',
+      servicioDescripcion: turno.servicio?.descripcion || 'Examen de laboratorio',
+      fecha: fechaLegible(turno.fecha_turno),
+      hora: horaLegible(turno.hora_inicio),
+      estado: turno.estado_turno?.nombre || 'Sin estado',
+      estadoCodigo: turno.estado_turno?.codigo?.toLowerCase() || 'sin-estado',
+      observacion: turno.observacion
+    });
+    const turnos = turnosPaciente
+      .filter((turno) => turno.estado_turno?.codigo !== 'ATENDIDO')
+      .map(serializarTurno);
+    const historial = turnosPaciente
+      .filter((turno) => turno.estado_turno?.codigo === 'ATENDIDO')
+      .reverse()
+      .map((turno) => {
+        const resultadoPublicado = turno.resultado_examen?.publicado === true;
+        return {
+          ...serializarTurno(turno),
+          resultado: resultadoPublicado ? {
+            resultado: turno.resultado_examen.resultado,
+            observaciones: turno.resultado_examen.observaciones || '',
+            fechaPublicacion: fechaHoraLegible(turno.resultado_examen.fecha_resultado),
+            tecnico: nombreUsuario(turno.resultado_examen.tecnico),
+            paciente: {
+              nombre: `${paciente.nombres} ${paciente.apellidos}`,
+              identificacion: paciente.identificacion,
+              edad: paciente.edad ? `${paciente.edad} años` : 'No registrada',
+              sexo: sexoPacienteLegible(paciente.sexo)
+            }
+          } : null
+        };
+      });
+    const resultadosJson = JSON.stringify(Object.fromEntries(
+      historial.filter((turno) => turno.resultado).map((turno) => [turno.id, turno])
+    )).replace(/</g, '\\u003c');
 
     const hoy = fechaLocalISO();
     const fechaMaxima = new Date(`${hoy}T00:00:00.000Z`);
@@ -237,16 +303,9 @@ router.get('/', verificarPermiso('VER_TURNOS'), async (req, res, next) => {
       paciente,
       servicios,
       hayServiciosDisponibles,
-      turnos: turnos.map((turno) => ({
-        id: turno.id_turno,
-        codigo: turno.codigo_turno,
-        servicio: turno.servicio?.nombre || 'Servicio no disponible',
-        fecha: fechaLegible(turno.fecha_turno),
-        hora: horaLegible(turno.hora_inicio),
-        estado: turno.estado_turno?.nombre || 'Sin estado',
-        estadoCodigo: turno.estado_turno?.codigo?.toLowerCase() || 'sin-estado',
-        observacion: turno.observacion
-      })),
+      turnos,
+      historial,
+      resultadosJson,
       fechaMinima: hoy,
       fechaMaxima: fechaMaxima.toISOString().slice(0, 10),
       abrirModal: req.query.agendar === '1',
