@@ -213,6 +213,9 @@ async function seed() {
       usuarioDemo = await prisma.usuario.create({
         data: {
           id_paciente: pacienteDemo.id_paciente,
+          identificacion: pacienteDemo.identificacion,
+          nombres: pacienteDemo.nombres,
+          apellidos: pacienteDemo.apellidos,
           nombre_usuario: 'paciente@uees.edu.ec',
           correo: 'paciente@uees.edu.ec',
           password_hash: passwordHash,
@@ -223,30 +226,36 @@ async function seed() {
         data: { id_usuario: usuarioDemo.id_usuario, id_rol: rolPaciente.id_rol }
       });
       console.log('Usuario de prueba creado: paciente@uees.edu.ec / password123');
+    } else {
+      usuarioDemo = await prisma.usuario.update({
+        where: { id_usuario: usuarioDemo.id_usuario },
+        data: {
+          id_paciente: pacienteDemo.id_paciente,
+          identificacion: pacienteDemo.identificacion,
+          nombres: pacienteDemo.nombres,
+          apellidos: pacienteDemo.apellidos
+        }
+      });
     }
   }
 
   // 7. Usuario administrador de prueba
   const rolAdministrador = await prisma.rol.findFirst({ where: { nombre: 'ADMINISTRADOR' } });
   if (rolAdministrador) {
-    let usuarioAdministrador = await prisma.usuario.findUnique({
-      where: { nombre_usuario: 'administrador' }
-    });
-
-    if (!usuarioAdministrador) {
-      usuarioAdministrador = await prisma.usuario.create({
-        data: {
+    const usuarioAdministrador = await prisma.usuario.upsert({
+      where: { nombre_usuario: 'administrador' },
+      update: { correo: 'administrador@sanfrancisco.com' },
+      create: {
           identificacion: 'administrador',
           nombres: 'Administrador',
           apellidos: 'Sistema',
           nombre_usuario: 'administrador',
-          correo: 'administrador@clinicasanfrancisco.local',
+          correo: 'administrador@sanfrancisco.com',
           password_hash: await crearPasswordHash('administrador'),
           activo: true
-        }
-      });
-      console.log('Usuario administrador creado: administrador / administrador');
-    }
+      }
+    });
+    console.log('Usuario administrador verificado: administrador@sanfrancisco.com / administrador');
 
     await prisma.usuario_rol.upsert({
       where: {

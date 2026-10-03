@@ -24,7 +24,7 @@
                 <header class="auth-heading">
                     <p class="app-eyebrow">Acceso al sistema</p>
                     <h1>Iniciar sesión</h1>
-                    <p>Pacientes: correo o cédula. Personal del laboratorio: cédula asignada.</p>
+                    <p>Pacientes: correo o cédula. Personal del laboratorio: correo electrónico.</p>
                 </header>
 
                 <% if (registrado) { %>
@@ -45,10 +45,10 @@
 
                 <form class="auth-form" method="post" action="/auth/login" novalidate>
                     <div>
-                        <label class="form-label" for="identifier">Correo del paciente o cédula del personal</label>
+                        <label class="form-label" for="identifier">Correo electrónico o cédula de paciente</label>
                         <div class="input-icon">
-                            <span class="input-icon-addon"><i data-lucide="user-round"></i></span>
-                            <input id="identifier" class="form-control" type="text" name="identificador" value="<%= identificador %>" placeholder="correo@ejemplo.com o 0912345678" autocomplete="username" required autofocus>
+                            <span class="input-icon-addon"><i data-lucide="at-sign"></i></span>
+                            <input id="identifier" class="form-control" type="text" name="identificador" value="<%= identificador %>" placeholder="correo@ejemplo.com o cédula del paciente" autocomplete="username" required autofocus>
                         </div>
                     </div>
                     <div>
