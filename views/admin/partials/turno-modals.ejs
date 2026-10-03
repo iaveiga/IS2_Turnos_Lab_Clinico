@@ -1,0 +1,92 @@
+<div class="modal modal-blur fade" id="appointment-detail-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="avatar bg-primary-lt text-primary"><i data-lucide="calendar-search"></i></span>
+                    <div>
+                        <div class="text-uppercase text-primary fw-bold admin-modal-eyebrow">Detalle del turno</div>
+                        <h2 class="modal-title" data-detail-field="code">Turno</h2>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body admin-appointment-detail">
+                <section class="admin-detail-section" aria-labelledby="detail-schedule-title">
+                    <h3 id="detail-schedule-title"><i data-lucide="calendar-clock"></i>Atención programada</h3>
+                    <div class="admin-detail-grid">
+                        <div><small>Fecha</small><strong data-detail-field="date"></strong></div>
+                        <div><small>Horario</small><strong data-detail-field="time"></strong></div>
+                        <div><small>Estado</small><strong data-detail-field="status"></strong></div>
+                        <div><small>Creado</small><strong data-detail-field="created"></strong></div>
+                    </div>
+                </section>
+                <section class="admin-detail-section" aria-labelledby="detail-patient-title">
+                    <h3 id="detail-patient-title"><i data-lucide="user-round"></i>Paciente asignado</h3>
+                    <div class="admin-detail-grid">
+                        <div><small>Paciente</small><strong data-detail-field="patient"></strong></div>
+                        <div><small>Cédula</small><strong data-detail-field="identification"></strong></div>
+                        <div><small>Teléfono</small><strong data-detail-field="phone"></strong></div>
+                        <div><small>Correo</small><strong data-detail-field="email"></strong></div>
+                    </div>
+                </section>
+                <section class="admin-detail-section" aria-labelledby="detail-service-title">
+                    <h3 id="detail-service-title"><i data-lucide="flask-conical"></i>Servicio solicitado</h3>
+                    <div class="admin-detail-stack">
+                        <strong data-detail-field="service"></strong>
+                        <span data-detail-field="serviceDescription"></span>
+                    </div>
+                </section>
+                <section class="admin-detail-section" aria-labelledby="detail-notes-title">
+                    <h3 id="detail-notes-title"><i data-lucide="notebook-text"></i>Información adicional</h3>
+                    <div class="admin-detail-grid">
+                        <div><small>Observación</small><strong data-detail-field="notes"></strong></div>
+                        <div><small>Último motivo registrado</small><strong data-detail-field="lastReason"></strong></div>
+                    </div>
+                </section>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar detalle</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="appointment-status-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" class="modal-content" id="appointment-status-form">
+            <div class="modal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="avatar bg-primary-lt text-primary"><i data-lucide="refresh-cw"></i></span>
+                    <div>
+                        <div class="text-uppercase text-primary fw-bold admin-modal-eyebrow">Gestión del turno</div>
+                        <h2 class="modal-title">Cambiar estado</h2>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="admin-status-summary">
+                    <strong data-status-summary="code"></strong>
+                    <span><span data-status-summary="patient"></span> · <span data-status-summary="service"></span></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="new-appointment-status">Nuevo estado</label>
+                    <select class="form-select" id="new-appointment-status" name="id_estado" required>
+                        <option value="" selected disabled>Seleccionar estado</option>
+                        <% estados.forEach((estado) => { %>
+                            <option value="<%= estado.id_estado %>" data-code="<%= estado.codigo %>"><%= estado.nombre %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div id="status-reason-group">
+                    <label class="form-label" for="status-reason">Motivo o comentario</label>
+                    <textarea class="form-control" id="status-reason" name="motivo" rows="3" maxlength="500" placeholder="Registra la razón del cambio"></textarea>
+                    <div class="form-hint">Es obligatorio para cancelaciones y ausencias.</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary"><i data-lucide="save"></i>Guardar estado</button>
+            </div>
+        </form>
+    </div>
+</div>

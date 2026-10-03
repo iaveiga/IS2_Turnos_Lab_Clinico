@@ -1,11 +1,25 @@
 const express = require('express');
-const crypto = require('crypto');
-const { promisify } = require('util');
 const prisma = require('../config/prisma');
+const { evitarCachePrivada } = require('../middlewares/authMiddleware');
+const { crearPasswordHash, verificarPassword } = require('../utils/password');
+const { validarCedulaEcuatoriana, validarCorreoElectronico } = require('../utils/validation');
 
 const router = express.Router();
-const scrypt = promisify(crypto.scrypt);
 const opcionesSexo = ['FEMENINO', 'MASCULINO', 'OTRO', 'PREFIERO_NO_DECIR'];
+
+router.use(evitarCachePrivada);
+
+function renovarSesion(req) {
+  return new Promise((resolve, reject) => {
+    req.session.regenerate((error) => (error ? reject(error) : resolve()));
+  });
+}
+
+function guardarSesion(req) {
+  return new Promise((resolve, reject) => {
+    req.session.save((error) => (error ? reject(error) : resolve()));
+  });
+}
 
 function datosFormulario(body = {}) {
   return {
@@ -24,39 +38,16 @@ function validarRegistro(datos, password) {
 
   if (datos.nombres.length < 2) errores.nombres = 'Ingresa tus nombres.';
   if (datos.apellidos.length < 2) errores.apellidos = 'Ingresa tus apellidos.';
-  if (!/^\d{10}$/.test(datos.identificacion)) errores.identificacion = 'La cedula debe tener 10 digitos.';
+  if (!validarCedulaEcuatoriana(datos.identificacion)) {
+    errores.identificacion = 'Ingresa una cédula ecuatoriana válida.';
+  }
   if (!/^\d+$/.test(datos.edad) || Number(datos.edad) < 1 || Number(datos.edad) > 120) errores.edad = 'Ingresa una edad valida.';
   if (!opcionesSexo.includes(datos.sexo)) errores.sexo = 'Selecciona una opcion.';
   if (!/^[\d\s()+-]{7,20}$/.test(datos.telefono)) errores.telefono = 'Ingresa un telefono valido.';
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo)) errores.correo = 'Ingresa un correo valido.';
+  if (!validarCorreoElectronico(datos.correo)) errores.correo = 'Ingresa un correo electrónico válido.';
   if (!password || password.length < 8) errores.password = 'Usa al menos 8 caracteres.';
 
   return errores;
-}
-
-async function crearPasswordHash(password) {
-  const salt = crypto.randomBytes(16).toString('hex');
-  const hash = await scrypt(password, salt, 64);
-  return `scrypt$${salt}$${hash.toString('hex')}`;
-}
-
-async function verificarPassword(password, passwordHash) {
-  if (!password || !passwordHash) return false;
-  try {
-    if (passwordHash.startsWith('scrypt$')) {
-      const parts = passwordHash.split('$');
-      if (parts.length !== 3) return false;
-      const [, salt, originalHashHex] = parts;
-      const computedHash = await scrypt(password, salt, 64);
-      const originalBuffer = Buffer.from(originalHashHex, 'hex');
-      if (originalBuffer.length !== computedHash.length) return false;
-      return crypto.timingSafeEqual(originalBuffer, computedHash);
-    }
-    return password === passwordHash;
-  } catch (err) {
-    console.error('Error al verificar hash de contraseña:', err);
-    return false;
-  }
 }
 
 router.get('/login', (req, res) => {
@@ -72,12 +63,12 @@ router.get('/login', (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-  const identificador = (req.body.identificador || req.body.correo || req.body.cedula || '').trim();
+  const identificador = (req.body.identificador || req.body.correo || req.body.cedula || '').trim().toLowerCase();
   const password = req.body.password || '';
 
   if (!identificador || !password) {
     return res.status(400).render('auth/login', {
-      error: 'Por favor ingresa tu correo o cédula y tu contraseña.',
+      error: 'Por favor ingresa tu correo o cédula de paciente y tu contraseña.',
       identificador,
       registrado: false,
       salida: false
@@ -85,20 +76,30 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    // Buscar usuario por correo, nombre_usuario o cédula del paciente asociado
+    // El personal ingresa por correo; los pacientes también pueden usar su cédula.
     const usuario = await prisma.usuario.findFirst({
       where: {
         OR: [
           { correo: { equals: identificador, mode: 'insensitive' } },
-          { nombre_usuario: { equals: identificador, mode: 'insensitive' } },
-          { paciente: { identificacion: identificador } }
+          {
+            AND: [
+              { paciente: { identificacion: identificador } },
+              { usuario_rol: { some: { activo: true, rol: { nombre: 'PACIENTE', activo: true } } } }
+            ]
+          }
         ]
       },
       include: {
         paciente: true,
         usuario_rol: {
           include: {
-            rol: true
+            rol: {
+              include: {
+                rol_permiso: {
+                  include: { permiso: true }
+                }
+              }
+            }
           }
         }
       }
@@ -122,6 +123,30 @@ router.post('/login', async (req, res) => {
       });
     }
 
+    const roles = (usuario.usuario_rol || [])
+      .filter((asignacion) => asignacion.activo && asignacion.rol.activo)
+      .map((asignacion) => asignacion.rol.nombre);
+    const permisos = [...new Set((usuario.usuario_rol || [])
+      .filter((asignacion) => asignacion.activo && asignacion.rol.activo)
+      .flatMap((asignacion) => asignacion.rol.rol_permiso.map((relacion) => relacion.permiso.codigo)))];
+    const esPaciente = roles.includes('PACIENTE');
+    const esPersonal = roles.some((rol) => ['ADMINISTRADOR', 'TECNICO', 'RECEPCIONISTA'].includes(rol));
+    const accesoPermitido = esPaciente && !esPersonal
+      ? usuario.correo.toLowerCase() === identificador
+        || usuario.paciente?.identificacion === identificador
+      : usuario.correo.toLowerCase() === identificador;
+
+    if (!accesoPermitido) {
+      return res.status(401).render('auth/login', {
+        error: esPersonal
+          ? 'El personal del laboratorio debe ingresar con su correo electrónico.'
+          : 'Credenciales inválidas para el tipo de usuario.',
+        identificador,
+        registrado: false,
+        salida: false
+      });
+    }
+
     const passwordValida = await verificarPassword(password, usuario.password_hash);
     if (!passwordValida) {
       return res.status(401).render('auth/login', {
@@ -138,14 +163,13 @@ router.post('/login', async (req, res) => {
       data: { ultimo_acceso: new Date() }
     }).catch(err => console.warn('Aviso: no se pudo actualizar último acceso:', err.message));
 
-    // Obtener roles asociados al usuario
-    const roles = (usuario.usuario_rol || []).map(ur => ur.rol.nombre);
-    const rolPrincipal = roles[0] || 'PACIENTE';
+    const rolPrincipal = roles.includes('ADMINISTRADOR') ? 'ADMINISTRADOR' : roles[0] || 'PACIENTE';
     const nombreCompleto = usuario.paciente
       ? `${usuario.paciente.nombres} ${usuario.paciente.apellidos}`
-      : usuario.nombre_usuario;
+      : [usuario.nombres, usuario.apellidos].filter(Boolean).join(' ') || usuario.nombre_usuario;
 
-    // Guardar sesión
+    // Evita reutilizar el identificador de una sesión previa al autenticar.
+    await renovarSesion(req);
     req.session.userId = usuario.id_usuario;
     req.session.user = {
       id: usuario.id_usuario,
@@ -153,12 +177,18 @@ router.post('/login', async (req, res) => {
       nombre: nombreCompleto,
       rol: rolPrincipal,
       roles: roles,
+      permisos,
+      identificacion: usuario.identificacion,
       id_paciente: usuario.id_paciente
     };
+    await guardarSesion(req);
 
     // Redirigir según el rol
-    if (roles.includes('ADMINISTRADOR')) {
-      return res.redirect('/admin/console');
+    if (permisos.includes('ACCEDER_CONSOLA')) {
+      return res.redirect('/admin');
+    }
+    if (permisos.includes('ACCEDER_RECEPCION')) {
+      return res.redirect('/recepcion');
     }
     return res.redirect('/turnos');
 
@@ -208,6 +238,9 @@ router.post('/registro', async (req, res) => {
       const usuario = await tx.usuario.create({
         data: {
           id_paciente: paciente.id_paciente,
+          identificacion: paciente.identificacion,
+          nombres: paciente.nombres,
+          apellidos: paciente.apellidos,
           nombre_usuario: datos.correo,
           correo: datos.correo,
           password_hash: passwordHash
@@ -241,9 +274,18 @@ router.post('/registro', async (req, res) => {
   }
 });
 
-router.get('/logout', (req, res) => {
-  if (!req.session) return res.redirect('/auth/login');
-  req.session.destroy(() => res.redirect('/auth/login?salida=1'));
+router.get('/logout', (req, res, next) => {
+  const finalizar = () => {
+    res.clearCookie('connect.sid', { path: '/' });
+    return res.redirect('/auth/login?salida=1');
+  };
+
+  if (!req.session) return finalizar();
+
+  return req.session.destroy((error) => {
+    if (error) return next(error);
+    return finalizar();
+  });
 });
 
 module.exports = router;

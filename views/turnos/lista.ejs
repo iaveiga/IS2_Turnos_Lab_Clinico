@@ -1,70 +1,161 @@
-﻿<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Turnos | Clínica San Francisco</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-    <link rel="stylesheet" href="/css/custom.css">
-</head>
-<body>
-    <header class="site-header">
-        <nav class="site-nav page-container" aria-label="Navegación principal">
-            <a class="brand" href="/" aria-label="Clínica San Francisco, inicio">
-                <span class="brand-mark"><i data-lucide="flask-conical" aria-hidden="true"></i></span>
-                <span class="brand-copy">
-                    <strong>Clínica San Francisco</strong>
-                    <small>Laboratorio clínico · Turnos</small>
-                </span>
-            </a>
+<%- include('../partials/head', {
+    titulo: 'Mis turnos',
+    descripcion: 'Consulta y agenda tus turnos de laboratorio.'
+}) %>
+<% const puedeCrearTurno = (locals.permisosUsuario || locals.usuario?.permisos || []).includes('CREAR_TURNO'); %>
+<body class="patient-page">
+    <%- include('../partials/public-header', { seccion: 'turnos' }) %>
 
-            <div class="nav-actions">
-                <% if (locals.usuario) { %>
-                    <span style="font-weight: 600; color: var(--pico-primary, #007a78); font-size: 0.9rem;">
-                        <i data-lucide="user-check"></i> <%= locals.usuario.nombre %> (<%= locals.usuario.rol %>)
-                    </span>
-                    <a class="login-link" href="/auth/logout"><i data-lucide="log-out"></i><span>Salir</span></a>
-                <% } else { %>
-                    <a class="login-link" href="/auth/login">Iniciar sesión</a>
-                <% } %>
+    <main class="container-xl patient-main">
+        <% if (turnoCreado) { %>
+            <div class="alert alert-success alert-dismissible booking-success" role="status">
+                <div class="d-flex">
+                    <div class="alert-icon"><i data-lucide="circle-check"></i></div>
+                    <div><strong>Turno agendado correctamente.</strong> Tu código de reserva es <strong><%= turnoCreado %></strong>.</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
             </div>
-        </nav>
-    </header>
+        <% } %>
 
-    <main class="page-container" style="padding: 2.5rem 1rem; min-height: 70vh;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <header class="module-header">
             <div>
-                <p class="eyebrow" style="color: var(--pico-primary, #007a78); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; margin: 0;">PORTAL DE PACIENTES</p>
-                <h1 style="margin: 0.2rem 0; font-size: 1.8rem;">Mis Turnos de Laboratorio</h1>
-                <p style="color: #64748b; margin: 0;">Consulta el estado de tus citas o agenda una nueva toma de muestras.</p>
+                <p class="app-eyebrow">Portal de pacientes</p>
+                <h1>Mis turnos de laboratorio</h1>
+                <p>Consulta tus citas y reserva un horario disponible para tus exámenes.</p>
             </div>
-            <div>
-                <a href="/turnos/nuevo" role="button" class="button" style="display: inline-flex; align-items: center; gap: 0.5rem;">
-                    <i data-lucide="plus-circle"></i> Nuevo Turno
-                </a>
-            </div>
-        </div>
+            <% if (puedeCrearTurno) { %>
+                <button class="btn btn-primary" type="button" data-open-booking <%= !paciente || !hayServiciosDisponibles ? 'disabled' : '' %>>
+                    <i data-lucide="calendar-plus"></i>Agendar turno
+                </button>
+            <% } %>
+        </header>
 
-        <section style="background: white; border-radius: 12px; padding: 2.5rem; text-align: center; border: 1px dashed #cbd5e1;">
-            <div style="max-width: 450px; margin: 0 auto;">
-                <div style="font-size: 3rem; margin-bottom: 0.5rem;">📅</div>
-                <h3 style="margin-bottom: 0.5rem; color: #1e293b;">Aún no tienes turnos registrados</h3>
-                <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1.5rem;">
-                    Puedes programar tu cita para exámenes de sangre, orina, VIH o alergias de forma rápida.
-                </p>
-                <a href="/turnos/nuevo" class="button button-small" role="button">Agendar mi primer turno</a>
+        <% if (!paciente) { %>
+            <div class="alert alert-warning" role="alert">
+                <div class="d-flex"><div class="alert-icon"><i data-lucide="circle-alert"></i></div><div><strong>No hay un paciente asociado a tu usuario.</strong><div class="text-secondary mt-1">Solicita al administrador que complete la relación antes de agendar.</div></div></div>
             </div>
+        <% } else if (!hayServiciosDisponibles) { %>
+            <div class="alert alert-warning" role="alert">
+                <div class="d-flex"><div class="alert-icon"><i data-lucide="calendar-x"></i></div><div><strong>Aún no hay horarios disponibles.</strong><div class="text-secondary mt-1">Los tipos de examen necesitan al menos un horario activo en la base de datos.</div></div></div>
+            </div>
+        <% } %>
+
+        <section class="card appointments-card" aria-labelledby="appointments-title">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title" id="appointments-title">Próximas citas</h2>
+                    <div class="text-secondary small mt-1"><%= turnos.length %> <%= turnos.length === 1 ? 'turno registrado' : 'turnos registrados' %></div>
+                </div>
+            </div>
+
+            <% if (turnos.length === 0) { %>
+                <div class="appointments-empty">
+                    <span class="avatar bg-azure-lt text-azure"><i data-lucide="calendar-days"></i></span>
+                    <h3>No tienes turnos registrados</h3>
+                    <p>Elige un tipo de examen, una fecha y uno de los horarios con cupo.</p>
+                    <% if (puedeCrearTurno && paciente && hayServiciosDisponibles) { %>
+                        <button class="btn btn-primary" type="button" data-open-booking><i data-lucide="plus"></i>Agendar mi primer turno</button>
+                    <% } %>
+                </div>
+            <% } else { %>
+                <div>
+                    <% turnos.forEach((turno) => { %>
+                        <% const estadoClase = turno.estadoCodigo === 'atendido' ? 'bg-green-lt' : turno.estadoCodigo === 'cancelado' || turno.estadoCodigo === 'ausente' ? 'bg-red-lt' : 'bg-azure-lt'; %>
+                        <article class="appointment-row">
+                            <div class="appointment-date"><span><%= turno.fecha %></span><strong><%= turno.hora %></strong></div>
+                            <div class="appointment-info">
+                                <span class="avatar avatar-sm bg-cyan-lt text-cyan"><i data-lucide="flask-conical"></i></span>
+                                <div class="min-w-0">
+                                    <h3><%= turno.servicio %></h3>
+                                    <p><%= turno.codigo %><% if (turno.observacion) { %> · <%= turno.observacion %><% } %></p>
+                                </div>
+                            </div>
+                            <span class="badge <%= estadoClase %>"><%= turno.estado %></span>
+                        </article>
+                    <% }); %>
+                </div>
+            <% } %>
         </section>
     </main>
 
-    <footer class="site-footer">
-        <div class="page-container footer-inner">
-            <p>© 2026 Clínica San Francisco. Portal de turnos de laboratorio.</p>
-            <a href="/">Ir al inicio</a>
-        </div>
-    </footer>
+    <% if (puedeCrearTurno) { %>
+    <div class="modal modal-blur fade booking-modal" id="booking-modal" tabindex="-1" aria-hidden="true" data-auto-open="<%= abrirModal && paciente && hayServiciosDisponibles ? 'true' : 'false' %>">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <form class="modal-content" id="booking-form" novalidate>
+                <div class="modal-header">
+                    <div class="booking-modal-title">
+                        <span class="avatar bg-cyan-lt text-cyan"><i data-lucide="calendar-plus"></i></span>
+                        <div><p class="app-eyebrow">Nueva reserva</p><h2>Agenda tu turno</h2></div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
 
-    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script>lucide.createIcons();</script>
+                <div class="modal-body">
+                    <div class="patient-summary">
+                        <span class="avatar bg-white text-cyan"><i data-lucide="user-round"></i></span>
+                        <div class="patient-summary-copy">
+                            <small>Paciente</small>
+                            <strong><%= paciente ? paciente.nombres + ' ' + paciente.apellidos : 'Sin paciente asociado' %></strong>
+                            <% if (paciente) { %><small>CI <%= paciente.identificacion %></small><% } %>
+                        </div>
+                    </div>
+
+                    <fieldset class="booking-section">
+                        <legend><span class="booking-step">1</span>Tipo de examen</legend>
+                        <div class="exam-options">
+                            <% servicios.forEach((servicio) => { %>
+                                <label class="exam-option <%= servicio.disponible ? '' : 'exam-option-disabled' %>" <%= servicio.disponible ? '' : 'aria-disabled="true"' %>>
+                                    <input type="radio" name="id_servicio" value="<%= servicio.id_servicio %>" required <%= servicio.disponible ? '' : 'disabled' %>>
+                                    <span class="exam-option-content">
+                                        <span class="exam-icon"><i data-lucide="<%= servicio.icono %>"></i></span>
+                                        <span class="exam-copy"><strong><%= servicio.nombre %></strong><small><%= servicio.descripcion || 'Examen de laboratorio' %></small></span>
+                                        <span class="option-status">
+                                            <i data-lucide="<%= servicio.disponible ? 'circle-check' : 'circle-slash-2' %>"></i>
+                                            <% if (!servicio.disponible) { %><small>No disponible</small><% } %>
+                                        </span>
+                                    </span>
+                                </label>
+                            <% }); %>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="booking-section">
+                        <legend><span class="booking-step">2</span>Fecha y hora</legend>
+                        <div class="schedule-grid">
+                            <div>
+                                <label class="form-label" for="appointment-date">Fecha de atención</label>
+                                <input id="appointment-date" class="form-control" type="date" name="fecha_turno" min="<%= fechaMinima %>" max="<%= fechaMaxima %>" required>
+                            </div>
+                            <div class="slots-field">
+                                <div class="slots-heading"><span>Horarios disponibles</span><small>Hora local de Guayaquil</small></div>
+                                <div id="slots-state" class="slots-state"><i data-lucide="mouse-pointer-click"></i><span>Selecciona un examen y una fecha.</span></div>
+                                <div id="time-slots" class="time-slots" aria-live="polite"></div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="id_horario">
+                        <input type="hidden" name="hora_inicio">
+                    </fieldset>
+
+                    <div class="booking-notes">
+                        <label class="form-label" for="appointment-notes">Observación <span class="text-secondary fw-normal">(opcional)</span></label>
+                        <textarea id="appointment-notes" class="form-control" name="observacion" rows="2" maxlength="500" placeholder="Indica alguna consideración para el laboratorio"></textarea>
+                    </div>
+                    <div id="booking-error" class="alert alert-danger mt-3 mb-0" role="alert" hidden></div>
+                </div>
+
+                <div class="modal-footer">
+                    <p class="booking-validation-note"><i data-lucide="shield-check"></i>Tu cupo se valida nuevamente al confirmar.</p>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" disabled><i data-lucide="check"></i>Confirmar turno</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <% } %>
+
+    <%- include('../partials/footer') %>
+    <%- include('../partials/scripts', { scripts: ['/js/turnos.js'] }) %>
 </body>
 </html>

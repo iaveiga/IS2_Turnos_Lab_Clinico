@@ -1,0 +1,17 @@
+<% if (mensaje) { %>
+    <div class="alert alert-success alert-dismissible" role="status">
+        <div class="d-flex">
+            <div class="alert-icon"><i data-lucide="circle-check"></i></div>
+            <div><%= mensaje %></div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+<% } %>
+<% if (error) { %>
+    <div class="alert alert-danger" role="alert">
+        <div class="d-flex">
+            <div class="alert-icon"><i data-lucide="circle-alert"></i></div>
+            <div><%= error %></div>
+        </div>
+    </div>
+<% } %>
