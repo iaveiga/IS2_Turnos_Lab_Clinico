@@ -8,7 +8,9 @@
     "dev": "nodemon server.js",
     "seed": "node prisma/seed.js",
     "seed:patients": "node scripts/seed-demo-patients.js",
+    "seed:reports": "node scripts/seed-report-data.js",
     "sync:reception-permissions": "node scripts/sync-reception-permissions.js",
+    "sync:lab-permissions": "node scripts/sync-lab-permissions.js",
     "sync:patient-users": "node scripts/sync-patient-users.js",
     "check:ui": "node scripts/check-ui.js",
     "test": "echo \"Error: no test specified\" && exit 1"

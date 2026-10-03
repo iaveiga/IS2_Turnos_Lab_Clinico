@@ -21,7 +21,7 @@
             <div>
                 <p class="app-eyebrow">Portal de pacientes</p>
                 <h1>Mis turnos de laboratorio</h1>
-                <p>Consulta tus citas y reserva un horario disponible para tus exámenes.</p>
+                <p>Consulta tus citas, revisa tus resultados y reserva un horario disponible para tus exámenes.</p>
             </div>
             <% if (puedeCrearTurno) { %>
                 <button class="btn btn-primary" type="button" data-open-booking <%= !paciente || !hayServiciosDisponibles ? 'disabled' : '' %>>
@@ -43,15 +43,15 @@
         <section class="card appointments-card" aria-labelledby="appointments-title">
             <div class="card-header">
                 <div>
-                    <h2 class="card-title" id="appointments-title">Próximas citas</h2>
-                    <div class="text-secondary small mt-1"><%= turnos.length %> <%= turnos.length === 1 ? 'turno registrado' : 'turnos registrados' %></div>
+                    <h2 class="card-title" id="appointments-title">Citas y reservas</h2>
+                    <div class="text-secondary small mt-1"><%= turnos.length %> <%= turnos.length === 1 ? 'turno sin atender' : 'turnos sin atender' %></div>
                 </div>
             </div>
 
             <% if (turnos.length === 0) { %>
                 <div class="appointments-empty">
                     <span class="avatar bg-azure-lt text-azure"><i data-lucide="calendar-days"></i></span>
-                    <h3>No tienes turnos registrados</h3>
+                    <h3>No tienes citas pendientes</h3>
                     <p>Elige un tipo de examen, una fecha y uno de los horarios con cupo.</p>
                     <% if (puedeCrearTurno && paciente && hayServiciosDisponibles) { %>
                         <button class="btn btn-primary" type="button" data-open-booking><i data-lucide="plus"></i>Agendar mi primer turno</button>
@@ -71,6 +71,56 @@
                                 </div>
                             </div>
                             <span class="badge <%= estadoClase %>"><%= turno.estado %></span>
+                        </article>
+                    <% }); %>
+                </div>
+            <% } %>
+        </section>
+
+        <section class="card appointments-card exam-history-card" aria-labelledby="exam-history-title">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title" id="exam-history-title">Historial de exámenes</h2>
+                    <div class="text-secondary small mt-1"><%= historial.length %> <%= historial.length === 1 ? 'servicio atendido' : 'servicios atendidos' %></div>
+                </div>
+            </div>
+
+            <% if (historial.length === 0) { %>
+                <div class="appointments-empty exam-history-empty">
+                    <span class="avatar bg-teal-lt text-teal"><i data-lucide="clipboard-check"></i></span>
+                    <h3>Aún no tienes exámenes atendidos</h3>
+                    <p>Cuando finalice una atención, podrás consultar aquí el examen y su resultado publicado.</p>
+                </div>
+            <% } else { %>
+                <div class="exam-history-list">
+                    <% historial.forEach((turno) => { %>
+                        <article class="exam-history-row">
+                            <div class="appointment-date"><span><%= turno.fecha %></span><strong><%= turno.hora %></strong></div>
+                            <div class="appointment-info">
+                                <span class="avatar avatar-sm bg-teal-lt text-teal"><i data-lucide="microscope"></i></span>
+                                <div class="min-w-0">
+                                    <h3><%= turno.servicio %></h3>
+                                    <p><%= turno.codigo %> · <%= turno.servicioDescripcion %></p>
+                                </div>
+                            </div>
+                            <div class="exam-result-state">
+                                <% if (turno.resultado) { %>
+                                    <span class="badge bg-green-lt"><i data-lucide="circle-check"></i>Publicado</span>
+                                    <small><%= turno.resultado.fechaPublicacion %></small>
+                                <% } else { %>
+                                    <span class="badge bg-yellow-lt"><i data-lucide="clock-3"></i>Pendiente</span>
+                                    <small>En proceso de publicación</small>
+                                <% } %>
+                            </div>
+                            <% if (turno.resultado) { %>
+                                <button class="btn btn-outline-primary btn-sm exam-result-action" type="button" data-view-result="<%= turno.id %>">
+                                    <i data-lucide="file-search"></i>Ver resultado
+                                </button>
+                            <% } else { %>
+                                <button class="btn btn-outline-secondary btn-sm exam-result-action" type="button" disabled>
+                                    <i data-lucide="file-clock"></i>No disponible
+                                </button>
+                            <% } %>
                         </article>
                     <% }); %>
                 </div>
@@ -154,6 +204,101 @@
         </div>
     </div>
     <% } %>
+
+    <div class="modal modal-blur fade patient-result-modal" id="patient-result-modal" tabindex="-1" aria-hidden="true" aria-labelledby="patient-result-title">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="patient-result-heading">
+                        <span class="avatar bg-teal-lt text-teal"><i data-lucide="file-check-2"></i></span>
+                        <div>
+                            <p class="app-eyebrow">Resultado publicado</p>
+                            <h2 class="modal-title" id="patient-result-title">Resultado del examen</h2>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="patient-result-summary">
+                        <div><span>Servicio</span><strong data-result-service></strong></div>
+                        <div><span>Turno</span><strong data-result-code></strong></div>
+                        <div><span>Fecha de atención</span><strong data-result-date></strong></div>
+                    </div>
+                    <section class="patient-result-section" aria-labelledby="result-detail-title">
+                        <h3 id="result-detail-title">Detalle del resultado</h3>
+                        <div class="patient-result-text" data-result-text></div>
+                    </section>
+                    <section class="patient-result-section" data-result-observations-section aria-labelledby="result-observations-title">
+                        <h3 id="result-observations-title">Observaciones</h3>
+                        <div class="patient-result-text" data-result-observations></div>
+                    </section>
+                    <div class="patient-result-meta">
+                        <span><i data-lucide="user-round-check"></i><span data-result-technician></span></span>
+                        <span><i data-lucide="calendar-check-2"></i><span data-result-published></span></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" data-print-result><i data-lucide="printer"></i>Imprimir resultado</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <article class="patient-result-print" aria-label="Informe imprimible de resultado de laboratorio">
+        <header class="patient-result-print-header">
+            <div class="patient-result-print-brand">
+                <span class="patient-result-print-logo">CSF</span>
+                <div>
+                    <strong>Clínica San Francisco</strong>
+                    <span>Laboratorio clínico</span>
+                </div>
+            </div>
+            <div class="patient-result-print-title">
+                <strong>Informe de resultados</strong>
+                <span data-print-code></span>
+            </div>
+        </header>
+
+        <div class="patient-result-print-meta">
+            <span>Fecha de impresión</span>
+            <strong data-print-date></strong>
+        </div>
+
+        <section class="patient-result-print-section">
+            <h2>Información del paciente</h2>
+            <dl class="patient-result-print-grid">
+                <div><dt>Paciente</dt><dd data-print-patient></dd></div>
+                <div><dt>Identificación</dt><dd data-print-identification></dd></div>
+                <div><dt>Edad</dt><dd data-print-age></dd></div>
+                <div><dt>Sexo</dt><dd data-print-sex></dd></div>
+            </dl>
+        </section>
+
+        <section class="patient-result-print-section">
+            <h2>Información del servicio</h2>
+            <dl class="patient-result-print-grid">
+                <div><dt>Servicio o examen</dt><dd data-print-service></dd></div>
+                <div><dt>Fecha del servicio</dt><dd data-print-service-date></dd></div>
+            </dl>
+        </section>
+
+        <section class="patient-result-print-section">
+            <h2>Resultado</h2>
+            <div class="patient-result-print-content" data-print-result-text></div>
+        </section>
+
+        <section class="patient-result-print-section">
+            <h2>Comentarios u observaciones</h2>
+            <div class="patient-result-print-content" data-print-observations></div>
+        </section>
+
+        <footer class="patient-result-print-footer">
+            <div><span>Responsable del resultado</span><strong data-print-technician></strong></div>
+            <div><span>Fecha de publicación</span><strong data-print-published></strong></div>
+        </footer>
+    </article>
+    <script id="patient-results-data" type="application/json"><%- resultadosJson %></script>
 
     <%- include('../partials/footer') %>
     <%- include('../partials/scripts', { scripts: ['/js/turnos.js'] }) %>

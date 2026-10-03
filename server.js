@@ -41,14 +41,14 @@ app.get('/login', (req, res) => res.redirect('/auth/login'));
 app.get('/registro', (req, res) => res.redirect('/auth/registro'));
 
 // 3. Montar las rutas del sistema
-  app.use('/', require('./routes/indexRoutes'));
+app.use('/', require('./routes/indexRoutes'));
 app.use('/auth', require('./routes/authRoutes'));
 app.use('/turnos', require('./routes/turnoRoutes'));
-app.use('/admin', require('./routes/servicioRoutes'));
+app.use('/servicios', require('./routes/servicioRoutes'));
 app.use('/pacientes', require('./routes/pacienteRoutes'));
 app.use('/recepcion', require('./routes/recepcionRoutes'));
+app.use('/laboratorio', require('./routes/laboratorioRoutes'));
 app.use('/admin', require('./routes/adminRoutes'));
-app.use('/reportes', require('./routes/reporteRoutes'));
 
 
 // 4. Verificar la base de datos antes de iniciar el servidor

@@ -9,7 +9,7 @@ datasource db {
 
 model atencion {
   id_atencion           Int       @id @default(autoincrement())
-  id_turno              Int?
+  id_turno              Int?      @unique
   id_tecnico            Int?
   fecha_hora_inicio     DateTime? @db.Timestamp(6)
   fecha_hora_fin        DateTime? @db.Timestamp(6)
@@ -154,7 +154,7 @@ model turno {
   hora_fin           DateTime          @db.Time(6)
   fecha_creacion     DateTime?         @default(now()) @db.Timestamp(6)
   observacion        String?           @db.VarChar
-  atencion           atencion[]
+  atencion           atencion?
   historial_turno    historial_turno[]
   estado_turno       estado_turno?     @relation(fields: [id_estado], references: [id_estado], onDelete: Restrict, onUpdate: NoAction)
   horario_servicio   horario_servicio? @relation(fields: [id_horario], references: [id_horario], onDelete: Restrict, onUpdate: NoAction)
